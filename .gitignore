@@ -1,0 +1,9 @@
+node_modules/
+.DS_Store
+
+# build helper (regenerated when making the link-preview image)
+tools/og.bundle.js
+
+# kept locally, not published: the old v1 design and full-resolution personal photos
+archive/
+photos/

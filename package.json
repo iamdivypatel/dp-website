@@ -1,0 +1,26 @@
+{
+  "name": "divya-patel-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Portfolio of Divya Patel, Backend & Cloud Engineer. Static site: HTML + Tailwind CSS + vanilla JavaScript.",
+  "type": "module",
+  "scripts": {
+    "build": "npm run build:css && npm run build:js && npm run csp",
+    "build:css": "tailwindcss -i ./src/input.css -o ./public/assets/css/styles.css --minify",
+    "build:js": "node scripts/clean-js.mjs && esbuild src/js/main.js --bundle --format=esm --splitting --minify --target=es2020 --outdir=public/assets/js --chunk-names=chunks/[name]-[hash] --legal-comments=none",
+    "csp": "node scripts/csp-hash.mjs",
+    "dev": "npm run build && (npm run build:css -- --watch & npx esbuild src/js/main.js --bundle --format=esm --splitting --target=es2020 --outdir=public/assets/js --chunk-names=chunks/[name]-[hash] --watch & wait)",
+    "serve": "python3 -m http.server 5173 --directory public",
+    "set-domain": "node scripts/set-domain.mjs"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.5",
+    "esbuild": "^0.28.2",
+    "tailwindcss": "^4.3.5"
+  },
+  "dependencies": {
+    "gsap": "^3.15.1",
+    "lenis": "^1.3.27",
+    "three": "^0.187.0"
+  }
+}
