@@ -1,121 +1,20 @@
-// Divya Patel portfolio: motion, 3D stage and contact form.
+// Divya Patel portfolio, home page: hero, 3D stage, "How I build" story, projects and contact form.
 // Every effect is an enhancement: with JavaScript off, or "reduce motion" on,
 // the page is a calm, fully readable single page.
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
-import Lenis from 'lenis';
+import {
+  html, $, $$, media, lenis, paused, pausables,
+  startLenis, stopLenis, scrollToTarget, initShell, initCursor, initMotionToggle, splitTitles, riseWordmark,
+} from './shell.js';
 
-gsap.registerPlugin(ScrollTrigger, SplitText);
-
-const html = document.documentElement;
-const $ = (sel, root = document) => root.querySelector(sel);
-const $$ = (sel, root = document) => gsap.utils.toArray(sel, root);
-const media = {
-  reduce: window.matchMedia('(prefers-reduced-motion: reduce)'),
-  fine: window.matchMedia('(hover: hover) and (pointer: fine)'),
-  desktop: window.matchMedia('(min-width: 1024px)'),
-};
 const FORM_ENDPOINT = 'https://formsubmit.co/ajax/iamdivypatel@gmail.com';
 
-let lenis = null;
 let stage = null;
 let stageSync = () => {}; // set once the motion setup runs
-let paused = false;
-const pausables = new Set(); // tweens and loops the pause button controls
 
-/* ---------------- Smooth scrolling (Lenis drives ScrollTrigger) ---------------- */
-
-const tick = (time) => lenis?.raf(time * 1000);
-function startLenis() {
-  lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
-  lenis.on('scroll', ScrollTrigger.update);
-  gsap.ticker.add(tick);
-  gsap.ticker.lagSmoothing(0);
-}
-function stopLenis() {
-  gsap.ticker.remove(tick);
-  lenis?.destroy();
-  lenis = null;
-}
-
-function scrollToTarget(target, immediate = false) {
-  const el = typeof target === 'string' ? $(target) : target;
-  if (!el) return;
-  const offset = el.id === 'top' ? 0 : -(parseFloat(getComputedStyle(html).scrollPaddingTop) || 80);
-  if (lenis) lenis.scrollTo(el, { offset, immediate, duration: 1.4 });
-  else el.scrollIntoView({ behavior: immediate || media.reduce.matches ? 'auto' : 'smooth' });
-}
-
-// In-page links go through Lenis so they glide, and move focus for keyboard users.
-document.addEventListener('click', (e) => {
-  const a = e.target.closest('a[href^="#"]');
-  if (!a) return;
-  const id = a.getAttribute('href');
-  const el = id.length > 1 ? $(id) : null;
-  if (!el) return;
-  e.preventDefault();
-  closeMenu();
-  scrollToTarget(el);
-  if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
-  el.focus({ preventScroll: true });
-  history.pushState(null, '', id);
-});
-
-/* ---------------- Header: scrolled state, hide on scroll down, progress, current section ---------------- */
-
-const header = $('.site-header');
-ScrollTrigger.create({
-  start: 0,
-  end: 'max',
-  onUpdate(self) {
-    const y = self.scroll();
-    header.classList.toggle('is-scrolled', y > 24);
-    header.classList.toggle('is-hidden', self.direction === 1 && y > 600 && !menuOpen());
-  },
-});
-gsap.to('.progress i', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: true } });
-
-const navLinks = $$('.nav a');
-for (const a of navLinks) {
-  const section = $(a.getAttribute('href'));
-  if (!section) continue;
-  ScrollTrigger.create({
-    trigger: section,
-    start: 'top 50%',
-    end: 'bottom 50%',
-    onToggle: (self) => (self.isActive ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')),
-  });
-}
-
-/* ---------------- Mobile menu ---------------- */
-
-const menuButton = $('.menu-toggle');
-const menu = $('#menu');
-const menuOpen = () => menu && !menu.hidden;
-function openMenu() {
-  menu.hidden = false;
-  menuButton.setAttribute('aria-expanded', 'true');
-  menuButton.setAttribute('aria-label', 'Close menu');
-  lenis?.stop();
-  if (!media.reduce.matches) gsap.from('#menu nav a', { yPercent: 60, opacity: 0, stagger: 0.05, duration: 0.6, ease: 'power3.out' });
-  $('#menu nav a')?.focus();
-}
-function closeMenu() {
-  if (!menuOpen()) return;
-  menu.hidden = true;
-  menuButton.setAttribute('aria-expanded', 'false');
-  menuButton.setAttribute('aria-label', 'Open menu');
-  lenis?.start();
-}
-menuButton?.addEventListener('click', () => (menuOpen() ? closeMenu() : openMenu()));
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && menuOpen()) {
-    closeMenu();
-    menuButton.focus();
-  }
-});
-media.desktop.addEventListener('change', () => media.desktop.matches && closeMenu());
+initShell();
 
 /* ---------------- Hero name: split into letters that respond to the cursor ---------------- */
 
@@ -193,17 +92,7 @@ mm.add(
     if (motion) startLenis();
 
     // Section titles: lines slide up from a mask.
-    for (const el of $$('[data-split]')) {
-      if (!motion) break;
-      SplitText.create(el, {
-        type: 'lines',
-        mask: 'lines',
-        linesClass: 'split-line',
-        autoSplit: true,
-        onSplit: (self) =>
-          gsap.from(self.lines, { yPercent: 105, duration: 1, stagger: 0.09, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 86%' } }),
-      });
-    }
+    if (motion) splitTitles();
 
     // About: words brighten as you read down the paragraph.
     const words = $('[data-reveal-words]');
@@ -361,9 +250,7 @@ mm.add(
     }
 
     // Footer wordmark rises into place.
-    if (motion) {
-      gsap.from('.wordmark', { yPercent: 45, opacity: 0, ease: 'none', scrollTrigger: { trigger: '.footer', start: 'top 85%', end: 'bottom bottom', scrub: true } });
-    }
+    if (motion) riseWordmark();
 
     // Hero letters swell toward the cursor (variable font weight + width).
     if (motion && fine) {
@@ -432,68 +319,6 @@ mm.add(
   },
 );
 
-/* ---------------- Custom cursor ---------------- */
-
-function initCursor() {
-  const cursor = $('.cursor');
-  const dot = $('.cursor__dot');
-  const ring = $('.cursor__ring');
-  const label = $('.cursor__label');
-  html.classList.add('has-cursor');
-  const dx = gsap.quickTo(dot, 'x', { duration: 0.08, ease: 'power3' });
-  const dy = gsap.quickTo(dot, 'y', { duration: 0.08, ease: 'power3' });
-  const rx = gsap.quickTo(ring, 'x', { duration: 0.45, ease: 'power3' });
-  const ry = gsap.quickTo(ring, 'y', { duration: 0.45, ease: 'power3' });
-  const move = (e) => {
-    dx(e.clientX); dy(e.clientY); rx(e.clientX); ry(e.clientY);
-    const t = e.target instanceof Element ? e.target : null;
-    const labelled = t?.closest('[data-cursor]');
-    const field = t?.closest('input, textarea, select');
-    const interactive = t?.closest('a, button, label, summary');
-    cursor.classList.toggle('is-hidden', Boolean(field));
-    cursor.classList.toggle('is-label', Boolean(labelled) && !interactive);
-    cursor.classList.toggle('is-link', Boolean(interactive));
-    label.textContent = labelled && !interactive ? labelled.dataset.cursor : '';
-  };
-  const hide = () => cursor.classList.add('is-hidden');
-  window.addEventListener('pointermove', move, { passive: true });
-  document.documentElement.addEventListener('pointerleave', hide);
-
-  // Magnetic buttons pull toward the pointer.
-  const magnets = $$('.magnetic').map((el) => {
-    const x = gsap.quickTo(el, 'x', { duration: 0.6, ease: 'elastic.out(1, 0.4)' });
-    const y = gsap.quickTo(el, 'y', { duration: 0.6, ease: 'elastic.out(1, 0.4)' });
-    let r = null;
-    const enter = () => (r = el.getBoundingClientRect());
-    const over = (e) => {
-      if (!r) r = el.getBoundingClientRect();
-      x((e.clientX - r.left - r.width / 2) * 0.3);
-      y((e.clientY - r.top - r.height / 2) * 0.3);
-    };
-    const leave = () => {
-      r = null;
-      x(0);
-      y(0);
-    };
-    el.addEventListener('pointerenter', enter);
-    el.addEventListener('pointermove', over);
-    el.addEventListener('pointerleave', leave);
-    return () => {
-      el.removeEventListener('pointerenter', enter);
-      el.removeEventListener('pointermove', over);
-      el.removeEventListener('pointerleave', leave);
-      gsap.set(el, { clearProps: 'transform' });
-    };
-  });
-
-  return () => {
-    window.removeEventListener('pointermove', move);
-    document.documentElement.removeEventListener('pointerleave', hide);
-    magnets.forEach((fn) => fn());
-    html.classList.remove('has-cursor');
-  };
-}
-
 /* ---------------- Intro: curtain, then the hero assembles ---------------- */
 
 function heroIntro() {
@@ -536,42 +361,6 @@ function runIntro() {
       .to(loader, { yPercent: -100, duration: 0.9, ease: 'expo.inOut' }, '+=0.1')
       .add(heroIntro(), '-=0.45');
   });
-}
-
-/* ---------------- Pause control for everything that moves on its own ---------------- */
-
-function initMotionToggle() {
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'motion-toggle';
-  const render = () => {
-    const text = paused ? 'Play motion' : 'Pause motion';
-    button.setAttribute('aria-pressed', String(paused));
-    button.setAttribute('aria-label', text);
-    button.title = text;
-    button.innerHTML = paused
-      ? `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5v14l11-7z"/></svg><span>${text}</span>`
-      : `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg><span>${text}</span>`;
-  };
-  const apply = () => {
-    html.classList.toggle('is-paused', paused);
-    pausables.forEach((t) => (paused ? t.pause() : t.resume()));
-    stage?.setPaused(paused);
-    setRotator(!media.reduce.matches);
-    render();
-  };
-  try {
-    paused = localStorage.getItem('dp-motion') === 'paused';
-  } catch {}
-  button.addEventListener('click', () => {
-    paused = !paused;
-    try {
-      localStorage.setItem('dp-motion', paused ? 'paused' : 'on');
-    } catch {}
-    apply();
-  });
-  document.body.append(button);
-  apply();
 }
 
 /* ---------------- 3D stage (loaded after the intro so it never delays first paint) ---------------- */
@@ -631,9 +420,6 @@ function updateTime() {
 updateTime();
 setInterval(() => !paused && updateTime(), 30000);
 document.addEventListener('visibilitychange', () => !document.hidden && updateTime());
-
-const yearEl = $('[data-current-year]');
-if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
 const form = $('[data-contact-form]');
 if (form) initForm(form);
@@ -715,7 +501,10 @@ function initForm(form) {
 
 /* ---------------- Start ---------------- */
 
-initMotionToggle();
+initMotionToggle(() => {
+  stage?.setPaused(paused);
+  setRotator(!media.reduce.matches);
+});
 document.fonts?.ready.then(() => ScrollTrigger.refresh());
 runIntro().then(() => {
   if (location.hash && $(location.hash)) scrollToTarget(location.hash, true);

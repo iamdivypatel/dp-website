@@ -17,6 +17,14 @@ A one-page, dark, cinematic portfolio for Divya Patel, Backend & Cloud Engineer.
 - **Skills, education and contact:** the contact form emails you.
 - **Footer:** a giant wordmark.
 
+## The Industries page (`/industries/`)
+
+- **Six cards, one per industry from the CV:** fashion & AI (OKKAI at Refy9), golf training, carbon credits, ad-tech, EV lifecycle and fuel monitoring (the Blisslers client products).
+- **Each card** has its own colour and an animated illustration of what you built there (a wardrobe filling up, a golf shot that becomes a session update, a carbon certificate being verified, a New Tab page with its analytics, a vehicle moving through five roles, dispenser data streaming over MQTT). Below it come the product, what you built and the stack.
+- **On desktop** each illustration tilts toward the cursor, and its chips float in front of it. Illustrations only animate while they're on screen; the pause button and "reduce motion" stop them.
+- **"Different industries, same problems."** lists the backend problems you solved in more than one industry, with the industries tagged.
+- It's linked from the header, the mobile menu, the Projects heading and the footer.
+
 **The text matches the CV** in `public/assets/cv/` (every download button serves the India CV). When the CV changes, update `public/index.html` to match.
 
 ## Run locally
@@ -37,7 +45,10 @@ npm run dev        # rebuild on every save (run `npm run serve` in a second term
 | `public/` | The website. Deploy this folder only. |
 | `public/index.html` | All the page text and meta tags. |
 | `src/input.css` | Design tokens and component styles (Tailwind v4). |
-| `src/js/main.js` | Motion, smooth scrolling, cursor, form. |
+| `public/industries/index.html` | The Industries page. |
+| `src/js/shell.js` | Shared by both pages: smooth scrolling, header, menu, cursor, pause button. |
+| `src/js/main.js` | Home page: hero, 3D stage, story, projects, form. |
+| `src/js/industries.js` | Industries page: card reveals, live illustrations, tilt. |
 | `src/js/scene.js` | The 3D model: node labels and links live in the `NODES` and `LINKS` lists at the top. |
 | `public/assets/css`, `public/assets/js` | Build output. Don't edit these by hand. |
 | `scripts/` | `set-domain` (absolute URLs), `csp-hash` (security policy), `clean-js`. |
@@ -87,11 +98,11 @@ python3 tools/looks.py photo.png mask.png public/assets/img photos
 npm run set-domain -- https://your-domain.com
 ```
 
-This writes your address into the canonical link, the Open Graph tags, the structured data, `robots.txt` and `sitemap.xml`.
+This writes your address into the canonical links, the Open Graph tags and the structured data of both pages, plus `robots.txt` and `sitemap.xml`.
 
 ## Deploy
 
-**Live site:** https://dp-website-self.vercel.app (Vercel, deployed from the `main` branch of github.com/iamdivypatel/dp-website).
+**Live site:** https://divypatel.in (Vercel, deployed from the `main` branch of github.com/iamdivypatel/dp-website). The domain is connected in Vercel under **Settings → Domains**.
 
 - **Vercel:** every push to `main` redeploys.
   - Vercel runs `npm run build` and serves the `public/` folder.
@@ -99,7 +110,7 @@ This writes your address into the canonical link, the Open Graph tags, the struc
 - **Other hosts:**
   - Netlify and Cloudflare read `public/_headers` instead.
   - Build command: `npm run build`. Output folder: `public`.
-- **Security policy:** `npm run build` recomputes the hash of the one inline script in `index.html`. If you edit that script, also update the `sha256-…` value in `vercel.json`.
+- **Security policy:** `npm run build` recomputes the hashes of the inline scripts in both pages and writes them into the pages, `public/_headers` and `vercel.json`.
 
 ## Regenerate the link-preview image
 

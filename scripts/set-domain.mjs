@@ -26,19 +26,25 @@ const files = {
     /"@type": "ProfilePage",\s*"url": "([^"]*?)\/"/,
     /"image": "([^"]*?)\/assets\/img\/portrait-coder\.webp"/,
   ],
+  'public/industries/index.html': [
+    /<link rel="canonical" href="([^"]*?)\/industries\/">/,
+    /<meta property="og:url" content="([^"]*?)\/industries\/">/,
+    /<meta property="og:image" content="([^"]*?)\/assets\/img\/og-image\.jpg">/,
+  ],
   'public/robots.txt': [/Sitemap: (\S*?)\/sitemap\.xml/],
-  'public/sitemap.xml': [/<loc>([^<]*?)\/<\/loc>/],
+  'public/sitemap.xml': [/<loc>([^<]*?)\/(?:industries\/)?<\/loc>/g],
 };
 
 for (const [file, patterns] of Object.entries(files)) {
   let text = readFileSync(file, 'utf8');
   for (const pattern of patterns) {
-    const match = text.match(pattern);
-    if (!match) {
+    // A /g pattern updates every match (the sitemap lists one URL per page); the others update one.
+    const matches = pattern.global ? [...text.matchAll(pattern)] : [text.match(pattern)].filter(Boolean);
+    if (!matches.length) {
       console.error(`Could not find ${pattern} in ${file}. Was the markup changed?`);
       process.exit(1);
     }
-    text = text.replace(match[0], match[0].replace(match[1], base));
+    for (const match of matches) text = text.replace(match[0], match[0].replace(match[1], base));
   }
   writeFileSync(file, text);
   console.log(`${file}: now uses ${base}/`);

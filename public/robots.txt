@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://dp-website-self.vercel.app/sitemap.xml
+Sitemap: https://divypatel.in/sitemap.xml
