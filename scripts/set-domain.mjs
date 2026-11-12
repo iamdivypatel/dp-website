@@ -1,6 +1,6 @@
 // Point every absolute URL on the site at your real address.
-// Usage: npm run set-domain -- https://divyapatel.dev
-//        npm run set-domain -- https://USERNAME.github.io/REPO   (GitHub Pages project site)
+// Usage: npm run set-domain -- https://divypatel.in   (then npm run build)
+// The site must be served from the root of a domain: pages load /assets/… and use /about-style addresses.
 //
 // Link previews (LinkedIn, WhatsApp, Slack) and search engines need absolute URLs,
 // so the canonical link, Open Graph tags, structured data, robots.txt and the
@@ -26,13 +26,8 @@ const files = {
     /"@type": "ProfilePage",\s*"url": "([^"]*?)\/"/,
     /"image": "([^"]*?)\/assets\/img\/portrait-coder\.webp"/,
   ],
-  'public/industries/index.html': [
-    /<link rel="canonical" href="([^"]*?)\/industries\/">/,
-    /<meta property="og:url" content="([^"]*?)\/industries\/">/,
-    /<meta property="og:image" content="([^"]*?)\/assets\/img\/og-image\.jpg">/,
-  ],
   'public/robots.txt': [/Sitemap: (\S*?)\/sitemap\.xml/],
-  'public/sitemap.xml': [/<loc>([^<]*?)\/(?:industries\/)?<\/loc>/g],
+  // sitemap.xml and the section pages (/about, /journey…) are rebuilt from index.html by `npm run build`.
 };
 
 for (const [file, patterns] of Object.entries(files)) {
@@ -49,3 +44,4 @@ for (const [file, patterns] of Object.entries(files)) {
   writeFileSync(file, text);
   console.log(`${file}: now uses ${base}/`);
 }
+console.log('Now run `npm run build` to rebuild the section pages and sitemap.xml.');

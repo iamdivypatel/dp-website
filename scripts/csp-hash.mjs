@@ -4,7 +4,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
-const pages = ['public/index.html', 'public/industries/index.html'];
+const pages = ['public/index.html']; // the section pages are copies of it (scripts/sections.mjs)
 const hashes = new Set();
 for (const page of pages) {
   const scripts = [...readFileSync(page, 'utf8').matchAll(/<script>([\s\S]*?)<\/script>/g)];

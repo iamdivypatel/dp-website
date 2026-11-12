@@ -1,5 +1,5 @@
-// Shared by every page: smooth scrolling, the header, the mobile menu, title reveals,
-// the custom cursor and the pause control.
+// The page shell: smooth scrolling, the header, the mobile menu, title reveals,
+// the custom cursor and the pause control. main.js adds the sections on top.
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
@@ -38,8 +38,8 @@ export function stopLenis() {
 export function scrollToTarget(target, immediate = false) {
   const el = typeof target === 'string' ? $(target) : target;
   if (!el) return;
-  const offset = el.id === 'top' ? 0 : -(parseFloat(getComputedStyle(html).scrollPaddingTop) || 80);
-  if (lenis) lenis.scrollTo(el, { offset, immediate, duration: 1.4 });
+  // Lenis and the browser both leave room for the fixed header (html's scroll-padding-top).
+  if (lenis) lenis.scrollTo(el, { immediate, duration: 1.4 });
   else el.scrollIntoView({ behavior: immediate || media.reduce.matches ? 'auto' : 'smooth' });
 }
 
@@ -56,7 +56,7 @@ function openMenu() {
   if (!media.reduce.matches) gsap.from('#menu nav a', { yPercent: 60, opacity: 0, stagger: 0.05, duration: 0.6, ease: 'power3.out' });
   $('#menu nav a')?.focus();
 }
-function closeMenu() {
+export function closeMenu() {
   if (!menuOpen()) return;
   menu.hidden = true;
   menuButton.setAttribute('aria-expanded', 'false');
@@ -94,18 +94,6 @@ export function initShell() {
     },
   });
   gsap.to('.progress i', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: true } });
-
-  // The nav marks the section you're reading. Links to other pages are skipped.
-  for (const a of $$('.nav a[href^="#"]')) {
-    const section = $(a.getAttribute('href'));
-    if (!section) continue;
-    ScrollTrigger.create({
-      trigger: section,
-      start: 'top 50%',
-      end: 'bottom 50%',
-      onToggle: (self) => (self.isActive ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')),
-    });
-  }
 
   menuButton?.addEventListener('click', () => (menuOpen() ? closeMenu() : openMenu()));
   document.addEventListener('keydown', (e) => {

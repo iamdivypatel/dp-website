@@ -12,29 +12,30 @@ const DIM = new THREE.Color(0x2a3345);
 
 // layer: 0 edge & auth, 1 compute, 2 data, 3 async, 4 ops & AI. steps: which story cards light it up.
 // logos: files in assets/logos (official AWS Architecture Icons, Simple Icons brand marks, three plain glyphs).
+// hero: label shown in the hero on wide screens, so the model reads as an architecture diagram.
 const NODES = [
   { id: 'clients', label: 'Mobile & web apps', p: [-6.7, 0], s: [1.3, 0.5, 2.2], layer: 0, steps: [0], logos: ['devices'] },
   { id: 'google', label: 'Google APIs · Gmail, Calendar', p: [-6.7, -2.7], s: [1.1, 0.45, 1.1], layer: 0, steps: [0], logos: ['gmail', 'googlecalendar'] },
   { id: 'cicd', label: 'GitHub Actions CI/CD', p: [-6.7, -5.0], s: [1.1, 0.4, 1.1], layer: 1, steps: [1], logos: ['githubactions'] },
-  { id: 'apigw', label: 'API Gateway · REST + WebSocket', p: [-4.1, 0], s: [1.5, 0.9, 1.5], layer: 0, steps: [0, 4], logos: ['aws-api-gateway'] },
+  { id: 'apigw', label: 'API Gateway · REST + WebSocket', p: [-4.1, 0], s: [1.5, 0.9, 1.5], layer: 0, steps: [0, 4], logos: ['aws-api-gateway'], hero: true },
   { id: 'auth', label: 'Lambda authorizer · JWT + Google OAuth', p: [-4.1, -2.7], s: [1.0, 0.55, 1.0], layer: 0, steps: [0, 3], logos: ['jsonwebtokens', 'google'] },
   { id: 'community', label: 'Communities · WebSocket chat', p: [-4.1, 2.9], s: [1.1, 0.6, 1.1], layer: 0, steps: [4], logos: ['chat'] },
-  { id: 'api', label: 'Core API · Node.js + TypeScript', p: [-1.3, 0], s: [1.7, 1.25, 1.7], layer: 1, steps: [0, 1, 2, 3], logos: ['nodedotjs', 'typescript'] },
-  { id: 'lambdas', label: '45+ Lambda functions', p: [-1.3, -3.1], s: [2.6, 0.22, 1.5], layer: 1, steps: [1], cluster: true, logos: ['aws-lambda'] },
-  { id: 'redis', label: 'Redis · L0 / L1 / L2 caching', p: [-1.3, -1.65], s: [1.1, 0.5, 0.75], layer: 2, steps: [2], logos: ['redis'] },
+  { id: 'api', label: 'Core API · Node.js + TypeScript', p: [-1.3, 0], s: [1.7, 1.25, 1.7], layer: 1, steps: [0, 1, 2, 3], logos: ['nodedotjs', 'typescript'], hero: true },
+  { id: 'lambdas', label: '45+ Lambda functions', p: [-1.3, -3.1], s: [2.6, 0.22, 1.5], layer: 1, steps: [1], cluster: true, logos: ['aws-lambda'], hero: true },
+  { id: 'redis', label: 'Redis cache', p: [-1.3, -1.6], s: [1.4, 0.62, 0.95], layer: 2, steps: [2], logos: ['redis'], hero: true, tint: 0xff4438 },
   { id: 'sqs', label: 'SQS FIFO queues', p: [-1.3, 2.9], s: [2.0, 0.35, 0.8], layer: 3, steps: [4], logos: ['aws-sqs'] },
   { id: 'pgb', label: 'PgBouncer · shared pool', p: [1.4, 0], s: [1.0, 0.7, 1.0], layer: 2, steps: [1, 2], logos: ['pool'] },
   { id: 'notify', label: 'Notifications · FCM + WhatsApp OTP', p: [1.4, 2.9], s: [1.3, 0.8, 1.3], layer: 3, steps: [4], logos: ['firebase', 'whatsapp'] },
   { id: 'events', label: 'EventBridge scheduling', p: [1.4, 5.1], s: [1.0, 0.45, 1.0], layer: 3, steps: [4], logos: ['aws-eventbridge'] },
   { id: 'ec2', label: 'EC2 · AI team services', p: [1.4, -3.1], s: [1.2, 0.9, 1.2], layer: 4, steps: [5], logos: ['aws-ec2', 'docker'] },
-  { id: 'aurora', label: 'Aurora PostgreSQL · private', p: [4.1, 0], s: [1.6, 1.6, 1.6], layer: 2, steps: [1, 2, 3], logos: ['aws-aurora'] },
+  { id: 'aurora', label: 'Aurora PostgreSQL · private', p: [4.1, 0], s: [1.6, 1.6, 1.6], layer: 2, steps: [1, 2, 3], logos: ['aws-aurora'], hero: true },
   { id: 'bastion', label: 'SSM bastion', p: [4.1, 2.7], s: [0.9, 0.45, 0.9], layer: 2, steps: [3], logos: ['aws-systems-manager'] },
-  { id: 'grafana', label: 'Grafana · Prometheus + Loki', p: [4.1, -3.1], s: [1.2, 0.6, 1.2], layer: 4, steps: [5], logos: ['grafana', 'prometheus'] },
-  { id: 'gpu', label: 'RunPod GPU · Gemma on vLLM', p: [6.8, -3.1], s: [1.3, 1.0, 1.3], layer: 4, steps: [5], logos: ['vllm'] },
+  { id: 'grafana', label: 'Grafana · Prometheus + Loki', p: [4.1, -3.1], s: [1.2, 0.6, 1.2], layer: 4, steps: [5], logos: ['grafana', 'prometheus'], hero: true },
+  { id: 'gpu', label: 'RunPod GPU · Gemma on vLLM', p: [6.8, -3.1], s: [1.3, 1.0, 1.3], layer: 4, steps: [5], logos: ['vllm'], hero: true },
 ];
 const LINKS = [
   ['clients', 'apigw', [0]], ['apigw', 'auth', [0, 3]], ['auth', 'google', [0]], ['apigw', 'api', [0, 1]],
-  ['cicd', 'lambdas', [1]], ['api', 'redis', [2]], ['api', 'pgb', [1, 2]], ['pgb', 'aurora', [1, 2, 3]], ['bastion', 'aurora', [3]],
+  ['cicd', 'lambdas', [1]], ['api', 'redis', [2], 0xff4438], ['redis', 'api', [2], 0xff4438], ['api', 'pgb', [1, 2]], ['pgb', 'aurora', [1, 2, 3]], ['bastion', 'aurora', [3]],
   ['api', 'sqs', [4]], ['apigw', 'community', [4]], ['community', 'sqs', [4]], ['sqs', 'notify', [4]],
   ['events', 'notify', [4]], ['ec2', 'grafana', [5]], ['ec2', 'gpu', [5]],
 ];
@@ -53,7 +54,7 @@ export function webglAvailable() {
   }
 }
 
-export async function createStage({ canvas, labelsEl, reducedMotion, onLost, logoBase = 'assets/logos/' }) {
+export async function createStage({ canvas, labelsEl, reducedMotion, onLost, logoBase = '/assets/logos/' }) {
   const small = window.matchMedia('(max-width: 767px)').matches;
   const weak = (navigator.hardwareConcurrency || 8) <= 4;
 
@@ -123,7 +124,7 @@ export async function createStage({ canvas, labelsEl, reducedMotion, onLost, log
     const keyStr = def.s.join('x');
     if (!boxGeoCache.has(keyStr)) boxGeoCache.set(keyStr, new RoundedBoxGeometry(w, h, d, 3, Math.min(0.1, h * 0.3)));
     const mat = new THREE.MeshStandardMaterial({
-      color: 0x1b2130, roughness: 0.38, metalness: 0.55, emissive: 0x4d8dff, emissiveIntensity: 0,
+      color: 0x1b2130, roughness: 0.38, metalness: 0.55, emissive: def.tint ?? 0x4d8dff, emissiveIntensity: 0,
       visible: !def.cluster,
     });
     const mesh = new THREE.Mesh(boxGeoCache.get(keyStr), mat);
@@ -201,10 +202,10 @@ export async function createStage({ canvas, labelsEl, reducedMotion, onLost, log
   const cellColor = new THREE.Color();
 
   /* ---------- Links and packets ---------- */
-  const links = LINKS.map(([a, b, steps]) => ({
-    a: byId[a], b: byId[b], steps,
+  const links = LINKS.map(([a, b, steps, tint]) => ({
+    a: byId[a], b: byId[b], steps, tint: tint === undefined ? null : new THREE.Color(tint),
     curve: new THREE.CatmullRomCurve3([new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()]),
-    speed: 0.16 + Math.random() * 0.12,
+    speed: tint === undefined ? 0.16 + Math.random() * 0.12 : 0.42, // cache round trips are quick
   }));
   const linePos = new Float32Array(links.length * SEG * 2 * 3);
   const lineCol = new Float32Array(links.length * SEG * 2 * 3);
@@ -249,6 +250,11 @@ export async function createStage({ canvas, labelsEl, reducedMotion, onLost, log
     } catch {
       bloom = null;
     }
+  }
+
+  // In the hero, wide screens label the main parts; phones keep the model clean under the copy.
+  function heroLabels() {
+    return state.mode === 'hero' && state.w >= 1024 && state.h >= 600;
   }
 
   function isLit(steps) {
@@ -315,14 +321,15 @@ export async function createStage({ canvas, labelsEl, reducedMotion, onLost, log
     let k = 0;
     for (const L of links) {
       const lit = isLit(L.steps);
-      const col = lit ? (state.mode === 'hero' ? _c.copy(GLOW).multiplyScalar(0.55) : _c.copy(GLOW).multiplyScalar(1.6)) : _c.copy(DIM);
+      const base = L.tint || GLOW;
+      const col = lit ? (state.mode === 'hero' ? _c.copy(base).multiplyScalar(0.55) : _c.copy(base).multiplyScalar(1.6)) : _c.copy(DIM);
       for (let s = 0; s < SEG * 2; s++, k += 3) { lineCol[k] = col.r; lineCol[k + 1] = col.g; lineCol[k + 2] = col.b; }
     }
     lineGeo.attributes.color.needsUpdate = true;
     let i = 0;
     for (const L of links) {
       const lit = isLit(L.steps);
-      const col = lit ? _c.copy(GLOW).multiplyScalar(state.mode === 'hero' ? 2.6 : 4) : _c.copy(DIM);
+      const col = lit ? _c.copy(L.tint || GLOW).multiplyScalar(state.mode === 'hero' ? 2.6 : 4) : _c.copy(DIM);
       for (let j = 0; j < PACKETS_PER_LINK; j++, i++) packets.setColorAt(i, col);
     }
     packets.instanceColor.needsUpdate = true;
@@ -362,12 +369,12 @@ export async function createStage({ canvas, labelsEl, reducedMotion, onLost, log
     for (const n of nodes) {
       const target = Math.max(n.glowTarget, state.hovered === n ? 1 : 0);
       n.glow = THREE.MathUtils.damp(n.glow, target, 6, dt);
-      n.mat.emissiveIntensity = (state.mode === 'hero' ? 0.07 : 0) + n.glow * 0.45;
+      n.mat.emissiveIntensity = (state.mode === 'hero' ? (n.tint ? 0.22 : 0.07) : 0) + n.glow * 0.45;
       const e = 0.3 + n.glow * 0.7;
       n.edgeMat.opacity = e;
       n.edgeMat.color.copy(GLOW).multiplyScalar(n.glow > 0.05 ? 1 + n.glow * 1.4 : 1);
       if (n.glow <= 0.05) n.edgeMat.color.set(0xffffff);
-      n.labelOn = n.glow > 0.5 || state.hovered === n;
+      n.labelOn = n.glow > 0.5 || state.hovered === n || (Boolean(n.hero) && heroLabels());
       if (n.logoMats) {
         const hot = state.hovered === n;
         n.logoLevel = THREE.MathUtils.damp(n.logoLevel, hot ? 1 : n.glowTarget ? 0.62 : 0.2, 7, dt);
@@ -385,7 +392,9 @@ export async function createStage({ canvas, labelsEl, reducedMotion, onLost, log
     for (const g of logoGroups) g.rotation.y = rig.az; // logos stay upright for the camera
   }
 
+  const shown = [];
   function updateLabels() {
+    shown.length = 0;
     for (const n of nodes) {
       n.label.classList.toggle('is-on', n.labelOn);
       n.label.classList.toggle('is-hot', state.hovered === n);
@@ -393,13 +402,29 @@ export async function createStage({ canvas, labelsEl, reducedMotion, onLost, log
       _v.copy(n.top);
       _v.y += 0.3;
       _v.project(camera);
-      const x = (_v.x * 0.5 + 0.5) * state.w;
-      const y = (-_v.y * 0.5 + 0.5) * state.h;
-      n.label.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translate(-50%, -100%)`;
+      n.lw = n.label.offsetWidth;
+      n.lh = n.label.offsetHeight;
+      // Centred above the box, but never past the screen edges.
+      n.lx = THREE.MathUtils.clamp((_v.x * 0.5 + 0.5) * state.w, n.lw / 2 + 8, state.w - n.lw / 2 - 8);
+      n.ly = (-_v.y * 0.5 + 0.5) * state.h;
+      shown.push(n);
     }
-    const tfOn = state.mode === 'story' && state.step === TERRAFORM_STEP;
+    // Labels never cover each other: from the lowest up, a label that would overlap one already placed moves above it.
+    shown.sort((a, b) => b.ly - a.ly);
+    const overlaps = (a, b) => Math.abs(a.lx - b.lx) < (a.lw + b.lw) / 2 + 4 && a.ly > b.ly - b.lh - 4 && a.ly - a.lh < b.ly + 4;
+    for (let i = 0; i < shown.length; i++) {
+      const n = shown[i];
+      for (let pass = 0; pass < shown.length; pass++) {
+        const hit = shown.slice(0, i).find((o) => overlaps(n, o));
+        if (!hit) break;
+        n.ly = hit.ly - hit.lh - 4;
+      }
+      n.label.style.transform = `translate3d(${n.lx.toFixed(1)}px, ${n.ly.toFixed(1)}px, 0) translate(-50%, -100%)`;
+    }
+    const tfStep = state.mode === 'story' && state.step === TERRAFORM_STEP;
+    const tfOn = tfStep || heroLabels();
     tfLabel.classList.toggle('is-on', tfOn);
-    tfLabel.classList.toggle('is-hot', tfOn);
+    tfLabel.classList.toggle('is-hot', tfStep);
     if (tfOn) {
       _v.set(AWS_BOUNDS.x0 + 0.4, 0.05, AWS_BOUNDS.z1).project(camera);
       tfLabel.style.transform = `translate3d(${((_v.x * 0.5 + 0.5) * state.w).toFixed(1)}px, ${((-_v.y * 0.5 + 0.5) * state.h).toFixed(1)}px, 0) translate(0, 8px)`;

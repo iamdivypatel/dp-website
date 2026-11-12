@@ -1,6 +1,6 @@
 <!doctype html>
 <!--
-  Source for public/assets/img/og-image.png (1200×630 link preview).
+  Source for public/assets/img/og-image.jpg (1200×630 link preview).
   Reuses the site's CSS and the real 3D stage. Regenerate: see README.
 -->
 <html lang="en" class="js">
@@ -20,12 +20,13 @@
     .og-person { position: absolute; z-index: 1; right: -30px; bottom: 0; height: 560px; filter: drop-shadow(0 30px 60px rgb(0 0 0 / .6));
       /* the source photo is cut at the shoulders: dissolve the sides and bottom */
       -webkit-mask-image: radial-gradient(75% 92% at 50% 30%, #000 62%, transparent 92%); mask-image: radial-gradient(75% 92% at 50% 30%, #000 62%, transparent 92%); }
+    .stage__labels { display: none; } /* the architecture labels would clutter a small preview */
     .og-fade { position: absolute; z-index: 1; left: 0; right: 0; bottom: 0; height: 90px; background: linear-gradient(transparent, #0a0a0f); }
   </style>
 </head>
 <body>
   <div class="stage" aria-hidden="true"><canvas class="stage__canvas"></canvas><div class="stage__labels"></div></div>
-  <img class="og-person" src="/photos/divya-patel-cutout-studio.png" alt="">
+  <img class="og-person" src="/photos/divya-patel-cutout.png" alt="">
   <div class="og-fade"></div>
   <div class="og">
     <div style="display:flex;gap:18px;align-items:center">
@@ -35,7 +36,7 @@
     <div>
       <p class="serif">Hi, I’m Divya.</p>
       <h1>Divya<br>Patel</h1>
-      <p class="role"><b>Node.js, TypeScript &amp; AWS</b>: serverless APIs, Terraform, CI/CD, observability.</p>
+      <p class="role"><b>AWS infrastructure &amp; backend systems</b>: Terraform, serverless, caching with Redis, CI/CD, observability.</p>
     </div>
   </div>
   <script type="module" src="/tools/og.bundle.js"></script>

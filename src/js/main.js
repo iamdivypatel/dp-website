@@ -6,8 +6,10 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import {
   html, $, $$, media, lenis, paused, pausables,
-  startLenis, stopLenis, scrollToTarget, initShell, initCursor, initMotionToggle, splitTitles, riseWordmark,
+  startLenis, stopLenis, scrollToTarget, closeMenu, initShell, initCursor, initMotionToggle, splitTitles, riseWordmark,
 } from './shell.js';
+import { routes } from './routes.js';
+import { watchIllustrations, driftWords, initTilt } from './projects.js';
 
 const FORM_ENDPOINT = 'https://formsubmit.co/ajax/iamdivypatel@gmail.com';
 
@@ -15,6 +17,41 @@ let stage = null;
 let stageSync = () => {}; // set once the motion setup runs
 
 initShell();
+watchIllustrations();
+
+/* ---------------- Section addresses: /about, /journey… (see routes.js) ---------------- */
+
+const cleanPath = (path) => path.replace(/\.html$/, '').replace(/(.)\/+$/, '$1') || '/';
+const routeByPath = new Map(routes.map((r) => [r.path, r]));
+const routeOf = (path) => routeByPath.get(cleanPath(path));
+let followScroll = false; // the address bar follows the scroll once any deep link has been honoured
+
+function goToRoute(route, immediate = false) {
+  const el = document.getElementById(route.id);
+  if (!el) return;
+  document.title = route.title;
+  scrollToTarget(el, immediate);
+  if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
+  el.focus({ preventScroll: true });
+}
+
+// Section links glide to their section and update the address, without reloading the page.
+// New-tab clicks (Cmd/Ctrl/Shift, middle button) still open the address normally.
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('a[href^="/"]');
+  if (!a || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target || a.hasAttribute('download')) return;
+  const url = new URL(a.href);
+  const route = url.origin === location.origin && !url.hash ? routeOf(url.pathname) : null;
+  if (!route) return;
+  e.preventDefault();
+  closeMenu();
+  if (route.path !== cleanPath(location.pathname)) history.pushState(null, '', route.path);
+  goToRoute(route);
+});
+window.addEventListener('popstate', () => {
+  const route = routeOf(location.pathname);
+  if (route && !location.hash) goToRoute(route);
+});
 
 /* ---------------- Hero name: split into letters that respond to the cursor ---------------- */
 
@@ -124,7 +161,7 @@ mm.add(
     }
 
     // Generic fade-up reveals.
-    const revealables = $$('.stats li, .role, .skill-card, .edu__item, .contact__list > div, .form, .manifest > div' + (desktop ? '' : ', .project, .step'));
+    const revealables = $$('.stats li, .role, .project, .project-cta, .pattern, .skill-card, .edu__item, .contact__list > div, .form, .manifest > div' + (desktop ? '' : ', .step'));
     if (motion && revealables.length) {
       gsap.set(revealables, { opacity: 0, y: 28 });
       ScrollTrigger.batch(revealables, {
@@ -168,11 +205,16 @@ mm.add(
       gsap.to('.journey__rail i', { scaleY: 1, ease: 'none', scrollTrigger: { trigger: '.journey__list', start: 'top 60%', end: 'bottom 60%', scrub: true } });
     }
 
+    // Declared before any trigger exists: a trigger can call syncStage() while it's being created
+    // (when this handler re-runs after a resize or a motion-setting change, with the 3D stage loaded).
+    let heroST = null;
+    let stackST = null;
+    let stackViewST = null;
+
     // Hero ranges: whether the 3D stage should be visible.
-    const heroST = ScrollTrigger.create({ trigger: '#top', start: 'top top', end: 'bottom top', onToggle: syncStage });
+    heroST = ScrollTrigger.create({ trigger: '#top', start: 'top top', end: 'bottom top', onToggle: syncStage });
 
     // "How I build": pinned story driving the 3D model (desktop, motion allowed).
-    let stackST = null;
     if (motion && desktop) {
       const steps = $$('.step');
       let active = -1;
@@ -207,47 +249,7 @@ mm.add(
         gsap.set(steps, { clearProps: 'all' });
       });
     }
-    const stackViewST = stackST ? ScrollTrigger.create({ trigger: '#stack', start: 'top bottom', end: 'bottom top', onToggle: syncStage }) : null;
-
-    // Projects: vertical scroll moves the cards sideways (desktop, motion allowed).
-    if (motion && desktop) {
-      const track = $('.projects__track');
-      const cards = $$('.project', track);
-      const index = $('[data-project-index]');
-      const dist = () => Math.max(0, track.scrollWidth - window.innerWidth);
-      const tween = gsap.to(track, {
-        x: () => -dist(),
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '#projects',
-          pin: '.projects__pin',
-          start: 'top top',
-          end: () => '+=' + dist(),
-          scrub: true,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            gsap.set('.projects__bar i', { scaleX: self.progress });
-            index.textContent = String(Math.min(cards.length, Math.round(self.progress * (cards.length - 1)) + 1)).padStart(2, '0');
-          },
-        },
-      });
-      // Only the illustration zooms; the monogram (GD, AdUP…) stays put so it is never pushed out of the card.
-      for (const card of cards) {
-        const motif = $$('.project__art > :not(.art__mono)', card);
-        gsap.fromTo(motif, { scale: 1.12 }, { scale: 1, ease: 'none', scrollTrigger: { containerAnimation: tween, trigger: card, start: 'left right', end: 'center center', scrub: true } });
-      }
-      // Keyboard: focusing a link inside an off-screen card scrolls the page to that card.
-      const onFocus = (e) => {
-        const card = e.target.closest('.project');
-        if (!card) return;
-        const st = tween.scrollTrigger;
-        const y = st.start + gsap.utils.clamp(0, 1, card.offsetLeft / Math.max(1, dist())) * (st.end - st.start);
-        if (lenis) lenis.scrollTo(y, { immediate: true });
-        else window.scrollTo(0, y);
-      };
-      track.addEventListener('focusin', onFocus);
-      off.push(() => track.removeEventListener('focusin', onFocus));
-    }
+    if (stackST) stackViewST = ScrollTrigger.create({ trigger: '#stack', start: 'top bottom', end: 'bottom top', onToggle: syncStage });
 
     // Footer wordmark rises into place.
     if (motion) riseWordmark();
@@ -279,6 +281,10 @@ mm.add(
       });
     }
 
+    // Projects: the word behind each illustration drifts; on desktop the cards tilt toward the pointer.
+    if (motion) driftWords();
+    if (motion && fine) off.push(initTilt());
+
     // Custom cursor and magnetic buttons.
     if (motion && fine) off.push(initCursor());
 
@@ -296,6 +302,25 @@ mm.add(
       off.push(() => grid?.removeEventListener('pointermove', onMove));
     }
 
+    // The nav, the address bar and the tab title follow the section you're reading (no new history entries).
+    for (const route of routes) {
+      const section = document.getElementById(route.id);
+      if (!section) continue;
+      const link = $(`.nav a[href="${route.path}"]`);
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top 50%',
+        end: 'bottom 50%',
+        onToggle: (self) => {
+          if (self.isActive) link?.setAttribute('aria-current', 'true');
+          else link?.removeAttribute('aria-current');
+          if (!self.isActive || !followScroll || route.path === cleanPath(location.pathname)) return;
+          history.replaceState(null, '', route.path);
+          document.title = route.title;
+        },
+      });
+    }
+
     setRotator(motion);
     syncStage();
     function syncStage() {
@@ -303,7 +328,7 @@ mm.add(
       const inStory = Boolean(stackST?.isActive);
       stage.setMode(inStory ? 'story' : 'hero');
       if (inStory) stage.setProgress(stackST.progress);
-      const on = heroST.isActive || inStory || Boolean(stackViewST?.isActive) || window.scrollY < 10;
+      const on = Boolean(heroST?.isActive) || inStory || Boolean(stackViewST?.isActive) || window.scrollY < 10;
       $('.stage').classList.toggle('is-on', on);
       stage.setActive(on);
     }
@@ -507,7 +532,11 @@ initMotionToggle(() => {
 });
 document.fonts?.ready.then(() => ScrollTrigger.refresh());
 runIntro().then(() => {
+  const route = routeOf(location.pathname);
   if (location.hash && $(location.hash)) scrollToTarget(location.hash, true);
+  else if (route && route.path !== '/') goToRoute(route, true);
+  // Let that jump land before the address bar starts following the scroll.
+  requestAnimationFrame(() => requestAnimationFrame(() => (followScroll = true)));
 });
 // Let the intro own the first frames, then build the 3D scene.
 (window.requestIdleCallback || ((fn) => setTimeout(fn, 400)))(() => initStage(), { timeout: 1500 });
