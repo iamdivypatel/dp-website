@@ -334,6 +334,9 @@ mm.add(
     }
     stageSync = syncStage;
 
+    // Measure every trigger in page order, so the pinned "How I build" story (created after the
+    // journey and reveal triggers below it) adds its scroll length before they are measured.
+    ScrollTrigger.sort();
     ScrollTrigger.refresh();
     return () => {
       off.forEach((fn) => fn());
