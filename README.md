@@ -91,18 +91,15 @@ This writes your address into the canonical link, the Open Graph tags, the struc
 
 ## Deploy
 
-The output folder is `public/` and the build command is `npm run build`.
+**Live site:** https://dp-website-self.vercel.app (Vercel, deployed from the `main` branch of github.com/iamdivypatel/dp-website).
 
-- **GitHub Pages:**
-  1. Push the project to GitHub.
-  2. In Settings › Pages, set Source to **GitHub Actions**.
-  3. Push to `main`. The workflow in `.github/workflows/deploy-pages.yml` builds and publishes.
-- **Netlify or Cloudflare:**
-  - Drag the `public/` folder in after running `npm run build`, or connect the repository.
-  - Both hosts read `public/_headers` for the security headers.
-- **Vercel:** its free Hobby plan is for non-commercial use only.
-
-**Security policy:** `npm run build` recomputes the hash of the one inline script in `index.html`, so editing it is safe.
+- **Vercel:** every push to `main` redeploys.
+  - Vercel runs `npm run build` and serves the `public/` folder.
+  - Security headers come from `vercel.json`.
+- **Other hosts:**
+  - Netlify and Cloudflare read `public/_headers` instead.
+  - Build command: `npm run build`. Output folder: `public`.
+- **Security policy:** `npm run build` recomputes the hash of the one inline script in `index.html`. If you edit that script, also update the `sha256-…` value in `vercel.json`.
 
 ## Regenerate the link-preview image
 

@@ -286,8 +286,8 @@ for name, img in looks.items():
     if name in FADE_TO:
         full = bottom_fade(full, FADE_TO[name])
     full.save(f'{full_dir}/divya-patel-{name}.jpg', quality=92, optimize=True, progressive=True)
-    full.resize((960, 1200), LANCZOS).save(f'{web_dir}/portrait-{name}.webp', quality=80, method=6)
-    full.resize((144, 180), LANCZOS).save(f'{web_dir}/thumb-{name}.webp', quality=78, method=6)
+    if name == 'coder':  # the site uses the coder look; the others stay in photos/ for your own use
+        full.resize((960, 1200), LANCZOS).save(f'{web_dir}/portrait-{name}.webp', quality=80, method=6)
     print(name, 'ok')
 
 looks['natural'].crop(HEADSHOT).save(f'{full_dir}/divya-patel-headshot-square.jpg', quality=92, optimize=True)

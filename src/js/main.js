@@ -598,41 +598,6 @@ async function initStage() {
   }
 }
 
-/* ---------------- Portrait looks (studio, mono, duotone, natural) ---------------- */
-
-const lookButtons = $$('.look');
-const lookName = $('[data-look-name]');
-let lookBusy = false;
-for (const button of lookButtons) {
-  const img = $(`.portrait__img[data-look="${button.dataset.look}"]`);
-  // Start fetching a look as soon as someone points at or focuses its thumbnail.
-  const warm = () => img && (img.loading = 'eager');
-  button.addEventListener('pointerenter', warm, { once: true });
-  button.addEventListener('focus', warm, { once: true });
-  button.addEventListener('click', () => showLook(button));
-}
-async function showLook(button) {
-  const next = $(`.portrait__img[data-look="${button.dataset.look}"]`);
-  const current = $$('.portrait__img').find((img) => !img.hidden && img !== next);
-  if (!next || !current || lookBusy) return;
-  lookBusy = true;
-  lookButtons.forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
-  lookName.textContent = button.textContent.trim();
-  next.loading = 'eager';
-  next.hidden = false;
-  next.style.zIndex = '2';
-  current.style.zIndex = '1';
-  try {
-    await next.decode();
-  } catch {}
-  const done = () => {
-    current.hidden = true;
-    lookBusy = false;
-  };
-  if (media.reduce.matches) return done();
-  gsap.fromTo(next, { opacity: 0, scale: 1.05 }, { opacity: 1, scale: 1, duration: 0.7, ease: 'power2.out', onComplete: done });
-}
-
 /* ---------------- Contact: copy, local time, form ---------------- */
 
 const copyStatus = $('[data-copy-status]');
