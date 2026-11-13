@@ -1,7 +1,7 @@
 ---
 title: "Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL"
 description: "Redis caching patterns for Postgres in plain words: cache-aside vs write-through, cache stampede prevention, TTL jitter and safe invalidation."
-date: 2026-10-27
+date: 2026-10-20
 tags: [Redis, PostgreSQL, AWS, System design]
 draft: false
 logos: [redis, aws-aurora, nodedotjs, typescript]

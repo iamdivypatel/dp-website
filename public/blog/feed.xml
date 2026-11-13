@@ -18,26 +18,26 @@
       <category>Terraform</category>
     </item>
     <item>
-      <title>Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL</title>
-      <link>https://divypatel.in/blog/redis-cache-stampede-aurora</link>
-      <guid>https://divypatel.in/blog/redis-cache-stampede-aurora</guid>
-      <pubDate>Tue, 27 Oct 2026 00:00:00 GMT</pubDate>
-      <description>Redis caching patterns for Postgres in plain words: cache-aside vs write-through, cache stampede prevention, TTL jitter and safe invalidation.</description>
-      <category>Redis</category>
-      <category>PostgreSQL</category>
-      <category>AWS</category>
-      <category>System design</category>
-    </item>
-    <item>
       <title>Self-hosting an LLM with vLLM: the real cost math vs an API</title>
       <link>https://divypatel.in/blog/self-host-llm-vllm-cost-vs-api</link>
       <guid>https://divypatel.in/blog/self-host-llm-vllm-cost-vs-api</guid>
-      <pubDate>Tue, 20 Oct 2026 00:00:00 GMT</pubDate>
+      <pubDate>Tue, 27 Oct 2026 00:00:00 GMT</pubDate>
       <description>A neutral break-even model for self-hosting an LLM with vLLM vs paying an API per token, with a worked example, real prices and a small production setup.</description>
       <category>LLM</category>
       <category>vLLM</category>
       <category>Cost</category>
       <category>AI infrastructure</category>
+    </item>
+    <item>
+      <title>Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL</title>
+      <link>https://divypatel.in/blog/redis-cache-stampede-aurora</link>
+      <guid>https://divypatel.in/blog/redis-cache-stampede-aurora</guid>
+      <pubDate>Tue, 20 Oct 2026 00:00:00 GMT</pubDate>
+      <description>Redis caching patterns for Postgres in plain words: cache-aside vs write-through, cache stampede prevention, TTL jitter and safe invalidation.</description>
+      <category>Redis</category>
+      <category>PostgreSQL</category>
+      <category>AWS</category>
+      <category>System design</category>
     </item>
     <item>
       <title>Terraform for a one-AWS-account startup: layout, state, and the day you split</title>

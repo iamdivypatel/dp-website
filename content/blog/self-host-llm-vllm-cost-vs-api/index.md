@@ -1,7 +1,7 @@
 ---
 title: "Self-hosting an LLM with vLLM: the real cost math vs an API"
 description: "A neutral break-even model for self-hosting an LLM with vLLM vs paying an API per token, with a worked example, real prices and a small production setup."
-date: 2026-10-20
+date: 2026-10-27
 updated: 2026-11-13
 tags: [LLM, vLLM, Cost, AI infrastructure]
 draft: false
