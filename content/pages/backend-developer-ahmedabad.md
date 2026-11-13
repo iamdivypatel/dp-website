@@ -26,7 +26,7 @@ I write the services themselves in Node.js and TypeScript.
 
 - 45+ Lambda functions deployed with GitHub Actions CI/CD
 - Cold starts brought under 2 seconds
-- 144 API endpoints tested against a live dev environment
+- 144 API endpoints tested live
 - A 54-point server checklist for Google's CASA security review
 
 ## Projects I've worked on
