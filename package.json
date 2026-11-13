@@ -13,7 +13,8 @@
     "sections": "node scripts/sections.mjs",
     "dev": "npm run build && (npm run build:css -- --watch & npx esbuild src/js/main.js src/js/blog.js --bundle --format=esm --splitting --target=es2020 --outdir=public/assets/js --chunk-names=chunks/[name]-[hash] --watch & wait)",
     "serve": "node scripts/serve.mjs",
-    "set-domain": "node scripts/set-domain.mjs"
+    "set-domain": "node scripts/set-domain.mjs",
+    "indexnow": "node scripts/indexnow.mjs"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.3.5",

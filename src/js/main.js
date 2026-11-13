@@ -541,5 +541,7 @@ runIntro().then(() => {
   // Let that jump land before the address bar starts following the scroll.
   requestAnimationFrame(() => requestAnimationFrame(() => (followScroll = true)));
 });
-// Let the intro own the first frames, then build the 3D scene.
-(window.requestIdleCallback || ((fn) => setTimeout(fn, 400)))(() => initStage(), { timeout: 1500 });
+// Let the intro own the first frames, then build the 3D scene when the browser is idle.
+// Low-end phones and tablets keep the flat version: building the scene there blocks taps for too long.
+const lowEnd = window.matchMedia('(pointer: coarse)').matches && ((navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4);
+if (!lowEnd) (window.requestIdleCallback || ((fn) => setTimeout(fn, 1200)))(() => initStage());

@@ -1,5 +1,6 @@
 ---
 title: "Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL"
+seo_title: "Redis caching for Aurora PostgreSQL: stop cache stampedes"
 description: "Redis caching patterns for Postgres in plain words: cache-aside vs write-through, cache stampede prevention, TTL jitter and safe invalidation."
 date: 2026-10-20
 tags: [Redis, PostgreSQL, AWS, System design]
@@ -47,7 +48,7 @@ export async function loadProduct(id: string): Promise<Product | null> {
 }
 ```
 
-For ElastiCache with encryption in transit, use a `rediss://` URL (two s's) so ioredis connects over TLS.
+For ElastiCache with encryption in transit, use a `rediss://` URL (two s's) so ioredis connects over TLS. If you create the cluster with Terraform, it belongs with the other long-lived data stores; [Terraform for a one-AWS-account startup](/blog/terraform-aws-startup-layout) explains why.
 
 The three ioredis options matter. By default, ioredis queues commands while it reconnects, so if Redis hangs, every request hangs with it. With these settings, a Redis problem becomes a fast error your code can handle.
 

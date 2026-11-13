@@ -12,7 +12,7 @@
   'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
   })(window,document,'script','dataLayer','GTM-M75XC5GH');</script>
   <!-- End Google Tag Manager -->
-  <title>Terraform for a one-AWS-account startup: layout, state, and the day you split – Divya Patel</title>
+  <title>Terraform project structure for an AWS startup – Divya Patel</title>
   <meta name="description" content="How to structure Terraform for a small AWS startup: one state, then split state per stack and environment, then multi-account. With real HCL.">
   <meta name="author" content="Divya Patel">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
@@ -24,7 +24,7 @@
   <meta property="og:url" content="https://divypatel.in/blog/terraform-aws-startup-layout">
   <meta property="og:site_name" content="Divya Patel">
   <meta property="og:locale" content="en_IN">
-  <meta property="og:title" content="Terraform for a one-AWS-account startup: layout, state, and the day you split – Divya Patel">
+  <meta property="og:title" content="Terraform for a one-AWS-account startup: layout, state, and the day you split">
   <meta property="og:description" content="How to structure Terraform for a small AWS startup: one state, then split state per stack and environment, then multi-account. With real HCL.">
   <meta property="og:image" content="https://divypatel.in/assets/img/og/terraform-aws-startup-layout.png">
   <meta property="og:image:width" content="1200">
@@ -58,13 +58,18 @@
         "mainEntityOfPage": "https://divypatel.in/blog/terraform-aws-startup-layout",
         "image": "https://divypatel.in/assets/img/og/terraform-aws-startup-layout.png",
         "keywords": "Terraform, AWS, Infrastructure as Code, DevOps",
-        "wordCount": 2725,
+        "wordCount": 2735,
         "inLanguage": "en",
         "author": {
           "@id": "https://divypatel.in/#person",
           "@type": "Person",
           "name": "Divya Patel",
-          "url": "https://divypatel.in/"
+          "url": "https://divypatel.in/",
+          "jobTitle": "Backend & Cloud Engineer",
+          "image": "https://divypatel.in/assets/img/portrait-coder.webp",
+          "sameAs": [
+            "https://www.linkedin.com/in/divyapatel5113"
+          ]
         },
         "publisher": {
           "@id": "https://divypatel.in/#person",
@@ -661,7 +666,7 @@
   <line x1="384" y1="265" x2="416" y2="265" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
   <line x1="572" y1="265" x2="604" y2="265" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
 <g class="d3-badges"><rect class="d3-badge-ring" x="29" y="49" width="30" height="30" rx="9"/><image href="/assets/logos/githubactions.svg" x="31" y="51" width="26" height="26" clip-path="url(#tf-ci-flow-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="217" y="49" width="30" height="30" rx="9"/><image href="/assets/logos/terraform.svg" x="219" y="51" width="26" height="26" clip-path="url(#tf-ci-flow-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="217" y="219" width="30" height="30" rx="9"/><image href="/assets/logos/terraform.svg" x="219" y="221" width="26" height="26" clip-path="url(#tf-ci-flow-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="593" y="219" width="30" height="30" rx="9"/><image href="/assets/logos/terraform.svg" x="595" y="221" width="26" height="26" clip-path="url(#tf-ci-flow-d3clip)" preserveAspectRatio="xMidYMid slice"/></g></svg><figcaption>Nobody runs apply from a laptop</figcaption></figure>
-<p>The full pipeline is covered in a separate post, so here is the short version:</p>
+<p>The deploy side, with OIDC and no stored keys, is covered in <a href="/blog/lambda-zero-downtime-deploys-github-actions">Zero-downtime Lambda deploys from GitHub Actions</a>. Here is the short version for Terraform:</p>
 <ul>
 <li>On every pull request, CI runs <code>plan</code> for each stack and environment that changed, and posts the output as a PR comment. Reviewers read the plan, not just the code.</li>
 <li>CI logs in to AWS with <strong>OIDC</strong>, which lets GitHub Actions get short-lived AWS credentials without storing any access keys. The plan job uses a read-only role.</li>

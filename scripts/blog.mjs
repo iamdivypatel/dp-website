@@ -153,7 +153,7 @@ function ogImage(post) {
 /* ---------- Page shell ---------- */
 
 const person = { '@id': `${base}/#person` };
-function page({ title, description, path, type = 'website', image, extraHead = '', schema, body, blog = true }) {
+function page({ title, socialTitle = title, description, path, type = 'website', image, extraHead = '', schema, body, blog = true }) {
   const url = `${base}${path}`;
   const img = image ? `${base}/${image.replace(/^public\//, '')}` : `${base}/assets/img/og-image.jpg`;
   return `<!doctype html>
@@ -175,7 +175,7 @@ ${gtmHead}  <title>${esc(title)}</title>
   <meta property="og:url" content="${url}">
   <meta property="og:site_name" content="Divya Patel">
   <meta property="og:locale" content="en_IN">
-  <meta property="og:title" content="${esc(title)}">
+  <meta property="og:title" content="${esc(socialTitle)}">
   <meta property="og:description" content="${esc(description)}">
   <meta property="og:image" content="${img}">
   <meta property="og:image:width" content="1200">
@@ -266,14 +266,14 @@ ${post.html}
       datePublished: isoDate(post.date), dateModified: isoDate(post.updated), url: post.url, mainEntityOfPage: post.url,
       image: post.image ? `${base}/${post.image.replace(/^public\//, '')}` : `${base}/assets/img/og-image.jpg`,
       keywords: post.tags.join(', '), wordCount: post.words, inLanguage: 'en',
-      author: { ...person, '@type': 'Person', name: 'Divya Patel', url: `${base}/` },
+      author: { ...person, '@type': 'Person', name: 'Divya Patel', url: `${base}/`, jobTitle: 'Backend & Cloud Engineer', image: `${base}/assets/img/portrait-coder.webp`, sameAs },
       publisher: { ...person, '@type': 'Person', name: 'Divya Patel' },
       isPartOf: { '@id': `${base}/blog#blog` },
     },
     crumbs([['Divya Patel', `${base}/`], ['Writing', `${base}/blog`], [post.title, post.url]]),
   ];
   const extraHead = `  <meta property="article:published_time" content="${isoDate(post.date)}">\n  <meta property="article:modified_time" content="${isoDate(post.updated)}">\n  <meta property="article:author" content="${base}/">\n${post.tags.map((t) => `  <meta property="article:tag" content="${esc(t)}">\n`).join('')}`;
-  writeFileSync(`${OUT}/${post.slug}.html`, page({ title: `${post.title} – Divya Patel`, description: post.description, path: `/blog/${post.slug}`, type: 'article', image: post.image, extraHead, schema, body }));
+  writeFileSync(`${OUT}/${post.slug}.html`, page({ title: `${post.seo_title ?? post.title} – Divya Patel`, socialTitle: post.title, description: post.description, path: `/blog/${post.slug}`, type: 'article', image: post.image, extraHead, schema, body }));
 }
 
 function card(post) {

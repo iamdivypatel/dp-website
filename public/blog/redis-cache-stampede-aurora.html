@@ -12,7 +12,7 @@
   'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
   })(window,document,'script','dataLayer','GTM-M75XC5GH');</script>
   <!-- End Google Tag Manager -->
-  <title>Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL – Divya Patel</title>
+  <title>Redis caching for Aurora PostgreSQL: stop cache stampedes – Divya Patel</title>
   <meta name="description" content="Redis caching patterns for Postgres in plain words: cache-aside vs write-through, cache stampede prevention, TTL jitter and safe invalidation.">
   <meta name="author" content="Divya Patel">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
@@ -24,7 +24,7 @@
   <meta property="og:url" content="https://divypatel.in/blog/redis-cache-stampede-aurora">
   <meta property="og:site_name" content="Divya Patel">
   <meta property="og:locale" content="en_IN">
-  <meta property="og:title" content="Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL – Divya Patel">
+  <meta property="og:title" content="Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL">
   <meta property="og:description" content="Redis caching patterns for Postgres in plain words: cache-aside vs write-through, cache stampede prevention, TTL jitter and safe invalidation.">
   <meta property="og:image" content="https://divypatel.in/assets/img/og/redis-cache-stampede-aurora.png">
   <meta property="og:image:width" content="1200">
@@ -58,13 +58,18 @@
         "mainEntityOfPage": "https://divypatel.in/blog/redis-cache-stampede-aurora",
         "image": "https://divypatel.in/assets/img/og/redis-cache-stampede-aurora.png",
         "keywords": "Redis, PostgreSQL, AWS, System design",
-        "wordCount": 2789,
+        "wordCount": 2811,
         "inLanguage": "en",
         "author": {
           "@id": "https://divypatel.in/#person",
           "@type": "Person",
           "name": "Divya Patel",
-          "url": "https://divypatel.in/"
+          "url": "https://divypatel.in/",
+          "jobTitle": "Backend & Cloud Engineer",
+          "image": "https://divypatel.in/assets/img/portrait-coder.webp",
+          "sameAs": [
+            "https://www.linkedin.com/in/divyapatel5113"
+          ]
         },
         "publisher": {
           "@id": "https://divypatel.in/#person",
@@ -242,7 +247,7 @@
 <span class="line"><span style="color:#E6EDF3">  );</span></span>
 <span class="line"><span style="color:#FF7B72">  return</span><span style="color:#E6EDF3"> rows[</span><span style="color:#79C0FF">0</span><span style="color:#E6EDF3">] </span><span style="color:#FF7B72">??</span><span style="color:#79C0FF"> null</span><span style="color:#E6EDF3">;</span></span>
 <span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
-<p>For ElastiCache with encryption in transit, use a <code>rediss://</code> URL (two s&#39;s) so ioredis connects over TLS.</p>
+<p>For ElastiCache with encryption in transit, use a <code>rediss://</code> URL (two s&#39;s) so ioredis connects over TLS. If you create the cluster with Terraform, it belongs with the other long-lived data stores; <a href="/blog/terraform-aws-startup-layout">Terraform for a one-AWS-account startup</a> explains why.</p>
 <p>The three ioredis options matter. By default, ioredis queues commands while it reconnects, so if Redis hangs, every request hangs with it. With these settings, a Redis problem becomes a fast error your code can handle.</p>
 <h2 id="four-ways-to-keep-a-cache-filled"><a class="anchor" href="#four-ways-to-keep-a-cache-filled" aria-hidden="true" tabindex="-1">#</a>Four ways to keep a cache filled</h2>
 <figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" class="diagram" role="img" aria-labelledby="cache-patterns-t cache-patterns-d"><defs><filter id="cache-patterns-d3blur" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="6"/></filter><linearGradient id="cache-patterns-d3sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="d3-sheen-a"/><stop offset="1" class="d3-sheen-b"/></linearGradient><clipPath id="cache-patterns-d3clip" clipPathUnits="objectBoundingBox"><rect width="1" height="1" rx="0.26"/></clipPath></defs>

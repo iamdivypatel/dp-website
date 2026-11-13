@@ -12,7 +12,7 @@
   'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
   })(window,document,'script','dataLayer','GTM-M75XC5GH');</script>
   <!-- End Google Tag Manager -->
-  <title>Zero-downtime Lambda deploys from GitHub Actions: OIDC, versions, aliases and canary rollback – Divya Patel</title>
+  <title>Zero-downtime Lambda deploys with GitHub Actions and OIDC – Divya Patel</title>
   <meta name="description" content="Deploy AWS Lambda from GitHub Actions with no stored AWS keys: OIDC login, versions, a weighted alias canary and automatic rollback.">
   <meta name="author" content="Divya Patel">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
@@ -24,7 +24,7 @@
   <meta property="og:url" content="https://divypatel.in/blog/lambda-zero-downtime-deploys-github-actions">
   <meta property="og:site_name" content="Divya Patel">
   <meta property="og:locale" content="en_IN">
-  <meta property="og:title" content="Zero-downtime Lambda deploys from GitHub Actions: OIDC, versions, aliases and canary rollback – Divya Patel">
+  <meta property="og:title" content="Zero-downtime Lambda deploys from GitHub Actions: OIDC, versions, aliases and canary rollback">
   <meta property="og:description" content="Deploy AWS Lambda from GitHub Actions with no stored AWS keys: OIDC login, versions, a weighted alias canary and automatic rollback.">
   <meta property="og:image" content="https://divypatel.in/assets/img/og/lambda-zero-downtime-deploys-github-actions.png">
   <meta property="og:image:width" content="1200">
@@ -58,13 +58,18 @@
         "mainEntityOfPage": "https://divypatel.in/blog/lambda-zero-downtime-deploys-github-actions",
         "image": "https://divypatel.in/assets/img/og/lambda-zero-downtime-deploys-github-actions.png",
         "keywords": "AWS Lambda, GitHub Actions, CI/CD, Terraform",
-        "wordCount": 2650,
+        "wordCount": 2672,
         "inLanguage": "en",
         "author": {
           "@id": "https://divypatel.in/#person",
           "@type": "Person",
           "name": "Divya Patel",
-          "url": "https://divypatel.in/"
+          "url": "https://divypatel.in/",
+          "jobTitle": "Backend & Cloud Engineer",
+          "image": "https://divypatel.in/assets/img/portrait-coder.webp",
+          "sameAs": [
+            "https://www.linkedin.com/in/divyapatel5113"
+          ]
         },
         "publisher": {
           "@id": "https://divypatel.in/#person",
@@ -317,7 +322,7 @@
 <span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
 <p>One detail trips up a lot of people. <strong>If the job uses a GitHub environment, the <code>sub</code> claim uses the environment form (<code>…:environment:production</code>), not the branch form (<code>…:ref:refs/heads/main</code>).</strong> If your trust policy expects the branch but the job has <code>environment: production</code>, the login fails with &quot;Not authorized to perform sts:AssumeRoleWithWebIdentity&quot;. Write the condition for the form your job really sends.</p>
 <p>IAM also refuses a GitHub trust policy that has no <code>sub</code> condition, or one whose value is only <code>*</code>. That&#39;s good: without it, any GitHub repo in the world could take on your role.</p>
-<p>Here is the Terraform for the provider and the role:</p>
+<p>Here is the Terraform for the provider and the role. (Where this code lives in your repo, and which state it belongs to, is the topic of <a href="/blog/terraform-aws-startup-layout">Terraform for a one-AWS-account startup</a>.)</p>
 <div class="code"><span class="code__lang">hcl</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FFA657">resource</span><span style="color:#79C0FF"> "aws_iam_openid_connect_provider"</span><span style="color:#79C0FF"> "github"</span><span style="color:#E6EDF3"> {</span></span>
 <span class="line"><span style="color:#E6EDF3">  url</span><span style="color:#FF7B72">            =</span><span style="color:#A5D6FF"> "https://token.actions.githubusercontent.com"</span></span>
 <span class="line"><span style="color:#E6EDF3">  client_id_list</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> [</span><span style="color:#A5D6FF">"sts.amazonaws.com"</span><span style="color:#E6EDF3">]</span></span>

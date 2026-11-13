@@ -1,5 +1,6 @@
 ---
 title: "Terraform for a one-AWS-account startup: layout, state, and the day you split"
+seo_title: "Terraform project structure for an AWS startup"
 description: "How to structure Terraform for a small AWS startup: one state, then split state per stack and environment, then multi-account. With real HCL."
 date: 2026-10-13
 tags: [Terraform, AWS, Infrastructure as Code, DevOps]
@@ -263,7 +264,7 @@ Remember that any secret Terraform reads or creates ends up in the state file in
 
 ![CI flow: pull request triggers a read-only plan, the plan is posted as a comment and reviewed; on merge, staging applies automatically and prod applies after an environment approval](diagrams/tf-ci-flow.svg "Nobody runs apply from a laptop")
 
-The full pipeline is covered in a separate post, so here is the short version:
+The deploy side, with OIDC and no stored keys, is covered in [Zero-downtime Lambda deploys from GitHub Actions](/blog/lambda-zero-downtime-deploys-github-actions). Here is the short version for Terraform:
 
 - On every pull request, CI runs `plan` for each stack and environment that changed, and posts the output as a PR comment. Reviewers read the plan, not just the code.
 - CI logs in to AWS with **OIDC**, which lets GitHub Actions get short-lived AWS credentials without storing any access keys. The plan job uses a read-only role.

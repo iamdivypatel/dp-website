@@ -1,5 +1,6 @@
 ---
 title: "Zero-downtime Lambda deploys from GitHub Actions: OIDC, versions, aliases and canary rollback"
+seo_title: "Zero-downtime Lambda deploys with GitHub Actions and OIDC"
 description: "Deploy AWS Lambda from GitHub Actions with no stored AWS keys: OIDC login, versions, a weighted alias canary and automatic rollback."
 date: 2026-11-03
 updated: 2026-11-13
@@ -67,7 +68,7 @@ One detail trips up a lot of people. **If the job uses a GitHub environment, the
 
 IAM also refuses a GitHub trust policy that has no `sub` condition, or one whose value is only `*`. That's good: without it, any GitHub repo in the world could take on your role.
 
-Here is the Terraform for the provider and the role:
+Here is the Terraform for the provider and the role. (Where this code lives in your repo, and which state it belongs to, is the topic of [Terraform for a one-AWS-account startup](/blog/terraform-aws-startup-layout).)
 
 ```hcl
 resource "aws_iam_openid_connect_provider" "github" {

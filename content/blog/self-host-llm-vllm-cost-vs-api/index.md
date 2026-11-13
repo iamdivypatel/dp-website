@@ -1,5 +1,6 @@
 ---
 title: "Self-hosting an LLM with vLLM: the real cost math vs an API"
+seo_title: "Self-hosting an LLM with vLLM: real cost vs an API"
 description: "A neutral break-even model for self-hosting an LLM with vLLM vs paying an API per token, with a worked example, real prices and a small production setup."
 date: 2026-10-27
 updated: 2026-11-13
@@ -321,6 +322,7 @@ Because the API shape is the same, going back to a hosted API is a config change
 ## Gotchas
 
 - **`--api-key` only covers the API routes.** The vLLM docs say it protects `/v1` and a few other prefixes, and other endpoints stay open. Never expose port 8000 directly. Bind to localhost and put Nginx in front.
+- **The same prompt twice is wasted GPU time.** If many users send identical requests (a fixed system prompt plus the same question), cache the answer in Redis before it reaches vLLM. The stampede and TTL tips in [Redis in front of Aurora PostgreSQL](/blog/redis-cache-stampede-aurora) apply here too.
 - **Two vLLM processes, one GPU.** `--gpu-memory-utilization` is per process. Two instances at 0.9 each on one GPU will fail to start.
 - **Your input-to-output ratio drifts.** Longer documents or a "thinking" model that writes long hidden reasoning both change `k`. Re-check it from `res.usage` every month.
 - **Prompt caching changes API prices.** Many APIs charge much less for repeated input (cached input). If your prompts share a long prefix, use the cached price in the formula.

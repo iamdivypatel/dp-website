@@ -12,7 +12,7 @@
   'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
   })(window,document,'script','dataLayer','GTM-M75XC5GH');</script>
   <!-- End Google Tag Manager -->
-  <title>Self-hosting an LLM with vLLM: the real cost math vs an API – Divya Patel</title>
+  <title>Self-hosting an LLM with vLLM: real cost vs an API – Divya Patel</title>
   <meta name="description" content="A neutral break-even model for self-hosting an LLM with vLLM vs paying an API per token, with a worked example, real prices and a small production setup.">
   <meta name="author" content="Divya Patel">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
@@ -24,7 +24,7 @@
   <meta property="og:url" content="https://divypatel.in/blog/self-host-llm-vllm-cost-vs-api">
   <meta property="og:site_name" content="Divya Patel">
   <meta property="og:locale" content="en_IN">
-  <meta property="og:title" content="Self-hosting an LLM with vLLM: the real cost math vs an API – Divya Patel">
+  <meta property="og:title" content="Self-hosting an LLM with vLLM: the real cost math vs an API">
   <meta property="og:description" content="A neutral break-even model for self-hosting an LLM with vLLM vs paying an API per token, with a worked example, real prices and a small production setup.">
   <meta property="og:image" content="https://divypatel.in/assets/img/og/self-host-llm-vllm-cost-vs-api.png">
   <meta property="og:image:width" content="1200">
@@ -58,13 +58,18 @@
         "mainEntityOfPage": "https://divypatel.in/blog/self-host-llm-vllm-cost-vs-api",
         "image": "https://divypatel.in/assets/img/og/self-host-llm-vllm-cost-vs-api.png",
         "keywords": "LLM, vLLM, Cost, AI infrastructure",
-        "wordCount": 2803,
+        "wordCount": 2850,
         "inLanguage": "en",
         "author": {
           "@id": "https://divypatel.in/#person",
           "@type": "Person",
           "name": "Divya Patel",
-          "url": "https://divypatel.in/"
+          "url": "https://divypatel.in/",
+          "jobTitle": "Backend & Cloud Engineer",
+          "image": "https://divypatel.in/assets/img/portrait-coder.webp",
+          "sameAs": [
+            "https://www.linkedin.com/in/divyapatel5113"
+          ]
         },
         "publisher": {
           "@id": "https://divypatel.in/#person",
@@ -691,6 +696,7 @@
 <h2 id="gotchas"><a class="anchor" href="#gotchas" aria-hidden="true" tabindex="-1">#</a>Gotchas</h2>
 <ul>
 <li><strong><code>--api-key</code> only covers the API routes.</strong> The vLLM docs say it protects <code>/v1</code> and a few other prefixes, and other endpoints stay open. Never expose port 8000 directly. Bind to localhost and put Nginx in front.</li>
+<li><strong>The same prompt twice is wasted GPU time.</strong> If many users send identical requests (a fixed system prompt plus the same question), cache the answer in Redis before it reaches vLLM. The stampede and TTL tips in <a href="/blog/redis-cache-stampede-aurora">Redis in front of Aurora PostgreSQL</a> apply here too.</li>
 <li><strong>Two vLLM processes, one GPU.</strong> <code>--gpu-memory-utilization</code> is per process. Two instances at 0.9 each on one GPU will fail to start.</li>
 <li><strong>Your input-to-output ratio drifts.</strong> Longer documents or a &quot;thinking&quot; model that writes long hidden reasoning both change <code>k</code>. Re-check it from <code>res.usage</code> every month.</li>
 <li><strong>Prompt caching changes API prices.</strong> Many APIs charge much less for repeated input (cached input). If your prompts share a long prefix, use the cached price in the formula.</li>

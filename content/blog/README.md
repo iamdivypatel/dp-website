@@ -8,6 +8,7 @@ Each post is a folder: `content/blog/<slug>/index.md` plus `content/blog/<slug>/
 ```yaml
 ---
 title: "Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL"
+seo_title: "Optional: a shorter title for Google, under 60 characters"
 description: "One or two sentences, at most 155 characters. Shown in Google and on share cards."
 date: 2026-11-13          # first published
 updated: 2026-11-13       # optional; last real content change
