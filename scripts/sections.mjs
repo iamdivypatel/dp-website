@@ -25,6 +25,8 @@ for (const route of sections) {
     [/(<meta property="og:title" content=")[^"]*/, `$1${esc(route.title)}`],
     [/(<meta property="og:description" content=")[^"]*/, `$1${esc(route.description)}`],
     [/<!doctype html>\n/, `<!doctype html>\n<!-- Built from index.html by scripts/sections.mjs. Edit index.html, not this file. -->\n`],
+    // breadcrumb trail for search results: Divya Patel › About
+    [/("@graph": \[\n)/, `$1      { "@type": "BreadcrumbList", "itemListElement": [{ "@type": "ListItem", "position": 1, "name": "Divya Patel", "item": "${base}/" }, { "@type": "ListItem", "position": 2, "name": "${esc(route.title.split(' – ')[0])}", "item": "${url}" }] },\n`],
   ];
   let page = html;
   for (const [pattern, replacement] of heads) {
@@ -34,6 +36,8 @@ for (const route of sections) {
   writeFileSync(`public${route.path}.html`, page);
 }
 
-const urls = routes.map((route) => `  <url>\n    <loc>${base}${route.path}</loc>\n  </url>`).join('\n');
+const modified = html.match(/"dateModified": "([\d-]+)"/)?.[1];
+if (!modified) throw new Error('index.html JSON-LD has no dateModified');
+const urls = routes.map((route) => `  <url>\n    <loc>${base}${route.path}</loc>\n    <lastmod>${modified}</lastmod>\n  </url>`).join('\n');
 writeFileSync('public/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
 console.log(`Section pages: ${sections.map((r) => r.path).join(' ')} (+ sitemap.xml)`);
