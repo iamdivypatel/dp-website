@@ -23,10 +23,10 @@
   <rect x="24" y="110" width="150" height="70" rx="10" class="d-box d-accent"/>
   <text x="99" y="140" class="d-text d-mono" text-anchor="middle">network</text>
   <text x="99" y="161" class="d-sub" text-anchor="middle">VPC, subnets</text>
-  <rect x="224" y="110" width="150" height="70" rx="10" class="d-box d-accent"/>
+  <rect x="224" y="110" width="150" height="70" rx="10" class="d-box d-accent" data-logo="aws-aurora"/>
   <text x="299" y="140" class="d-text d-mono" text-anchor="middle">data</text>
   <text x="299" y="161" class="d-sub" text-anchor="middle">Aurora, Redis, S3</text>
-  <rect x="424" y="110" width="150" height="70" rx="10" class="d-box d-accent"/>
+  <rect x="424" y="110" width="150" height="70" rx="10" class="d-box d-accent" data-logo="aws-lambda"/>
   <text x="499" y="140" class="d-text d-mono" text-anchor="middle">app</text>
   <text x="499" y="161" class="d-sub" text-anchor="middle">Lambda, API, SQS</text>
   <rect x="624" y="110" width="150" height="70" rx="10" class="d-box d-accent"/>
@@ -39,7 +39,7 @@
   <line x1="574" y1="145" x2="624" y2="145" class="d-edge d-dashed" marker-end="url(#tf-state-deps-arrow)"/>
 
   <!-- SSM band -->
-  <rect x="24" y="250" width="750" height="72" rx="10" class="d-box d-cyan"/>
+  <rect x="24" y="250" width="750" height="72" rx="10" class="d-box d-cyan" data-logo="aws-systems-manager"/>
   <text x="400" y="276" class="d-text" text-anchor="middle">SSM Parameter Store</text>
   <text x="99" y="304" class="d-sub d-mono" text-anchor="middle">/prod/network/*</text>
   <text x="299" y="304" class="d-sub d-mono" text-anchor="middle">/prod/data/*</text>

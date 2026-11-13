@@ -162,7 +162,7 @@
 <li><strong>Delete from the cache only after the database commit</strong>, and keep TTLs short. For data where staleness really hurts, store a version number and refuse older writes.</li>
 <li><strong>Plan for Redis being down.</strong> Fall back to Aurora, but limit how many requests do that at the same time, or the outage moves to your database.</li>
 </ul>
-<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" class="diagram" role="img" aria-labelledby="cache-aside-path-t cache-aside-path-d">
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" class="diagram" role="img" aria-labelledby="cache-aside-path-t cache-aside-path-d"><defs><filter id="cache-aside-path-d3blur" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="6"/></filter><linearGradient id="cache-aside-path-d3sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="d3-sheen-a"/><stop offset="1" class="d3-sheen-b"/></linearGradient><clipPath id="cache-aside-path-d3clip" clipPathUnits="objectBoundingBox"><rect width="1" height="1" rx="0.26"/></clipPath></defs>
   <title id="cache-aside-path-t">Cache-aside read path</title>
   <desc id="cache-aside-path-d">The app asks Redis first; on a hit it returns, on a miss it queries Aurora PostgreSQL and writes the row back to Redis with a TTL.</desc>
   <defs>
@@ -172,19 +172,19 @@
   <rect class="d-zone" x="200" y="24" width="584" height="356" rx="10"/>
   <text class="d-zone-label" x="216" y="46">VPC</text>
 
-  <rect class="d-box" x="24" y="80" width="140" height="70" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="28" y="94" width="140" height="70" rx="10" filter="url(#cache-aside-path-d3blur)"/><rect class="d3-side d3-plain" x="24" y="88" width="140" height="70" rx="10"/><rect class="d3-base" x="24" y="80" width="140" height="70" rx="10"/><rect class="d-box" x="24" y="80" width="140" height="70" rx="10"/><rect class="d3-sheen" x="24" y="80" width="140" height="38.5" rx="10" fill="url(#cache-aside-path-d3sheen)"/></g>
   <text class="d-text" x="94" y="112" text-anchor="middle">Client</text>
   <text class="d-sub" x="94" y="132" text-anchor="middle">HTTP request</text>
 
-  <rect class="d-box d-accent" x="260" y="80" width="200" height="70" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="264" y="94" width="200" height="70" rx="10" filter="url(#cache-aside-path-d3blur)"/><rect class="d3-side d3-accent" x="260" y="88" width="200" height="70" rx="10"/><rect class="d3-base" x="260" y="80" width="200" height="70" rx="10"/><rect class="d-box d-accent" x="260" y="80" width="200" height="70" rx="10"/><rect class="d3-sheen" x="260" y="80" width="200" height="38.5" rx="10" fill="url(#cache-aside-path-d3sheen)"/></g>
   <text class="d-text" x="360" y="112" text-anchor="middle">App (Node.js)</text>
   <text class="d-sub d-mono" x="360" y="132" text-anchor="middle">ioredis + pg</text>
 
-  <rect class="d-box d-cyan" x="576" y="80" width="184" height="70" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="580" y="94" width="184" height="70" rx="10" filter="url(#cache-aside-path-d3blur)"/><rect class="d3-side d3-cyan" x="576" y="88" width="184" height="70" rx="10"/><rect class="d3-base" x="576" y="80" width="184" height="70" rx="10"/><rect class="d-box d-cyan" x="576" y="80" width="184" height="70" rx="10"/><rect class="d3-sheen" x="576" y="80" width="184" height="38.5" rx="10" fill="url(#cache-aside-path-d3sheen)"/></g>
   <text class="d-text" x="668" y="112" text-anchor="middle">ElastiCache</text>
   <text class="d-sub" x="668" y="132" text-anchor="middle">Valkey / Redis OSS</text>
 
-  <rect class="d-box" x="260" y="290" width="200" height="70" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="264" y="304" width="200" height="70" rx="10" filter="url(#cache-aside-path-d3blur)"/><rect class="d3-side d3-plain" x="260" y="298" width="200" height="70" rx="10"/><rect class="d3-base" x="260" y="290" width="200" height="70" rx="10"/><rect class="d-box" x="260" y="290" width="200" height="70" rx="10"/><rect class="d3-sheen" x="260" y="290" width="200" height="38.5" rx="10" fill="url(#cache-aside-path-d3sheen)"/></g>
   <text class="d-text" x="360" y="322" text-anchor="middle">Aurora PostgreSQL</text>
   <text class="d-sub" x="360" y="342" text-anchor="middle">source of truth</text>
 
@@ -219,7 +219,7 @@
 
   <text class="d-sub" x="560" y="300">miss path: steps 3 to 5</text>
   <text class="d-sub" x="560" y="320">hit path: steps 1 and 2</text>
-</svg><figcaption>Cache-aside: steps 1–2 on a hit, steps 1–5 on a miss</figcaption></figure>
+<g class="d3-badges"><rect class="d3-badge-ring" x="249" y="67" width="30" height="30" rx="9"/><image href="/assets/logos/nodedotjs.svg" x="251" y="69" width="26" height="26" clip-path="url(#cache-aside-path-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="565" y="67" width="30" height="30" rx="9"/><image href="/assets/logos/redis.svg" x="567" y="69" width="26" height="26" clip-path="url(#cache-aside-path-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="249" y="277" width="30" height="30" rx="9"/><image href="/assets/logos/aws-aurora.svg" x="251" y="279" width="26" height="26" clip-path="url(#cache-aside-path-d3clip)" preserveAspectRatio="xMidYMid slice"/></g></svg><figcaption>Cache-aside: steps 1–2 on a hit, steps 1–5 on a miss</figcaption></figure>
 <h2 id="the-setup"><a class="anchor" href="#the-setup" aria-hidden="true" tabindex="-1">#</a>The setup</h2>
 <p>A quick word on names first. On AWS, the managed service is <strong>Amazon ElastiCache</strong>. Since October 2024 it supports <strong>Valkey</strong>, the open-source fork of Redis run by the Linux Foundation, next to Redis OSS and Memcached. Valkey speaks the same protocol and commands as Redis, so everything in this post works on both. I&#39;ll say &quot;Redis&quot; for the cache and &quot;Aurora&quot; for Aurora PostgreSQL.</p>
 <p>I use <a href="https://github.com/redis/ioredis" target="_blank" rel="noopener">ioredis</a> for the cache and <a href="https://node-postgres.com/" target="_blank" rel="noopener">node-postgres</a> (<code>pg</code>) for the database. Here is the base that every later snippet builds on. A <strong>TTL</strong> (time to live) is how many seconds a key stays before Redis removes it on its own.</p>
@@ -245,7 +245,7 @@
 <p>For ElastiCache with encryption in transit, use a <code>rediss://</code> URL (two s&#39;s) so ioredis connects over TLS.</p>
 <p>The three ioredis options matter. By default, ioredis queues commands while it reconnects, so if Redis hangs, every request hangs with it. With these settings, a Redis problem becomes a fast error your code can handle.</p>
 <h2 id="four-ways-to-keep-a-cache-filled"><a class="anchor" href="#four-ways-to-keep-a-cache-filled" aria-hidden="true" tabindex="-1">#</a>Four ways to keep a cache filled</h2>
-<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" class="diagram" role="img" aria-labelledby="cache-patterns-t cache-patterns-d">
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" class="diagram" role="img" aria-labelledby="cache-patterns-t cache-patterns-d"><defs><filter id="cache-patterns-d3blur" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="6"/></filter><linearGradient id="cache-patterns-d3sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="d3-sheen-a"/><stop offset="1" class="d3-sheen-b"/></linearGradient><clipPath id="cache-patterns-d3clip" clipPathUnits="objectBoundingBox"><rect width="1" height="1" rx="0.26"/></clipPath></defs>
   <title id="cache-patterns-t">Cache-aside, write-through and write-behind</title>
   <desc id="cache-patterns-d">Three small flows side by side: cache-aside reads Redis and falls back to Aurora, write-through writes Aurora then Redis, write-behind writes Redis and flushes to Aurora later.</desc>
   <defs>
@@ -254,11 +254,11 @@
 
   <rect class="d-zone" x="16" y="16" width="240" height="328" rx="10"/>
   <text class="d-text" x="136" y="48" text-anchor="middle">Cache-aside</text>
-  <rect class="d-box d-accent" x="76" y="76" width="120" height="50" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="80" y="90" width="120" height="50" rx="10" filter="url(#cache-patterns-d3blur)"/><rect class="d3-side d3-accent" x="76" y="84" width="120" height="50" rx="10"/><rect class="d3-base" x="76" y="76" width="120" height="50" rx="10"/><rect class="d-box d-accent" x="76" y="76" width="120" height="50" rx="10"/><rect class="d3-sheen" x="76" y="76" width="120" height="27.5" rx="10" fill="url(#cache-patterns-d3sheen)"/></g>
   <text class="d-text" x="136" y="106" text-anchor="middle">App</text>
-  <rect class="d-box d-cyan" x="32" y="216" width="92" height="50" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="36" y="230" width="92" height="50" rx="10" filter="url(#cache-patterns-d3blur)"/><rect class="d3-side d3-cyan" x="32" y="224" width="92" height="50" rx="10"/><rect class="d3-base" x="32" y="216" width="92" height="50" rx="10"/><rect class="d-box d-cyan" x="32" y="216" width="92" height="50" rx="10"/><rect class="d3-sheen" x="32" y="216" width="92" height="27.5" rx="10" fill="url(#cache-patterns-d3sheen)"/></g>
   <text class="d-text" x="78" y="246" text-anchor="middle">Redis</text>
-  <rect class="d-box" x="148" y="216" width="92" height="50" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="152" y="230" width="92" height="50" rx="10" filter="url(#cache-patterns-d3blur)"/><rect class="d3-side d3-plain" x="148" y="224" width="92" height="50" rx="10"/><rect class="d3-base" x="148" y="216" width="92" height="50" rx="10"/><rect class="d-box" x="148" y="216" width="92" height="50" rx="10"/><rect class="d3-sheen" x="148" y="216" width="92" height="27.5" rx="10" fill="url(#cache-patterns-d3sheen)"/></g>
   <text class="d-text" x="194" y="246" text-anchor="middle">Aurora</text>
   <path class="d-edge d-edge-ok" d="M106 126L80 214" marker-end="url(#cache-patterns-arrow)"/>
   <text class="d-sub" x="86" y="174" text-anchor="end">1  read</text>
@@ -269,11 +269,11 @@
 
   <rect class="d-zone" x="280" y="16" width="240" height="328" rx="10"/>
   <text class="d-text" x="400" y="48" text-anchor="middle">Write-through</text>
-  <rect class="d-box d-accent" x="340" y="76" width="120" height="50" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="344" y="90" width="120" height="50" rx="10" filter="url(#cache-patterns-d3blur)"/><rect class="d3-side d3-accent" x="340" y="84" width="120" height="50" rx="10"/><rect class="d3-base" x="340" y="76" width="120" height="50" rx="10"/><rect class="d-box d-accent" x="340" y="76" width="120" height="50" rx="10"/><rect class="d3-sheen" x="340" y="76" width="120" height="27.5" rx="10" fill="url(#cache-patterns-d3sheen)"/></g>
   <text class="d-text" x="400" y="106" text-anchor="middle">App</text>
-  <rect class="d-box d-cyan" x="296" y="216" width="92" height="50" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="300" y="230" width="92" height="50" rx="10" filter="url(#cache-patterns-d3blur)"/><rect class="d3-side d3-cyan" x="296" y="224" width="92" height="50" rx="10"/><rect class="d3-base" x="296" y="216" width="92" height="50" rx="10"/><rect class="d-box d-cyan" x="296" y="216" width="92" height="50" rx="10"/><rect class="d3-sheen" x="296" y="216" width="92" height="27.5" rx="10" fill="url(#cache-patterns-d3sheen)"/></g>
   <text class="d-text" x="342" y="246" text-anchor="middle">Redis</text>
-  <rect class="d-box" x="412" y="216" width="92" height="50" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="416" y="230" width="92" height="50" rx="10" filter="url(#cache-patterns-d3blur)"/><rect class="d3-side d3-plain" x="412" y="224" width="92" height="50" rx="10"/><rect class="d3-base" x="412" y="216" width="92" height="50" rx="10"/><rect class="d-box" x="412" y="216" width="92" height="50" rx="10"/><rect class="d3-sheen" x="412" y="216" width="92" height="27.5" rx="10" fill="url(#cache-patterns-d3sheen)"/></g>
   <text class="d-text" x="458" y="246" text-anchor="middle">Aurora</text>
   <path class="d-edge d-edge-accent" d="M370 126L344 214" marker-end="url(#cache-patterns-arrow)"/>
   <text class="d-sub" x="350" y="174" text-anchor="end">2  SET</text>
@@ -284,18 +284,18 @@
 
   <rect class="d-zone" x="544" y="16" width="240" height="328" rx="10"/>
   <text class="d-text" x="664" y="48" text-anchor="middle">Write-behind</text>
-  <rect class="d-box d-accent" x="604" y="76" width="120" height="50" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="608" y="90" width="120" height="50" rx="10" filter="url(#cache-patterns-d3blur)"/><rect class="d3-side d3-accent" x="604" y="84" width="120" height="50" rx="10"/><rect class="d3-base" x="604" y="76" width="120" height="50" rx="10"/><rect class="d-box d-accent" x="604" y="76" width="120" height="50" rx="10"/><rect class="d3-sheen" x="604" y="76" width="120" height="27.5" rx="10" fill="url(#cache-patterns-d3sheen)"/></g>
   <text class="d-text" x="664" y="106" text-anchor="middle">App</text>
-  <rect class="d-box d-cyan" x="560" y="216" width="92" height="50" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="564" y="230" width="92" height="50" rx="10" filter="url(#cache-patterns-d3blur)"/><rect class="d3-side d3-cyan" x="560" y="224" width="92" height="50" rx="10"/><rect class="d3-base" x="560" y="216" width="92" height="50" rx="10"/><rect class="d-box d-cyan" x="560" y="216" width="92" height="50" rx="10"/><rect class="d3-sheen" x="560" y="216" width="92" height="27.5" rx="10" fill="url(#cache-patterns-d3sheen)"/></g>
   <text class="d-text" x="606" y="246" text-anchor="middle">Redis</text>
-  <rect class="d-box" x="676" y="216" width="92" height="50" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="680" y="230" width="92" height="50" rx="10" filter="url(#cache-patterns-d3blur)"/><rect class="d3-side d3-plain" x="676" y="224" width="92" height="50" rx="10"/><rect class="d3-base" x="676" y="216" width="92" height="50" rx="10"/><rect class="d-box" x="676" y="216" width="92" height="50" rx="10"/><rect class="d3-sheen" x="676" y="216" width="92" height="27.5" rx="10" fill="url(#cache-patterns-d3sheen)"/></g>
   <text class="d-text" x="722" y="246" text-anchor="middle">Aurora</text>
   <path class="d-edge d-edge-accent" d="M634 126L608 214" marker-end="url(#cache-patterns-arrow)"/>
   <text class="d-sub" x="614" y="174" text-anchor="end">1  write</text>
   <path class="d-edge d-dashed" d="M652 241H674" marker-end="url(#cache-patterns-arrow)"/>
   <text class="d-sub" x="664" y="296" text-anchor="middle">2  async flush</text>
   <text class="d-sub" x="664" y="320" text-anchor="middle">fast, can lose writes</text>
-</svg><figcaption>Who writes to the cache, and when</figcaption></figure>
+<g class="d3-badges"><rect class="d3-badge-ring" x="65" y="63" width="30" height="30" rx="9"/><image href="/assets/logos/nodedotjs.svg" x="67" y="65" width="26" height="26" clip-path="url(#cache-patterns-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="21" y="203" width="30" height="30" rx="9"/><image href="/assets/logos/redis.svg" x="23" y="205" width="26" height="26" clip-path="url(#cache-patterns-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="137" y="203" width="30" height="30" rx="9"/><image href="/assets/logos/aws-aurora.svg" x="139" y="205" width="26" height="26" clip-path="url(#cache-patterns-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="329" y="63" width="30" height="30" rx="9"/><image href="/assets/logos/nodedotjs.svg" x="331" y="65" width="26" height="26" clip-path="url(#cache-patterns-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="285" y="203" width="30" height="30" rx="9"/><image href="/assets/logos/redis.svg" x="287" y="205" width="26" height="26" clip-path="url(#cache-patterns-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="401" y="203" width="30" height="30" rx="9"/><image href="/assets/logos/aws-aurora.svg" x="403" y="205" width="26" height="26" clip-path="url(#cache-patterns-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="593" y="63" width="30" height="30" rx="9"/><image href="/assets/logos/nodedotjs.svg" x="595" y="65" width="26" height="26" clip-path="url(#cache-patterns-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="549" y="203" width="30" height="30" rx="9"/><image href="/assets/logos/redis.svg" x="551" y="205" width="26" height="26" clip-path="url(#cache-patterns-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="665" y="203" width="30" height="30" rx="9"/><image href="/assets/logos/aws-aurora.svg" x="667" y="205" width="26" height="26" clip-path="url(#cache-patterns-d3clip)" preserveAspectRatio="xMidYMid slice"/></g></svg><figcaption>Who writes to the cache, and when</figcaption></figure>
 <ul>
 <li><strong>Cache-aside</strong> (also called <em>lazy loading</em>): the app reads Redis. On a miss, the app reads Aurora and writes the result to Redis. On a write, the app updates Aurora and deletes the cache key.</li>
 <li><strong>Read-through</strong>: the same idea, but a cache library does the loading for you. Your code only talks to the cache. In Node apps this is usually just a helper like <code>getOrLoad</code> below.</li>
@@ -315,7 +315,7 @@
 <span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
 <p>Note <code>ttlWithJitter</code> and the 30-second <code>null</code>. I&#39;ll come back to both.</p>
 <h2 id="the-cache-stampede"><a class="anchor" href="#the-cache-stampede" aria-hidden="true" tabindex="-1">#</a>The cache stampede</h2>
-<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" class="diagram" role="img" aria-labelledby="stampede-timeline-t stampede-timeline-d">
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" class="diagram" role="img" aria-labelledby="stampede-timeline-t stampede-timeline-d"><defs><filter id="stampede-timeline-d3blur" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="6"/></filter><linearGradient id="stampede-timeline-d3sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="d3-sheen-a"/><stop offset="1" class="d3-sheen-b"/></linearGradient><clipPath id="stampede-timeline-d3clip" clipPathUnits="objectBoundingBox"><rect width="1" height="1" rx="0.26"/></clipPath></defs>
   <title id="stampede-timeline-t">Cache stampede with and without a lock</title>
   <desc id="stampede-timeline-d">Two bar charts of Aurora queries over time: without a lock, many queries hit Aurora right after a hot key expires; with a lock, only one query does.</desc>
   <defs>
@@ -327,10 +327,10 @@
   <path class="d-axis" d="M100 50V180H772"/>
   <text class="d-sub" x="90" y="111" text-anchor="end">Aurora</text>
   <text class="d-sub" x="90" y="127" text-anchor="end">queries</text>
-  <rect class="d-fill-warn" x="317" y="70" width="28" height="110" rx="3"/>
-  <rect class="d-fill-warn" x="359" y="76" width="28" height="104" rx="3"/>
-  <rect class="d-fill-warn" x="401" y="84" width="28" height="96" rx="3"/>
-  <rect class="d-fill-warn" x="443" y="128" width="28" height="52" rx="3"/>
+  <rect class="d-fill-warn" x="317" y="70" width="28" height="110" rx="3"/><polygon class="d3-bar-top d3-warn" points="317,70 324,63 352,63 345,70"/><polygon class="d3-bar-side d3-warn" points="345,70 352,63 352,173 345,180"/>
+  <rect class="d-fill-warn" x="359" y="76" width="28" height="104" rx="3"/><polygon class="d3-bar-top d3-warn" points="359,76 366,69 394,69 387,76"/><polygon class="d3-bar-side d3-warn" points="387,76 394,69 394,173 387,180"/>
+  <rect class="d-fill-warn" x="401" y="84" width="28" height="96" rx="3"/><polygon class="d3-bar-top d3-warn" points="401,84 408,77 436,77 429,84"/><polygon class="d3-bar-side d3-warn" points="429,84 436,77 436,173 429,180"/>
+  <rect class="d-fill-warn" x="443" y="128" width="28" height="52" rx="3"/><polygon class="d3-bar-top d3-warn" points="443,128 450,121 478,121 471,128"/><polygon class="d3-bar-side d3-warn" points="471,128 478,121 478,173 471,180"/>
   <path class="d-edge d-dashed" d="M310 50V180"/>
   <text class="d-sub" x="310" y="38" text-anchor="middle">key expires</text>
   <text class="d-sub" x="500" y="111">every request that misses</text>
@@ -341,7 +341,7 @@
   <path class="d-axis" d="M100 262V392H772"/>
   <text class="d-sub" x="90" y="323" text-anchor="end">Aurora</text>
   <text class="d-sub" x="90" y="339" text-anchor="end">queries</text>
-  <rect class="d-fill-ok" x="317" y="380" width="28" height="12" rx="3"/>
+  <rect class="d-fill-ok" x="317" y="380" width="28" height="12" rx="3"/><polygon class="d3-bar-top d3-ok" points="317,380 324,373 352,373 345,380"/><polygon class="d3-bar-side d3-ok" points="345,380 352,373 352,385 345,392"/>
   <path class="d-edge d-dashed" d="M310 262V392"/>
   <text class="d-sub" x="310" y="250" text-anchor="middle">key expires</text>
   <text class="d-sub" x="500" y="323">one request rebuilds the key</text>
@@ -455,7 +455,7 @@
 <p>Plus or minus 10% is enough for most cases. It costs nothing, so I add it everywhere.</p>
 <h2 id="invalidation-and-the-stale-write-back-race"><a class="anchor" href="#invalidation-and-the-stale-write-back-race" aria-hidden="true" tabindex="-1">#</a>Invalidation and the stale write-back race</h2>
 <p>&quot;Invalidation&quot; means removing or updating a cache entry when the real data changes. The usual cache-aside rule is: write to Aurora, then <code>DEL</code> the key. The next read will load the new row. Mostly, that works. But there is a race.</p>
-<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" class="diagram" role="img" aria-labelledby="invalidation-race-t invalidation-race-d">
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" class="diagram" role="img" aria-labelledby="invalidation-race-t invalidation-race-d"><defs><filter id="invalidation-race-d3blur" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="6"/></filter><linearGradient id="invalidation-race-d3sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="d3-sheen-a"/><stop offset="1" class="d3-sheen-b"/></linearGradient><clipPath id="invalidation-race-d3clip" clipPathUnits="objectBoundingBox"><rect width="1" height="1" rx="0.26"/></clipPath></defs>
   <title id="invalidation-race-t">The stale write-back race</title>
   <desc id="invalidation-race-d">A sequence diagram where a reader loads an old value from Aurora, a writer updates the row and deletes the cache key, and then the reader writes the old value back into Redis.</desc>
   <defs>
@@ -463,17 +463,17 @@
   </defs>
 
   <!-- race window band -->
-  <rect class="d-box d-warn" x="24" y="186" width="752" height="186" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="28" y="200" width="752" height="186" rx="10" filter="url(#invalidation-race-d3blur)"/><rect class="d3-side d3-warn" x="24" y="194" width="752" height="186" rx="10"/><rect class="d3-base" x="24" y="186" width="752" height="186" rx="10"/><rect class="d-box d-warn" x="24" y="186" width="752" height="186" rx="10"/><rect class="d3-sheen" x="24" y="186" width="752" height="102.3" rx="10" fill="url(#invalidation-race-d3sheen)"/></g>
   <text class="d-sub" x="620" y="356" text-anchor="middle">race window</text>
 
   <!-- actors -->
-  <rect class="d-box d-accent" x="60" y="24" width="120" height="50" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="64" y="38" width="120" height="50" rx="10" filter="url(#invalidation-race-d3blur)"/><rect class="d3-side d3-accent" x="60" y="32" width="120" height="50" rx="10"/><rect class="d3-base" x="60" y="24" width="120" height="50" rx="10"/><rect class="d-box d-accent" x="60" y="24" width="120" height="50" rx="10"/><rect class="d3-sheen" x="60" y="24" width="120" height="27.5" rx="10" fill="url(#invalidation-race-d3sheen)"/></g>
   <text class="d-text" x="120" y="54" text-anchor="middle">Reader</text>
-  <rect class="d-box d-cyan" x="260" y="24" width="120" height="50" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="264" y="38" width="120" height="50" rx="10" filter="url(#invalidation-race-d3blur)"/><rect class="d3-side d3-cyan" x="260" y="32" width="120" height="50" rx="10"/><rect class="d3-base" x="260" y="24" width="120" height="50" rx="10"/><rect class="d-box d-cyan" x="260" y="24" width="120" height="50" rx="10"/><rect class="d3-sheen" x="260" y="24" width="120" height="27.5" rx="10" fill="url(#invalidation-race-d3sheen)"/></g>
   <text class="d-text" x="320" y="54" text-anchor="middle">Redis</text>
-  <rect class="d-box" x="460" y="24" width="120" height="50" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="464" y="38" width="120" height="50" rx="10" filter="url(#invalidation-race-d3blur)"/><rect class="d3-side d3-plain" x="460" y="32" width="120" height="50" rx="10"/><rect class="d3-base" x="460" y="24" width="120" height="50" rx="10"/><rect class="d-box" x="460" y="24" width="120" height="50" rx="10"/><rect class="d3-sheen" x="460" y="24" width="120" height="27.5" rx="10" fill="url(#invalidation-race-d3sheen)"/></g>
   <text class="d-text" x="520" y="54" text-anchor="middle">Aurora</text>
-  <rect class="d-box d-accent" x="660" y="24" width="120" height="50" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="664" y="38" width="120" height="50" rx="10" filter="url(#invalidation-race-d3blur)"/><rect class="d3-side d3-accent" x="660" y="32" width="120" height="50" rx="10"/><rect class="d3-base" x="660" y="24" width="120" height="50" rx="10"/><rect class="d-box d-accent" x="660" y="24" width="120" height="50" rx="10"/><rect class="d3-sheen" x="660" y="24" width="120" height="27.5" rx="10" fill="url(#invalidation-race-d3sheen)"/></g>
   <text class="d-text" x="720" y="54" text-anchor="middle">Writer</text>
 
   <!-- lifelines -->
@@ -508,10 +508,10 @@
   <text class="d-sub" x="175" y="337">SET key = v1</text>
 
   <!-- outcome -->
-  <rect class="d-box d-warn" x="220" y="420" width="360" height="60" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="224" y="434" width="360" height="60" rx="10" filter="url(#invalidation-race-d3blur)"/><rect class="d3-side d3-warn" x="220" y="428" width="360" height="60" rx="10"/><rect class="d3-base" x="220" y="420" width="360" height="60" rx="10"/><rect class="d-box d-warn" x="220" y="420" width="360" height="60" rx="10"/><rect class="d3-sheen" x="220" y="420" width="360" height="33" rx="10" fill="url(#invalidation-race-d3sheen)"/></g>
   <text class="d-text" x="400" y="446" text-anchor="middle">Redis has v1, Aurora has v2</text>
   <text class="d-sub" x="400" y="466" text-anchor="middle">stale until the TTL runs out</text>
-</svg><figcaption>The bad order of events: the old value lands after the DEL</figcaption></figure>
+<g class="d3-badges"><rect class="d3-badge-ring" x="49" y="11" width="30" height="30" rx="9"/><image href="/assets/logos/nodedotjs.svg" x="51" y="13" width="26" height="26" clip-path="url(#invalidation-race-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="249" y="11" width="30" height="30" rx="9"/><image href="/assets/logos/redis.svg" x="251" y="13" width="26" height="26" clip-path="url(#invalidation-race-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="449" y="11" width="30" height="30" rx="9"/><image href="/assets/logos/aws-aurora.svg" x="451" y="13" width="26" height="26" clip-path="url(#invalidation-race-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="649" y="11" width="30" height="30" rx="9"/><image href="/assets/logos/nodedotjs.svg" x="651" y="13" width="26" height="26" clip-path="url(#invalidation-race-d3clip)" preserveAspectRatio="xMidYMid slice"/></g></svg><figcaption>The bad order of events: the old value lands after the DEL</figcaption></figure>
 <p>Follow the numbers:</p>
 <ol>
 <li>A reader misses in Redis.</li>

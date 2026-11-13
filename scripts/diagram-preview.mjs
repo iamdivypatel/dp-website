@@ -3,6 +3,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { basename, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { dimensionalize } from './diagram3d.mjs';
 
 const file = process.argv[2];
 if (!file) throw new Error('usage: node scripts/diagram-preview.mjs path/to/diagram.svg');
@@ -13,7 +14,7 @@ const out = '/private/tmp/diagram-preview';
 mkdirSync(out, { recursive: true });
 const html = `<!doctype html><meta charset="utf-8"><style>${fonts}${tokens}
 :root{--font-sans:"Archivo",system-ui,sans-serif;--font-mono:"JetBrains Mono",monospace}
-body{margin:0;background:var(--bg);padding:24px;width:800px}${readFileSync('src/blog/diagram.css', 'utf8')}</style>${readFileSync(file, 'utf8')}`;
+body{margin:0;background:var(--bg);padding:24px;width:800px}${readFileSync('src/blog/diagram.css', 'utf8')}</style>${dimensionalize(readFileSync(file, 'utf8'), file).replaceAll('href="/assets/', `href="file://${resolve('public/assets')}/`)}`;
 const page = `${out}/${basename(file, '.svg')}.html`;
 writeFileSync(page, html);
 const png = page.replace(/\.html$/, '.png');

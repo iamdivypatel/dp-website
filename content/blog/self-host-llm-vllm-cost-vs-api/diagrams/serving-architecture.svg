@@ -5,7 +5,7 @@
 <rect x="181" y="30" width="603" height="330" rx="10" class="d-zone"/>
 <text x="194" y="52" class="d-zone-label">YOUR NETWORK / GPU HOST</text>
 
-<rect x="12" y="90" width="122" height="80" rx="10" class="d-box"/>
+<rect x="12" y="90" width="122" height="80" rx="10" class="d-box" data-logo="nodedotjs"/>
 <text x="73" y="124" class="d-text" text-anchor="middle">Your app</text>
 <text x="73" y="146" class="d-sub" text-anchor="middle">OpenAI SDK</text>
 
@@ -14,7 +14,7 @@
 <text x="274" y="136" class="d-sub" text-anchor="middle">TLS, rate limit</text>
 <text x="274" y="156" class="d-sub" text-anchor="middle">API key check</text>
 
-<rect x="390" y="80" width="180" height="100" rx="10" class="d-box d-accent"/>
+<rect x="390" y="80" width="180" height="100" rx="10" class="d-box d-accent" data-logo="vllm"/>
 <text x="480" y="112" class="d-text" text-anchor="middle">vLLM server</text>
 <text x="480" y="136" class="d-sub" text-anchor="middle">OpenAI-compatible</text>
 <text x="480" y="156" class="d-sub d-mono" text-anchor="middle">:8000/v1</text>
@@ -24,11 +24,11 @@
 <text x="686" y="144" class="d-sub" text-anchor="middle">model weights</text>
 <text x="686" y="162" class="d-sub" text-anchor="middle">+ KV cache</text>
 
-<rect x="390" y="250" width="180" height="80" rx="10" class="d-box"/>
+<rect x="390" y="250" width="180" height="80" rx="10" class="d-box" data-logo="prometheus"/>
 <text x="480" y="284" class="d-text" text-anchor="middle">Prometheus</text>
 <text x="480" y="306" class="d-sub" text-anchor="middle">scrapes every 15 s</text>
 
-<rect x="194" y="250" width="160" height="80" rx="10" class="d-box d-ok"/>
+<rect x="194" y="250" width="160" height="80" rx="10" class="d-box d-ok" data-logo="grafana"/>
 <text x="274" y="284" class="d-text" text-anchor="middle">Grafana</text>
 <text x="274" y="306" class="d-sub" text-anchor="middle">dashboards, alerts</text>
 

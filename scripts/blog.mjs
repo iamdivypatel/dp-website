@@ -11,6 +11,7 @@ import { execFileSync } from 'node:child_process';
 import matter from 'gray-matter';
 import { Marked } from 'marked';
 import { createHighlighter } from 'shiki';
+import { dimensionalize } from './diagram3d.mjs';
 
 const SRC = 'content/blog';
 const OUT = 'public/blog';
@@ -81,8 +82,9 @@ function render(post, dir = join(SRC, post.slug)) {
           const svg = readFileSync(join(dir, href), 'utf8').replace(/<\?xml[^>]*>\s*/, '').trim();
           if (/<script|<style|<foreignObject|\son\w+=|style="|href="(?!#)/i.test(svg)) throw new Error(`${post.slug}/${href}: scripts, styles and external links are not allowed in diagrams`);
           if (!/class="diagram"/.test(svg)) throw new Error(`${post.slug}/${href}: the <svg> needs class="diagram"`);
+          const svg3d = dimensionalize(svg, `${post.slug}/${href}`);
           const caption = title || text;
-          return `<figure class="figure">${svg}${caption ? `<figcaption>${esc(caption)}</figcaption>` : ''}</figure>`;
+          return `<figure class="figure">${svg3d}${caption ? `<figcaption>${esc(caption)}</figcaption>` : ''}</figure>`;
         }
         return `<img src="${esc(href)}" alt="${esc(text)}" loading="lazy">`;
       },

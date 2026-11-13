@@ -16,7 +16,7 @@
   <!-- Stage 1 -->
   <rect x="20" y="76" width="220" height="280" rx="10" class="d-zone"/>
   <text x="36" y="96" class="d-zone-label">AWS ACCOUNT</text>
-  <rect x="36" y="112" width="188" height="228" rx="10" class="d-box"/>
+  <rect x="36" y="112" width="188" height="228" rx="10" class="d-box" data-logo="terraform"/>
   <text x="130" y="180" class="d-text d-mono" text-anchor="middle">root module</text>
   <text x="130" y="202" class="d-sub" text-anchor="middle">one state file</text>
   <text x="130" y="242" class="d-sub d-mono" text-anchor="middle">VPC · Aurora · SQS</text>
@@ -28,9 +28,9 @@
   <text x="306" y="96" class="d-zone-label">AWS ACCOUNT</text>
   <rect x="306" y="112" width="188" height="40" rx="10" class="d-box d-accent"/>
   <text x="400" y="137" class="d-text d-mono" text-anchor="middle">network</text>
-  <rect x="306" y="176" width="188" height="40" rx="10" class="d-box d-accent"/>
+  <rect x="306" y="176" width="188" height="40" rx="10" class="d-box d-accent" data-logo="aws-aurora"/>
   <text x="400" y="201" class="d-text d-mono" text-anchor="middle">data</text>
-  <rect x="306" y="240" width="188" height="40" rx="10" class="d-box d-accent"/>
+  <rect x="306" y="240" width="188" height="40" rx="10" class="d-box d-accent" data-logo="aws-lambda"/>
   <text x="400" y="265" class="d-text d-mono" text-anchor="middle">app</text>
   <rect x="306" y="304" width="188" height="40" rx="10" class="d-box d-accent"/>
   <text x="400" y="329" class="d-text d-mono" text-anchor="middle">edge</text>

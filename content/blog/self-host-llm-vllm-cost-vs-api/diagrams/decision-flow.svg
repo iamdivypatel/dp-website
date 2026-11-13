@@ -5,7 +5,7 @@
 <rect x="40" y="24" width="340" height="68" rx="10" class="d-box"/>
 <circle cx="68" cy="58.0" r="11" class="d-num"/><text x="68" y="58.0" class="d-num-text">1</text>
 <text x="226" y="63.0" class="d-text" text-anchor="middle">Data must stay in your network?</text>
-<rect x="480" y="24" width="290" height="68" rx="10" class="d-box d-accent"/>
+<rect x="480" y="24" width="290" height="68" rx="10" class="d-box d-accent" data-logo="vllm"/>
 <text x="625" y="53" class="d-text" text-anchor="middle">Self-host</text>
 <text x="625" y="75" class="d-sub" text-anchor="middle">or a private endpoint</text>
 <path d="M380 58.0H476" class="d-edge d-edge-accent" marker-end="url(#decision-flow-arrow)"/>
@@ -42,7 +42,7 @@
 <text x="428" y="386.0" class="d-sub" text-anchor="middle">no</text>
 <path d="M210 428V468" class="d-edge d-edge-accent" marker-end="url(#decision-flow-arrow)"/>
 <text x="222" y="455" class="d-sub">yes</text>
-<rect x="40" y="472" width="340" height="68" rx="10" class="d-box d-ok"/>
+<rect x="40" y="472" width="340" height="68" rx="10" class="d-box d-ok" data-logo="vllm"/>
 <text x="210" y="501" class="d-text" text-anchor="middle">Self-host with vLLM</text>
 <text x="210" y="523" class="d-sub" text-anchor="middle">re-check the math every quarter</text>
 </svg>

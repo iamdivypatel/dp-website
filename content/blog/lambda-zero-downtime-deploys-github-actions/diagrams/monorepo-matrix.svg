@@ -21,7 +21,7 @@
   <text class="d-sub d-mono" x="125" y="257" text-anchor="middle">users/  no change</text>
 
   <!-- Changes job -->
-  <rect class="d-box" x="310" y="128" width="200" height="76" rx="10"/>
+  <rect class="d-box" x="310" y="128" width="200" height="76" rx="10" data-logo="githubactions"/>
   <text class="d-text" x="410" y="158" text-anchor="middle">changes job</text>
   <text class="d-sub d-mono" x="410" y="182" text-anchor="middle">["orders","billing"]</text>
 
@@ -29,11 +29,11 @@
   <text class="d-sub" x="270" y="156" text-anchor="middle">git diff</text>
 
   <!-- Matrix -->
-  <rect class="d-box d-ok" x="590" y="40" width="190" height="64" rx="10"/>
+  <rect class="d-box d-ok" x="590" y="40" width="190" height="64" rx="10" data-logo="aws-lambda"/>
   <text class="d-text" x="685" y="68" text-anchor="middle">deploy orders</text>
   <text class="d-sub" x="685" y="88" text-anchor="middle">own canary</text>
 
-  <rect class="d-box d-ok" x="590" y="134" width="190" height="64" rx="10"/>
+  <rect class="d-box d-ok" x="590" y="134" width="190" height="64" rx="10" data-logo="aws-lambda"/>
   <text class="d-text" x="685" y="162" text-anchor="middle">deploy billing</text>
   <text class="d-sub" x="685" y="182" text-anchor="middle">own canary</text>
 

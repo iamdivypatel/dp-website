@@ -12,11 +12,11 @@
   <text class="d-zone-label" x="356" y="40">AWS ACCOUNT</text>
 
   <!-- GitHub side -->
-  <rect class="d-box d-accent" x="40" y="60" width="200" height="80" rx="10"/>
+  <rect class="d-box d-accent" x="40" y="60" width="200" height="80" rx="10" data-logo="githubactions"/>
   <text class="d-text" x="140" y="92" text-anchor="middle">Actions job</text>
   <text class="d-sub" x="140" y="114" text-anchor="middle">id-token: write</text>
 
-  <rect class="d-box" x="40" y="250" width="200" height="70" rx="10"/>
+  <rect class="d-box" x="40" y="250" width="200" height="70" rx="10" data-logo="githubactions"/>
   <text class="d-text" x="140" y="280" text-anchor="middle">GitHub OIDC</text>
   <text class="d-sub" x="140" y="300" text-anchor="middle">signs a JWT</text>
 
@@ -35,7 +35,7 @@
   <text class="d-text" x="675" y="92" text-anchor="middle">IAM role</text>
   <text class="d-sub" x="675" y="114" text-anchor="middle">trust policy</text>
 
-  <rect class="d-box d-ok" x="360" y="180" width="190" height="64" rx="10"/>
+  <rect class="d-box d-ok" x="360" y="180" width="190" height="64" rx="10" data-logo="aws-lambda"/>
   <text class="d-text" x="455" y="208" text-anchor="middle">Lambda API</text>
   <text class="d-sub" x="455" y="228" text-anchor="middle">update, publish, alias</text>
 

@@ -162,7 +162,7 @@
 <li><strong>Rollback is one API call.</strong> You point the alias back at the old version. You don&#39;t rebuild anything.</li>
 <li><strong>Monorepos:</strong> work out which function folders changed and deploy only those, one matrix job per function. Prod waits for a reviewer to approve it.</li>
 </ul>
-<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" class="diagram" role="img" aria-labelledby="pipeline-t pipeline-d">
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 302" class="diagram" role="img" aria-labelledby="pipeline-t pipeline-d"><defs><filter id="pipeline-d3blur" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="6"/></filter><linearGradient id="pipeline-d3sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="d3-sheen-a"/><stop offset="1" class="d3-sheen-b"/></linearGradient><clipPath id="pipeline-d3clip" clipPathUnits="objectBoundingBox"><rect width="1" height="1" rx="0.26"/></clipPath></defs>
   <title id="pipeline-t">Lambda deploy pipeline</title>
   <desc id="pipeline-d">A push runs tests, builds a zip, updates the function code and publishes version 8, then shifts 10 percent of the live alias to it, watches the alarms for five minutes, and either promotes v8 to 100 percent or rolls back to v7.</desc>
   <defs>
@@ -170,19 +170,19 @@
   </defs>
 
   <!-- Row 1: build -->
-  <rect class="d-box" x="20" y="40" width="160" height="64" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="24" y="54" width="160" height="64" rx="10" filter="url(#pipeline-d3blur)"/><rect class="d3-side d3-plain" x="20" y="48" width="160" height="64" rx="10"/><rect class="d3-base" x="20" y="40" width="160" height="64" rx="10"/><rect class="d-box" x="20" y="40" width="160" height="64" rx="10"/><rect class="d3-sheen" x="20" y="40" width="160" height="35.2" rx="10" fill="url(#pipeline-d3sheen)"/></g>
   <text class="d-text" x="100" y="68" text-anchor="middle">git push</text>
   <text class="d-sub" x="100" y="88" text-anchor="middle">to main</text>
 
-  <rect class="d-box" x="220" y="40" width="160" height="64" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="224" y="54" width="160" height="64" rx="10" filter="url(#pipeline-d3blur)"/><rect class="d3-side d3-plain" x="220" y="48" width="160" height="64" rx="10"/><rect class="d3-base" x="220" y="40" width="160" height="64" rx="10"/><rect class="d-box" x="220" y="40" width="160" height="64" rx="10"/><rect class="d3-sheen" x="220" y="40" width="160" height="35.2" rx="10" fill="url(#pipeline-d3sheen)"/></g>
   <text class="d-text" x="300" y="68" text-anchor="middle">Test</text>
   <text class="d-sub" x="300" y="88" text-anchor="middle">npm ci, npm test</text>
 
-  <rect class="d-box" x="420" y="40" width="160" height="64" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="424" y="54" width="160" height="64" rx="10" filter="url(#pipeline-d3blur)"/><rect class="d3-side d3-plain" x="420" y="48" width="160" height="64" rx="10"/><rect class="d3-base" x="420" y="40" width="160" height="64" rx="10"/><rect class="d-box" x="420" y="40" width="160" height="64" rx="10"/><rect class="d3-sheen" x="420" y="40" width="160" height="35.2" rx="10" fill="url(#pipeline-d3sheen)"/></g>
   <text class="d-text" x="500" y="68" text-anchor="middle">Build zip</text>
   <text class="d-sub" x="500" y="88" text-anchor="middle">function.zip</text>
 
-  <rect class="d-box" x="620" y="40" width="160" height="64" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="624" y="54" width="160" height="64" rx="10" filter="url(#pipeline-d3blur)"/><rect class="d3-side d3-plain" x="620" y="48" width="160" height="64" rx="10"/><rect class="d3-base" x="620" y="40" width="160" height="64" rx="10"/><rect class="d-box" x="620" y="40" width="160" height="64" rx="10"/><rect class="d3-sheen" x="620" y="40" width="160" height="35.2" rx="10" fill="url(#pipeline-d3sheen)"/></g>
   <text class="d-text" x="700" y="68" text-anchor="middle">Update code</text>
   <text class="d-sub" x="700" y="88" text-anchor="middle">lands on $LATEST</text>
 
@@ -192,15 +192,15 @@
   <line class="d-edge" x1="700" y1="104" x2="700" y2="180" marker-end="url(#pipeline-arrow)"/>
 
   <!-- Row 2: release (right to left) -->
-  <rect class="d-box d-accent" x="620" y="180" width="160" height="64" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="624" y="194" width="160" height="64" rx="10" filter="url(#pipeline-d3blur)"/><rect class="d3-side d3-accent" x="620" y="188" width="160" height="64" rx="10"/><rect class="d3-base" x="620" y="180" width="160" height="64" rx="10"/><rect class="d-box d-accent" x="620" y="180" width="160" height="64" rx="10"/><rect class="d3-sheen" x="620" y="180" width="160" height="35.2" rx="10" fill="url(#pipeline-d3sheen)"/></g>
   <text class="d-text" x="700" y="208" text-anchor="middle">Publish v8</text>
   <text class="d-sub" x="700" y="228" text-anchor="middle">frozen copy</text>
 
-  <rect class="d-box d-accent" x="420" y="180" width="160" height="64" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="424" y="194" width="160" height="64" rx="10" filter="url(#pipeline-d3blur)"/><rect class="d3-side d3-accent" x="420" y="188" width="160" height="64" rx="10"/><rect class="d3-base" x="420" y="180" width="160" height="64" rx="10"/><rect class="d-box d-accent" x="420" y="180" width="160" height="64" rx="10"/><rect class="d3-sheen" x="420" y="180" width="160" height="35.2" rx="10" fill="url(#pipeline-d3sheen)"/></g>
   <text class="d-text" x="500" y="208" text-anchor="middle">Shift alias</text>
   <text class="d-sub" x="500" y="228" text-anchor="middle">10% to v8</text>
 
-  <rect class="d-box" x="220" y="180" width="160" height="64" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="224" y="194" width="160" height="64" rx="10" filter="url(#pipeline-d3blur)"/><rect class="d3-side d3-plain" x="220" y="188" width="160" height="64" rx="10"/><rect class="d3-base" x="220" y="180" width="160" height="64" rx="10"/><rect class="d-box" x="220" y="180" width="160" height="64" rx="10"/><rect class="d3-sheen" x="220" y="180" width="160" height="35.2" rx="10" fill="url(#pipeline-d3sheen)"/></g>
   <text class="d-text" x="300" y="208" text-anchor="middle">Watch alarms</text>
   <text class="d-sub" x="300" y="228" text-anchor="middle">for 5 minutes</text>
 
@@ -208,17 +208,17 @@
   <line class="d-edge" x1="420" y1="212" x2="380" y2="212" marker-end="url(#pipeline-arrow)"/>
 
   <!-- Outcomes -->
-  <rect class="d-box d-ok" x="20" y="140" width="160" height="56" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="24" y="154" width="160" height="56" rx="10" filter="url(#pipeline-d3blur)"/><rect class="d3-side d3-ok" x="20" y="148" width="160" height="56" rx="10"/><rect class="d3-base" x="20" y="140" width="160" height="56" rx="10"/><rect class="d-box d-ok" x="20" y="140" width="160" height="56" rx="10"/><rect class="d3-sheen" x="20" y="140" width="160" height="30.8" rx="10" fill="url(#pipeline-d3sheen)"/></g>
   <text class="d-text" x="100" y="164" text-anchor="middle">Promote</text>
   <text class="d-sub" x="100" y="183" text-anchor="middle">100% to v8</text>
 
-  <rect class="d-box d-warn" x="20" y="228" width="160" height="56" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="24" y="242" width="160" height="56" rx="10" filter="url(#pipeline-d3blur)"/><rect class="d3-side d3-warn" x="20" y="236" width="160" height="56" rx="10"/><rect class="d3-base" x="20" y="228" width="160" height="56" rx="10"/><rect class="d-box d-warn" x="20" y="228" width="160" height="56" rx="10"/><rect class="d3-sheen" x="20" y="228" width="160" height="30.8" rx="10" fill="url(#pipeline-d3sheen)"/></g>
   <text class="d-text" x="100" y="252" text-anchor="middle">Roll back</text>
   <text class="d-sub" x="100" y="271" text-anchor="middle">100% to v7</text>
 
   <path class="d-edge d-edge-ok" d="M220 200 L180 172" marker-end="url(#pipeline-arrow)"/>
   <path class="d-edge d-edge-warn" d="M220 224 L180 252" marker-end="url(#pipeline-arrow)"/>
-</svg><figcaption>The whole path. Everything after 'publish' changes only where the alias points.</figcaption></figure>
+<g class="d3-badges"><rect class="d3-badge-ring" x="9" y="27" width="30" height="30" rx="9"/><image href="/assets/logos/githubactions.svg" x="11" y="29" width="26" height="26" clip-path="url(#pipeline-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="209" y="27" width="30" height="30" rx="9"/><image href="/assets/logos/githubactions.svg" x="211" y="29" width="26" height="26" clip-path="url(#pipeline-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="409" y="27" width="30" height="30" rx="9"/><image href="/assets/logos/nodedotjs.svg" x="411" y="29" width="26" height="26" clip-path="url(#pipeline-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="609" y="27" width="30" height="30" rx="9"/><image href="/assets/logos/aws-lambda.svg" x="611" y="29" width="26" height="26" clip-path="url(#pipeline-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="609" y="167" width="30" height="30" rx="9"/><image href="/assets/logos/aws-lambda.svg" x="611" y="169" width="26" height="26" clip-path="url(#pipeline-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="409" y="167" width="30" height="30" rx="9"/><image href="/assets/logos/aws-lambda.svg" x="411" y="169" width="26" height="26" clip-path="url(#pipeline-d3clip)" preserveAspectRatio="xMidYMid slice"/></g></svg><figcaption>The whole path. Everything after 'publish' changes only where the alias points.</figcaption></figure>
 <h2 id="four-words-you-need-first"><a class="anchor" href="#four-words-you-need-first" aria-hidden="true" tabindex="-1">#</a>Four words you need first</h2>
 <p>Here is the vocabulary, one plain sentence each:</p>
 <ul>
@@ -229,7 +229,7 @@
 </ul>
 <p>That&#39;s the whole trick. Versions are the &quot;what&quot;. The alias is the &quot;where&quot;. A deploy just publishes a new &quot;what&quot; and then slowly moves the &quot;where&quot;.</p>
 <h2 id="step-1-let-github-log-in-to-aws-without-keys"><a class="anchor" href="#step-1-let-github-log-in-to-aws-without-keys" aria-hidden="true" tabindex="-1">#</a>Step 1: let GitHub log in to AWS without keys</h2>
-<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" class="diagram" role="img" aria-labelledby="oidc-trust-t oidc-trust-d">
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" class="diagram" role="img" aria-labelledby="oidc-trust-t oidc-trust-d"><defs><filter id="oidc-trust-d3blur" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="6"/></filter><linearGradient id="oidc-trust-d3sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="d3-sheen-a"/><stop offset="1" class="d3-sheen-b"/></linearGradient><clipPath id="oidc-trust-d3clip" clipPathUnits="objectBoundingBox"><rect width="1" height="1" rx="0.26"/></clipPath></defs>
   <title id="oidc-trust-t">GitHub OIDC to AWS trust flow</title>
   <desc id="oidc-trust-d">The GitHub Actions job gets a signed JWT from GitHub's OIDC service, sends it to AWS STS, which checks the IAM role's trust policy conditions on aud and sub and returns short-lived credentials that the job uses to call the Lambda API.</desc>
   <defs>
@@ -243,11 +243,11 @@
   <text class="d-zone-label" x="356" y="40">AWS ACCOUNT</text>
 
   <!-- GitHub side -->
-  <rect class="d-box d-accent" x="40" y="60" width="200" height="80" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="44" y="74" width="200" height="80" rx="10" filter="url(#oidc-trust-d3blur)"/><rect class="d3-side d3-accent" x="40" y="68" width="200" height="80" rx="10"/><rect class="d3-base" x="40" y="60" width="200" height="80" rx="10"/><rect class="d-box d-accent" x="40" y="60" width="200" height="80" rx="10"/><rect class="d3-sheen" x="40" y="60" width="200" height="44" rx="10" fill="url(#oidc-trust-d3sheen)"/></g>
   <text class="d-text" x="140" y="92" text-anchor="middle">Actions job</text>
   <text class="d-sub" x="140" y="114" text-anchor="middle">id-token: write</text>
 
-  <rect class="d-box" x="40" y="250" width="200" height="70" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="44" y="264" width="200" height="70" rx="10" filter="url(#oidc-trust-d3blur)"/><rect class="d3-side d3-plain" x="40" y="258" width="200" height="70" rx="10"/><rect class="d3-base" x="40" y="250" width="200" height="70" rx="10"/><rect class="d-box" x="40" y="250" width="200" height="70" rx="10"/><rect class="d3-sheen" x="40" y="250" width="200" height="38.5" rx="10" fill="url(#oidc-trust-d3sheen)"/></g>
   <text class="d-text" x="140" y="280" text-anchor="middle">GitHub OIDC</text>
   <text class="d-sub" x="140" y="300" text-anchor="middle">signs a JWT</text>
 
@@ -258,15 +258,15 @@
   <text class="d-sub" x="140" y="236" text-anchor="middle">JWT</text>
 
   <!-- AWS side -->
-  <rect class="d-box" x="360" y="60" width="190" height="80" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="364" y="74" width="190" height="80" rx="10" filter="url(#oidc-trust-d3blur)"/><rect class="d3-side d3-plain" x="360" y="68" width="190" height="80" rx="10"/><rect class="d3-base" x="360" y="60" width="190" height="80" rx="10"/><rect class="d-box" x="360" y="60" width="190" height="80" rx="10"/><rect class="d3-sheen" x="360" y="60" width="190" height="44" rx="10" fill="url(#oidc-trust-d3sheen)"/></g>
   <text class="d-text" x="455" y="92" text-anchor="middle">AWS STS</text>
   <text class="d-sub" x="455" y="114" text-anchor="middle">checks the JWT</text>
 
-  <rect class="d-box" x="590" y="60" width="170" height="80" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="594" y="74" width="170" height="80" rx="10" filter="url(#oidc-trust-d3blur)"/><rect class="d3-side d3-plain" x="590" y="68" width="170" height="80" rx="10"/><rect class="d3-base" x="590" y="60" width="170" height="80" rx="10"/><rect class="d-box" x="590" y="60" width="170" height="80" rx="10"/><rect class="d3-sheen" x="590" y="60" width="170" height="44" rx="10" fill="url(#oidc-trust-d3sheen)"/></g>
   <text class="d-text" x="675" y="92" text-anchor="middle">IAM role</text>
   <text class="d-sub" x="675" y="114" text-anchor="middle">trust policy</text>
 
-  <rect class="d-box d-ok" x="360" y="180" width="190" height="64" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="364" y="194" width="190" height="64" rx="10" filter="url(#oidc-trust-d3blur)"/><rect class="d3-side d3-ok" x="360" y="188" width="190" height="64" rx="10"/><rect class="d3-base" x="360" y="180" width="190" height="64" rx="10"/><rect class="d-box d-ok" x="360" y="180" width="190" height="64" rx="10"/><rect class="d3-sheen" x="360" y="180" width="190" height="35.2" rx="10" fill="url(#oidc-trust-d3sheen)"/></g>
   <text class="d-text" x="455" y="208" text-anchor="middle">Lambda API</text>
   <text class="d-sub" x="455" y="228" text-anchor="middle">update, publish, alias</text>
 
@@ -285,12 +285,12 @@
 
   <!-- Trust condition -->
   <line class="d-edge d-dashed" x1="675" y1="140" x2="675" y2="280"/>
-  <rect class="d-box d-cyan" x="360" y="280" width="400" height="100" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="364" y="294" width="400" height="100" rx="10" filter="url(#oidc-trust-d3blur)"/><rect class="d3-side d3-cyan" x="360" y="288" width="400" height="100" rx="10"/><rect class="d3-base" x="360" y="280" width="400" height="100" rx="10"/><rect class="d-box d-cyan" x="360" y="280" width="400" height="100" rx="10"/><rect class="d3-sheen" x="360" y="280" width="400" height="55" rx="10" fill="url(#oidc-trust-d3sheen)"/></g>
   <text class="d-text" x="560" y="306" text-anchor="middle">Trust condition</text>
   <text class="d-sub d-mono" x="560" y="330" text-anchor="middle">aud = sts.amazonaws.com</text>
   <text class="d-sub d-mono" x="560" y="352" text-anchor="middle">sub = repo:my-org/my-repo:</text>
   <text class="d-sub d-mono" x="560" y="370" text-anchor="middle">environment:production</text>
-</svg><figcaption>The job proves who it is with a signed token. The role's trust policy decides if that is enough.</figcaption></figure>
+<g class="d3-badges"><rect class="d3-badge-ring" x="29" y="47" width="30" height="30" rx="9"/><image href="/assets/logos/githubactions.svg" x="31" y="49" width="26" height="26" clip-path="url(#oidc-trust-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="29" y="237" width="30" height="30" rx="9"/><image href="/assets/logos/githubactions.svg" x="31" y="239" width="26" height="26" clip-path="url(#oidc-trust-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="349" y="167" width="30" height="30" rx="9"/><image href="/assets/logos/aws-lambda.svg" x="351" y="169" width="26" height="26" clip-path="url(#oidc-trust-d3clip)" preserveAspectRatio="xMidYMid slice"/></g></svg><figcaption>The job proves who it is with a signed token. The role's trust policy decides if that is enough.</figcaption></figure>
 <p>OIDC (OpenID Connect) is a standard way for one system to prove its identity to another with a signed token. Here is how it works:</p>
 <ol>
 <li>Your job asks GitHub for a token. This needs <code>permissions: id-token: write</code> in the workflow.</li>
@@ -352,7 +352,7 @@
 </aside>
 <p>Give the role only what the deploy needs: <code>lambda:UpdateFunctionCode</code>, <code>GetFunction</code>, <code>GetFunctionConfiguration</code>, <code>PublishVersion</code>, <code>GetAlias</code>, <code>UpdateAlias</code>, <code>ListVersionsByFunction</code>, <code>ListAliases</code> and <code>DeleteFunction</code> (for cleanup), plus <code>cloudwatch:DescribeAlarms</code> and <code>cloudwatch:GetMetricStatistics</code>. Scope the Lambda actions to your function ARNs, like <code>arn:aws:lambda:*:111122223333:function:orders-*</code>. Make one role per environment, so a staging job can never touch prod.</p>
 <h2 id="step-2-point-everything-at-the-alias"><a class="anchor" href="#step-2-point-everything-at-the-alias" aria-hidden="true" tabindex="-1">#</a>Step 2: point everything at the alias</h2>
-<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 390" class="diagram" role="img" aria-labelledby="where-things-point-t where-things-point-d">
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 390" class="diagram" role="img" aria-labelledby="where-things-point-t where-things-point-d"><defs><filter id="where-things-point-d3blur" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="6"/></filter><linearGradient id="where-things-point-d3sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="d3-sheen-a"/><stop offset="1" class="d3-sheen-b"/></linearGradient><clipPath id="where-things-point-d3clip" clipPathUnits="objectBoundingBox"><rect width="1" height="1" rx="0.26"/></clipPath></defs>
   <title id="where-things-point-t">Callers point at the alias</title>
   <desc id="where-things-point-d">API Gateway, an SQS event source mapping and an EventBridge rule all call the live alias, which sends 90 percent of calls to version 7 and 10 percent to version 8; an unqualified ARN would call $LATEST, which you should never point at.</desc>
   <defs>
@@ -360,20 +360,20 @@
   </defs>
 
   <!-- Callers -->
-  <rect class="d-box" x="20" y="30" width="190" height="60" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="24" y="44" width="190" height="60" rx="10" filter="url(#where-things-point-d3blur)"/><rect class="d3-side d3-plain" x="20" y="38" width="190" height="60" rx="10"/><rect class="d3-base" x="20" y="30" width="190" height="60" rx="10"/><rect class="d-box" x="20" y="30" width="190" height="60" rx="10"/><rect class="d3-sheen" x="20" y="30" width="190" height="33" rx="10" fill="url(#where-things-point-d3sheen)"/></g>
   <text class="d-text" x="115" y="56" text-anchor="middle">API Gateway</text>
   <text class="d-sub" x="115" y="76" text-anchor="middle">HTTP requests</text>
 
-  <rect class="d-box" x="20" y="120" width="190" height="60" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="24" y="134" width="190" height="60" rx="10" filter="url(#where-things-point-d3blur)"/><rect class="d3-side d3-plain" x="20" y="128" width="190" height="60" rx="10"/><rect class="d3-base" x="20" y="120" width="190" height="60" rx="10"/><rect class="d-box" x="20" y="120" width="190" height="60" rx="10"/><rect class="d3-sheen" x="20" y="120" width="190" height="33" rx="10" fill="url(#where-things-point-d3sheen)"/></g>
   <text class="d-text" x="115" y="146" text-anchor="middle">SQS mapping</text>
   <text class="d-sub" x="115" y="166" text-anchor="middle">batches</text>
 
-  <rect class="d-box" x="20" y="210" width="190" height="60" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="24" y="224" width="190" height="60" rx="10" filter="url(#where-things-point-d3blur)"/><rect class="d3-side d3-plain" x="20" y="218" width="190" height="60" rx="10"/><rect class="d3-base" x="20" y="210" width="190" height="60" rx="10"/><rect class="d-box" x="20" y="210" width="190" height="60" rx="10"/><rect class="d3-sheen" x="20" y="210" width="190" height="33" rx="10" fill="url(#where-things-point-d3sheen)"/></g>
   <text class="d-text" x="115" y="236" text-anchor="middle">EventBridge rule</text>
   <text class="d-sub" x="115" y="256" text-anchor="middle">async events</text>
 
   <!-- Alias -->
-  <rect class="d-box d-accent" x="300" y="105" width="170" height="90" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="304" y="119" width="170" height="90" rx="10" filter="url(#where-things-point-d3blur)"/><rect class="d3-side d3-accent" x="300" y="113" width="170" height="90" rx="10"/><rect class="d3-base" x="300" y="105" width="170" height="90" rx="10"/><rect class="d-box d-accent" x="300" y="105" width="170" height="90" rx="10"/><rect class="d3-sheen" x="300" y="105" width="170" height="49.5" rx="10" fill="url(#where-things-point-d3sheen)"/></g>
   <text class="d-text" x="385" y="140" text-anchor="middle">alias: live</text>
   <text class="d-sub d-mono" x="385" y="164" text-anchor="middle">orders:live</text>
 
@@ -382,11 +382,11 @@
   <line class="d-edge d-edge-accent" x1="210" y1="240" x2="300" y2="172" marker-end="url(#where-things-point-arrow)"/>
 
   <!-- Versions -->
-  <rect class="d-box" x="590" y="40" width="190" height="64" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="594" y="54" width="190" height="64" rx="10" filter="url(#where-things-point-d3blur)"/><rect class="d3-side d3-plain" x="590" y="48" width="190" height="64" rx="10"/><rect class="d3-base" x="590" y="40" width="190" height="64" rx="10"/><rect class="d-box" x="590" y="40" width="190" height="64" rx="10"/><rect class="d3-sheen" x="590" y="40" width="190" height="35.2" rx="10" fill="url(#where-things-point-d3sheen)"/></g>
   <text class="d-text" x="685" y="68" text-anchor="middle">Version 7</text>
   <text class="d-sub" x="685" y="88" text-anchor="middle">current code</text>
 
-  <rect class="d-box" x="590" y="196" width="190" height="64" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="594" y="210" width="190" height="64" rx="10" filter="url(#where-things-point-d3blur)"/><rect class="d3-side d3-plain" x="590" y="204" width="190" height="64" rx="10"/><rect class="d3-base" x="590" y="196" width="190" height="64" rx="10"/><rect class="d-box" x="590" y="196" width="190" height="64" rx="10"/><rect class="d3-sheen" x="590" y="196" width="190" height="35.2" rx="10" fill="url(#where-things-point-d3sheen)"/></g>
   <text class="d-text" x="685" y="224" text-anchor="middle">Version 8</text>
   <text class="d-sub" x="685" y="244" text-anchor="middle">new code</text>
 
@@ -396,17 +396,17 @@
   <text class="d-sub" x="530" y="226" text-anchor="middle">10%</text>
 
   <!-- Never here -->
-  <rect class="d-box d-warn" x="20" y="306" width="190" height="60" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="24" y="320" width="190" height="60" rx="10" filter="url(#where-things-point-d3blur)"/><rect class="d3-side d3-warn" x="20" y="314" width="190" height="60" rx="10"/><rect class="d3-base" x="20" y="306" width="190" height="60" rx="10"/><rect class="d-box d-warn" x="20" y="306" width="190" height="60" rx="10"/><rect class="d3-sheen" x="20" y="306" width="190" height="33" rx="10" fill="url(#where-things-point-d3sheen)"/></g>
   <text class="d-text" x="115" y="332" text-anchor="middle">Plain function ARN</text>
   <text class="d-sub d-mono" x="115" y="352" text-anchor="middle">orders</text>
 
-  <rect class="d-box d-warn" x="590" y="306" width="190" height="60" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="594" y="320" width="190" height="60" rx="10" filter="url(#where-things-point-d3blur)"/><rect class="d3-side d3-warn" x="590" y="314" width="190" height="60" rx="10"/><rect class="d3-base" x="590" y="306" width="190" height="60" rx="10"/><rect class="d-box d-warn" x="590" y="306" width="190" height="60" rx="10"/><rect class="d3-sheen" x="590" y="306" width="190" height="33" rx="10" fill="url(#where-things-point-d3sheen)"/></g>
   <text class="d-text" x="685" y="332" text-anchor="middle">$LATEST</text>
   <text class="d-sub" x="685" y="352" text-anchor="middle">never point here</text>
 
   <line class="d-edge d-edge-warn d-dashed" x1="210" y1="336" x2="590" y2="336" marker-end="url(#where-things-point-arrow)"/>
   <text class="d-sub" x="400" y="326" text-anchor="middle">changes on every upload</text>
-</svg><figcaption>Callers only know 'live'. Only the alias knows about versions.</figcaption></figure>
+<g class="d3-badges"><rect class="d3-badge-ring" x="9" y="17" width="30" height="30" rx="9"/><image href="/assets/logos/aws-api-gateway.svg" x="11" y="19" width="26" height="26" clip-path="url(#where-things-point-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="9" y="107" width="30" height="30" rx="9"/><image href="/assets/logos/aws-sqs.svg" x="11" y="109" width="26" height="26" clip-path="url(#where-things-point-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="9" y="197" width="30" height="30" rx="9"/><image href="/assets/logos/aws-eventbridge.svg" x="11" y="199" width="26" height="26" clip-path="url(#where-things-point-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="289" y="92" width="30" height="30" rx="9"/><image href="/assets/logos/aws-lambda.svg" x="291" y="94" width="26" height="26" clip-path="url(#where-things-point-d3clip)" preserveAspectRatio="xMidYMid slice"/></g></svg><figcaption>Callers only know 'live'. Only the alias knows about versions.</figcaption></figure>
 <p>This is the step people skip, and then their &quot;canary&quot; does nothing. If API Gateway calls the plain function ARN (<code>…:function:orders</code>), it calls <code>$LATEST</code>. The moment CI uploads a new zip, 100% of your users get untested code. No alias trick can help after that.</p>
 <p>So every caller must use the <strong>alias ARN</strong> (<code>…:function:orders:live</code>):</p>
 <ul>
@@ -454,7 +454,7 @@
 </ul>
 <p>Watch out for one edge case: if nothing changed since the last version, Lambda doesn&#39;t make a new one. It hands back the existing one. The canary script below checks for this and exits early.</p>
 <h2 id="step-4-move-traffic-slowly"><a class="anchor" href="#step-4-move-traffic-slowly" aria-hidden="true" tabindex="-1">#</a>Step 4: move traffic slowly</h2>
-<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" class="diagram" role="img" aria-labelledby="alias-weights-t alias-weights-d">
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" class="diagram" role="img" aria-labelledby="alias-weights-t alias-weights-d"><defs><filter id="alias-weights-d3blur" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="6"/></filter><linearGradient id="alias-weights-d3sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="d3-sheen-a"/><stop offset="1" class="d3-sheen-b"/></linearGradient><clipPath id="alias-weights-d3clip" clipPathUnits="objectBoundingBox"><rect width="1" height="1" rx="0.26"/></clipPath></defs>
   <title id="alias-weights-t">Alias traffic weights over time</title>
   <desc id="alias-weights-d">Three stacked bars for the live alias: before the deploy v7 gets 100 percent, at t0 v7 gets 90 percent and v8 gets 10 percent, and at t plus 5 minutes v8 gets 100 percent.</desc>
 
@@ -477,15 +477,15 @@
   <text class="d-text" x="170" y="222" text-anchor="end">t+5 min: done</text>
 
   <!-- Bars (560 px = 100%) -->
-  <rect class="d-fill-cyan" x="190" y="68" width="560" height="40"/>
+  <rect class="d-fill-cyan" x="190" y="68" width="560" height="40"/><polygon class="d3-bar-top d3-cyan" points="190,68 197,61 757,61 750,68"/><polygon class="d3-bar-side d3-cyan" points="750,68 757,61 757,101 750,108"/>
   <text class="d-text" x="470" y="93" text-anchor="middle">v7 · 100%</text>
 
-  <rect class="d-fill-cyan" x="190" y="133" width="504" height="40"/>
-  <rect class="d-fill-accent" x="694" y="133" width="56" height="40"/>
+  <rect class="d-fill-cyan" x="190" y="133" width="504" height="40"/><polygon class="d3-bar-top d3-cyan" points="190,133 197,126 701,126 694,133"/>
+  <rect class="d-fill-accent" x="694" y="133" width="56" height="40"/><polygon class="d3-bar-top d3-accent" points="694,133 701,126 757,126 750,133"/><polygon class="d3-bar-side d3-accent" points="750,133 757,126 757,166 750,173"/>
   <text class="d-text" x="442" y="158" text-anchor="middle">v7 · 90%</text>
   <text class="d-text" x="722" y="158" text-anchor="middle">10%</text>
 
-  <rect class="d-fill-accent" x="190" y="198" width="560" height="40"/>
+  <rect class="d-fill-accent" x="190" y="198" width="560" height="40"/><polygon class="d3-bar-top d3-accent" points="190,198 197,191 757,191 750,198"/><polygon class="d3-bar-side d3-accent" points="750,198 757,191 757,231 750,238"/>
   <text class="d-text" x="470" y="223" text-anchor="middle">v8 · 100%</text>
 
   <!-- Axis -->
@@ -575,7 +575,7 @@
 <span class="line"><span style="color:#79C0FF">echo</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$fn</span><span style="color:#A5D6FF">:</span><span style="color:#E6EDF3">$alias</span><span style="color:#A5D6FF"> -> v</span><span style="color:#E6EDF3">$new</span><span style="color:#A5D6FF"> (100%)"</span></span></code></pre></div>
 <p>&quot;Any error at all&quot; is a strict rule. For a busy function, swap it for an error rate (<code>Errors</code> ÷ <code>Invocations</code> for the new version) and a minimum number of calls, so one unlucky timeout doesn&#39;t block every release.</p>
 <h2 id="the-full-workflow-option-b-monorepo-ready"><a class="anchor" href="#the-full-workflow-option-b-monorepo-ready" aria-hidden="true" tabindex="-1">#</a>The full workflow (option B, monorepo-ready)</h2>
-<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" class="diagram" role="img" aria-labelledby="monorepo-matrix-t monorepo-matrix-d">
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" class="diagram" role="img" aria-labelledby="monorepo-matrix-t monorepo-matrix-d"><defs><filter id="monorepo-matrix-d3blur" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="6"/></filter><linearGradient id="monorepo-matrix-d3sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="d3-sheen-a"/><stop offset="1" class="d3-sheen-b"/></linearGradient><clipPath id="monorepo-matrix-d3clip" clipPathUnits="objectBoundingBox"><rect width="1" height="1" rx="0.26"/></clipPath></defs>
   <title id="monorepo-matrix-t">Deploy only changed functions</title>
   <desc id="monorepo-matrix-d">A git diff finds that the orders and billing folders changed and users did not, so the changes job outputs a list of two names and the matrix starts one deploy job each for orders and billing, with no job for users.</desc>
   <defs>
@@ -586,19 +586,19 @@
   <rect class="d-zone" x="20" y="30" width="210" height="260" rx="10"/>
   <text class="d-zone-label" x="36" y="52">functions/</text>
 
-  <rect class="d-box d-accent" x="40" y="70" width="170" height="56" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="44" y="84" width="170" height="56" rx="10" filter="url(#monorepo-matrix-d3blur)"/><rect class="d3-side d3-accent" x="40" y="78" width="170" height="56" rx="10"/><rect class="d3-base" x="40" y="70" width="170" height="56" rx="10"/><rect class="d-box d-accent" x="40" y="70" width="170" height="56" rx="10"/><rect class="d3-sheen" x="40" y="70" width="170" height="30.8" rx="10" fill="url(#monorepo-matrix-d3sheen)"/></g>
   <text class="d-text d-mono" x="125" y="94" text-anchor="middle">orders/</text>
   <text class="d-sub" x="125" y="114" text-anchor="middle">changed</text>
 
-  <rect class="d-box d-accent" x="40" y="150" width="170" height="56" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="44" y="164" width="170" height="56" rx="10" filter="url(#monorepo-matrix-d3blur)"/><rect class="d3-side d3-accent" x="40" y="158" width="170" height="56" rx="10"/><rect class="d3-base" x="40" y="150" width="170" height="56" rx="10"/><rect class="d-box d-accent" x="40" y="150" width="170" height="56" rx="10"/><rect class="d3-sheen" x="40" y="150" width="170" height="30.8" rx="10" fill="url(#monorepo-matrix-d3sheen)"/></g>
   <text class="d-text d-mono" x="125" y="174" text-anchor="middle">billing/</text>
   <text class="d-sub" x="125" y="194" text-anchor="middle">changed</text>
 
-  <rect class="d-box" x="40" y="230" width="170" height="44" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="44" y="244" width="170" height="44" rx="10" filter="url(#monorepo-matrix-d3blur)"/><rect class="d3-side d3-plain" x="40" y="238" width="170" height="44" rx="10"/><rect class="d3-base" x="40" y="230" width="170" height="44" rx="10"/><rect class="d-box" x="40" y="230" width="170" height="44" rx="10"/><rect class="d3-sheen" x="40" y="230" width="170" height="24.2" rx="10" fill="url(#monorepo-matrix-d3sheen)"/></g>
   <text class="d-sub d-mono" x="125" y="257" text-anchor="middle">users/  no change</text>
 
   <!-- Changes job -->
-  <rect class="d-box" x="310" y="128" width="200" height="76" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="314" y="142" width="200" height="76" rx="10" filter="url(#monorepo-matrix-d3blur)"/><rect class="d3-side d3-plain" x="310" y="136" width="200" height="76" rx="10"/><rect class="d3-base" x="310" y="128" width="200" height="76" rx="10"/><rect class="d-box" x="310" y="128" width="200" height="76" rx="10"/><rect class="d3-sheen" x="310" y="128" width="200" height="41.8" rx="10" fill="url(#monorepo-matrix-d3sheen)"/></g>
   <text class="d-text" x="410" y="158" text-anchor="middle">changes job</text>
   <text class="d-sub d-mono" x="410" y="182" text-anchor="middle">["orders","billing"]</text>
 
@@ -606,21 +606,21 @@
   <text class="d-sub" x="270" y="156" text-anchor="middle">git diff</text>
 
   <!-- Matrix -->
-  <rect class="d-box d-ok" x="590" y="40" width="190" height="64" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="594" y="54" width="190" height="64" rx="10" filter="url(#monorepo-matrix-d3blur)"/><rect class="d3-side d3-ok" x="590" y="48" width="190" height="64" rx="10"/><rect class="d3-base" x="590" y="40" width="190" height="64" rx="10"/><rect class="d-box d-ok" x="590" y="40" width="190" height="64" rx="10"/><rect class="d3-sheen" x="590" y="40" width="190" height="35.2" rx="10" fill="url(#monorepo-matrix-d3sheen)"/></g>
   <text class="d-text" x="685" y="68" text-anchor="middle">deploy orders</text>
   <text class="d-sub" x="685" y="88" text-anchor="middle">own canary</text>
 
-  <rect class="d-box d-ok" x="590" y="134" width="190" height="64" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="594" y="148" width="190" height="64" rx="10" filter="url(#monorepo-matrix-d3blur)"/><rect class="d3-side d3-ok" x="590" y="142" width="190" height="64" rx="10"/><rect class="d3-base" x="590" y="134" width="190" height="64" rx="10"/><rect class="d-box d-ok" x="590" y="134" width="190" height="64" rx="10"/><rect class="d3-sheen" x="590" y="134" width="190" height="35.2" rx="10" fill="url(#monorepo-matrix-d3sheen)"/></g>
   <text class="d-text" x="685" y="162" text-anchor="middle">deploy billing</text>
   <text class="d-sub" x="685" y="182" text-anchor="middle">own canary</text>
 
-  <rect class="d-box" x="590" y="228" width="190" height="52" rx="10"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="594" y="242" width="190" height="52" rx="10" filter="url(#monorepo-matrix-d3blur)"/><rect class="d3-side d3-plain" x="590" y="236" width="190" height="52" rx="10"/><rect class="d3-base" x="590" y="228" width="190" height="52" rx="10"/><rect class="d-box" x="590" y="228" width="190" height="52" rx="10"/><rect class="d3-sheen" x="590" y="228" width="190" height="28.6" rx="10" fill="url(#monorepo-matrix-d3sheen)"/></g>
   <text class="d-sub" x="685" y="259" text-anchor="middle">users: no job</text>
 
   <line class="d-edge d-edge-ok" x1="510" y1="150" x2="590" y2="76" marker-end="url(#monorepo-matrix-arrow)"/>
   <line class="d-edge d-edge-ok" x1="510" y1="166" x2="590" y2="166" marker-end="url(#monorepo-matrix-arrow)"/>
   <text class="d-sub" x="550" y="200" text-anchor="middle">matrix</text>
-</svg><figcaption>Only folders with changes get a deploy job. Each job runs its own canary.</figcaption></figure>
+<g class="d3-badges"><rect class="d3-badge-ring" x="299" y="115" width="30" height="30" rx="9"/><image href="/assets/logos/githubactions.svg" x="301" y="117" width="26" height="26" clip-path="url(#monorepo-matrix-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="579" y="27" width="30" height="30" rx="9"/><image href="/assets/logos/aws-lambda.svg" x="581" y="29" width="26" height="26" clip-path="url(#monorepo-matrix-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="579" y="121" width="30" height="30" rx="9"/><image href="/assets/logos/aws-lambda.svg" x="581" y="123" width="26" height="26" clip-path="url(#monorepo-matrix-d3clip)" preserveAspectRatio="xMidYMid slice"/></g></svg><figcaption>Only folders with changes get a deploy job. Each job runs its own canary.</figcaption></figure>
 <p>This workflow assumes one folder per function under <code>functions/</code>, with the folder name the same as the Lambda function name. The first job finds which folders changed. The second job runs once per changed function.</p>
 <div class="code"><span class="code__lang">yaml</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#7EE787">name</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">deploy-lambdas</span></span>
 <span class="line"><span style="color:#79C0FF">on</span><span style="color:#E6EDF3">:</span></span>

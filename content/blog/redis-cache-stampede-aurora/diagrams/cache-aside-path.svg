@@ -12,15 +12,15 @@
   <text class="d-text" x="94" y="112" text-anchor="middle">Client</text>
   <text class="d-sub" x="94" y="132" text-anchor="middle">HTTP request</text>
 
-  <rect class="d-box d-accent" x="260" y="80" width="200" height="70" rx="10"/>
+  <rect class="d-box d-accent" x="260" y="80" width="200" height="70" rx="10" data-logo="nodedotjs"/>
   <text class="d-text" x="360" y="112" text-anchor="middle">App (Node.js)</text>
   <text class="d-sub d-mono" x="360" y="132" text-anchor="middle">ioredis + pg</text>
 
-  <rect class="d-box d-cyan" x="576" y="80" width="184" height="70" rx="10"/>
+  <rect class="d-box d-cyan" x="576" y="80" width="184" height="70" rx="10" data-logo="redis"/>
   <text class="d-text" x="668" y="112" text-anchor="middle">ElastiCache</text>
   <text class="d-sub" x="668" y="132" text-anchor="middle">Valkey / Redis OSS</text>
 
-  <rect class="d-box" x="260" y="290" width="200" height="70" rx="10"/>
+  <rect class="d-box" x="260" y="290" width="200" height="70" rx="10" data-logo="aws-aurora"/>
   <text class="d-text" x="360" y="322" text-anchor="middle">Aurora PostgreSQL</text>
   <text class="d-sub" x="360" y="342" text-anchor="middle">source of truth</text>
 

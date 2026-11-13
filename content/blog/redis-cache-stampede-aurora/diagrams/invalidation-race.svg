@@ -10,13 +10,13 @@
   <text class="d-sub" x="620" y="356" text-anchor="middle">race window</text>
 
   <!-- actors -->
-  <rect class="d-box d-accent" x="60" y="24" width="120" height="50" rx="10"/>
+  <rect class="d-box d-accent" x="60" y="24" width="120" height="50" rx="10" data-logo="nodedotjs"/>
   <text class="d-text" x="120" y="54" text-anchor="middle">Reader</text>
-  <rect class="d-box d-cyan" x="260" y="24" width="120" height="50" rx="10"/>
+  <rect class="d-box d-cyan" x="260" y="24" width="120" height="50" rx="10" data-logo="redis"/>
   <text class="d-text" x="320" y="54" text-anchor="middle">Redis</text>
-  <rect class="d-box" x="460" y="24" width="120" height="50" rx="10"/>
+  <rect class="d-box" x="460" y="24" width="120" height="50" rx="10" data-logo="aws-aurora"/>
   <text class="d-text" x="520" y="54" text-anchor="middle">Aurora</text>
-  <rect class="d-box d-accent" x="660" y="24" width="120" height="50" rx="10"/>
+  <rect class="d-box d-accent" x="660" y="24" width="120" height="50" rx="10" data-logo="nodedotjs"/>
   <text class="d-text" x="720" y="54" text-anchor="middle">Writer</text>
 
   <!-- lifelines -->

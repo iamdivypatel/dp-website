@@ -41,6 +41,8 @@ Callouts are blockquotes that start with a bold label: `> **Note:** …`, `> **W
 
 Diagrams are hand-written SVG files, inlined into the page at build time. Draw them with the classes below, and never with hard-coded colours or fonts: the site's CSS colours them for the dark theme and they stay crisp at any size.
 
+Draw them flat. The build (scripts/diagram3d.mjs) adds the depth: every `d-box` becomes a raised tile with a shadow, chart bars (`d-fill-*`) become 3D blocks, and chart lines get a soft shadow. To put a tool's logo on a box's corner, add `data-logo="<name>"` to its `<rect>`, using a file name from `public/assets/logos` (e.g. `data-logo="redis"`). The preview script shows the final 3D look.
+
 Reference one from Markdown on its own line: `![Alt text describing the diagram](diagrams/cache-aside.svg "Caption shown under the figure")`.
 
 Rules:

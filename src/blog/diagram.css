@@ -31,3 +31,26 @@
 .diagram .d-fill-ok { fill: rgb(61 220 151 / 0.3); }
 .diagram .d-num { fill: var(--accent); }
 .diagram .d-num-text { fill: var(--on-accent); font-size: 12px; font-weight: 700; text-anchor: middle; dominant-baseline: central; }
+
+/* Depth added at build time by scripts/diagram3d.mjs */
+.diagram .d3-shadow { fill: #000; opacity: 0.55; }
+.diagram .d3-base { fill: var(--bg-2); }
+.diagram .d3-side { stroke-width: 1.5; }
+.diagram .d3-side.d3-plain { fill: color-mix(in srgb, #fff 11%, var(--bg)); stroke: rgb(255 255 255 / 0.22); }
+.diagram .d3-side.d3-accent { fill: color-mix(in srgb, var(--accent) 42%, var(--bg)); stroke: var(--accent); }
+.diagram .d3-side.d3-cyan { fill: color-mix(in srgb, var(--accent-2) 34%, var(--bg)); stroke: var(--accent-2); }
+.diagram .d3-side.d3-warn { fill: color-mix(in srgb, var(--error) 38%, var(--bg)); stroke: var(--error); }
+.diagram .d3-side.d3-ok { fill: color-mix(in srgb, var(--ok) 34%, var(--bg)); stroke: var(--ok); }
+.diagram .d3-sheen { pointer-events: none; }
+.diagram .d3-sheen-a { stop-color: #fff; stop-opacity: 0.09; }
+.diagram .d3-sheen-b { stop-color: #fff; stop-opacity: 0; }
+.diagram .d3-bar-top.d3-accent { fill: color-mix(in srgb, var(--accent) 75%, #fff); opacity: 0.55; }
+.diagram .d3-bar-top.d3-cyan { fill: color-mix(in srgb, var(--accent-2) 75%, #fff); opacity: 0.5; }
+.diagram .d3-bar-top.d3-warn { fill: color-mix(in srgb, var(--error) 75%, #fff); opacity: 0.5; }
+.diagram .d3-bar-top.d3-ok { fill: color-mix(in srgb, var(--ok) 75%, #fff); opacity: 0.5; }
+.diagram .d3-bar-side.d3-accent { fill: color-mix(in srgb, var(--accent) 45%, var(--bg)); }
+.diagram .d3-bar-side.d3-cyan { fill: color-mix(in srgb, var(--accent-2) 38%, var(--bg)); }
+.diagram .d3-bar-side.d3-warn { fill: color-mix(in srgb, var(--error) 40%, var(--bg)); }
+.diagram .d3-bar-side.d3-ok { fill: color-mix(in srgb, var(--ok) 38%, var(--bg)); }
+.diagram .d3-line-shadow { fill: none; stroke: #000; stroke-width: 4; opacity: 0.45; stroke-linejoin: round; stroke-linecap: round; }
+.diagram .d3-badge-ring { fill: var(--bg-2); stroke: var(--line-2); stroke-width: 1; }

@@ -6,20 +6,20 @@
   </defs>
 
   <!-- Callers -->
-  <rect class="d-box" x="20" y="30" width="190" height="60" rx="10"/>
+  <rect class="d-box" x="20" y="30" width="190" height="60" rx="10" data-logo="aws-api-gateway"/>
   <text class="d-text" x="115" y="56" text-anchor="middle">API Gateway</text>
   <text class="d-sub" x="115" y="76" text-anchor="middle">HTTP requests</text>
 
-  <rect class="d-box" x="20" y="120" width="190" height="60" rx="10"/>
+  <rect class="d-box" x="20" y="120" width="190" height="60" rx="10" data-logo="aws-sqs"/>
   <text class="d-text" x="115" y="146" text-anchor="middle">SQS mapping</text>
   <text class="d-sub" x="115" y="166" text-anchor="middle">batches</text>
 
-  <rect class="d-box" x="20" y="210" width="190" height="60" rx="10"/>
+  <rect class="d-box" x="20" y="210" width="190" height="60" rx="10" data-logo="aws-eventbridge"/>
   <text class="d-text" x="115" y="236" text-anchor="middle">EventBridge rule</text>
   <text class="d-sub" x="115" y="256" text-anchor="middle">async events</text>
 
   <!-- Alias -->
-  <rect class="d-box d-accent" x="300" y="105" width="170" height="90" rx="10"/>
+  <rect class="d-box d-accent" x="300" y="105" width="170" height="90" rx="10" data-logo="aws-lambda"/>
   <text class="d-text" x="385" y="140" text-anchor="middle">alias: live</text>
   <text class="d-sub d-mono" x="385" y="164" text-anchor="middle">orders:live</text>
 

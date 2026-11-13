@@ -8,10 +8,10 @@
   <!-- Pull request lane -->
   <rect x="24" y="24" width="752" height="126" rx="10" class="d-zone"/>
   <text x="40" y="44" class="d-zone-label d-mono">on: pull_request</text>
-  <rect x="40" y="62" width="156" height="66" rx="10" class="d-box"/>
+  <rect x="40" y="62" width="156" height="66" rx="10" class="d-box" data-logo="githubactions"/>
   <text x="118" y="90" class="d-text" text-anchor="middle">Pull request</text>
   <text x="118" y="110" class="d-sub" text-anchor="middle">touches a stack</text>
-  <rect x="228" y="62" width="156" height="66" rx="10" class="d-box d-accent"/>
+  <rect x="228" y="62" width="156" height="66" rx="10" class="d-box d-accent" data-logo="terraform"/>
   <text x="306" y="90" class="d-text" text-anchor="middle">Plan</text>
   <text x="306" y="110" class="d-sub" text-anchor="middle">OIDC, read-only</text>
   <rect x="416" y="62" width="156" height="66" rx="10" class="d-box"/>
@@ -33,13 +33,13 @@
   <rect x="40" y="232" width="156" height="66" rx="10" class="d-box"/>
   <text x="118" y="260" class="d-text" text-anchor="middle">Merge</text>
   <text x="118" y="280" class="d-sub" text-anchor="middle">into main</text>
-  <rect x="228" y="232" width="156" height="66" rx="10" class="d-box"/>
+  <rect x="228" y="232" width="156" height="66" rx="10" class="d-box" data-logo="terraform"/>
   <text x="306" y="260" class="d-text" text-anchor="middle">Apply staging</text>
   <text x="306" y="280" class="d-sub" text-anchor="middle">automatic</text>
   <rect x="416" y="232" width="156" height="66" rx="10" class="d-box d-warn"/>
   <text x="494" y="260" class="d-text" text-anchor="middle">Approval</text>
   <text x="494" y="280" class="d-sub" text-anchor="middle">prod environment</text>
-  <rect x="604" y="232" width="156" height="66" rx="10" class="d-box d-ok"/>
+  <rect x="604" y="232" width="156" height="66" rx="10" class="d-box d-ok" data-logo="terraform"/>
   <text x="682" y="260" class="d-text" text-anchor="middle">Apply prod</text>
   <text x="682" y="280" class="d-sub" text-anchor="middle">OIDC, apply role</text>
   <line x1="196" y1="265" x2="228" y2="265" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>

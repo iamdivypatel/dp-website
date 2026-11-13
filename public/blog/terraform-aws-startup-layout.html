@@ -162,7 +162,7 @@
 <li><strong>Use folders for environments, not workspaces.</strong> The environment name sits in the path, so you can see where you are applying.</li>
 <li><strong>Move to several AWS accounts</strong> when you need hard walls around prod data, or when a second team starts working in the same account.</li>
 </ul>
-<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 470" class="diagram" role="img" aria-labelledby="tf-stages-t tf-stages-d">
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 470" class="diagram" role="img" aria-labelledby="tf-stages-t tf-stages-d"><defs><filter id="tf-stages-d3blur" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="6"/></filter><linearGradient id="tf-stages-d3sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="d3-sheen-a"/><stop offset="1" class="d3-sheen-b"/></linearGradient><clipPath id="tf-stages-d3clip" clipPathUnits="objectBoundingBox"><rect width="1" height="1" rx="0.26"/></clipPath></defs>
   <title id="tf-stages-t">Three stages of a Terraform layout</title>
   <desc id="tf-stages-d">Stage one is a single root module with one state file, stage two splits the same account into network, data, app and edge states, and stage three moves prod, staging and shared into separate AWS accounts, with the signals that trigger each move shown on a timeline.</desc>
   <defs>
@@ -180,7 +180,7 @@
   <!-- Stage 1 -->
   <rect x="20" y="76" width="220" height="280" rx="10" class="d-zone"/>
   <text x="36" y="96" class="d-zone-label">AWS ACCOUNT</text>
-  <rect x="36" y="112" width="188" height="228" rx="10" class="d-box"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="40" y="126" width="188" height="228" rx="10" filter="url(#tf-stages-d3blur)"/><rect class="d3-side d3-plain" x="36" y="120" width="188" height="228" rx="10"/><rect class="d3-base" x="36" y="112" width="188" height="228" rx="10"/><rect x="36" y="112" width="188" height="228" rx="10" class="d-box"/><rect class="d3-sheen" x="36" y="112" width="188" height="125.4" rx="10" fill="url(#tf-stages-d3sheen)"/></g>
   <text x="130" y="180" class="d-text d-mono" text-anchor="middle">root module</text>
   <text x="130" y="202" class="d-sub" text-anchor="middle">one state file</text>
   <text x="130" y="242" class="d-sub d-mono" text-anchor="middle">VPC · Aurora · SQS</text>
@@ -190,25 +190,25 @@
   <!-- Stage 2 -->
   <rect x="290" y="76" width="220" height="280" rx="10" class="d-zone"/>
   <text x="306" y="96" class="d-zone-label">AWS ACCOUNT</text>
-  <rect x="306" y="112" width="188" height="40" rx="10" class="d-box d-accent"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="310" y="126" width="188" height="40" rx="10" filter="url(#tf-stages-d3blur)"/><rect class="d3-side d3-accent" x="306" y="120" width="188" height="40" rx="10"/><rect class="d3-base" x="306" y="112" width="188" height="40" rx="10"/><rect x="306" y="112" width="188" height="40" rx="10" class="d-box d-accent"/><rect class="d3-sheen" x="306" y="112" width="188" height="22" rx="10" fill="url(#tf-stages-d3sheen)"/></g>
   <text x="400" y="137" class="d-text d-mono" text-anchor="middle">network</text>
-  <rect x="306" y="176" width="188" height="40" rx="10" class="d-box d-accent"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="310" y="190" width="188" height="40" rx="10" filter="url(#tf-stages-d3blur)"/><rect class="d3-side d3-accent" x="306" y="184" width="188" height="40" rx="10"/><rect class="d3-base" x="306" y="176" width="188" height="40" rx="10"/><rect x="306" y="176" width="188" height="40" rx="10" class="d-box d-accent"/><rect class="d3-sheen" x="306" y="176" width="188" height="22" rx="10" fill="url(#tf-stages-d3sheen)"/></g>
   <text x="400" y="201" class="d-text d-mono" text-anchor="middle">data</text>
-  <rect x="306" y="240" width="188" height="40" rx="10" class="d-box d-accent"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="310" y="254" width="188" height="40" rx="10" filter="url(#tf-stages-d3blur)"/><rect class="d3-side d3-accent" x="306" y="248" width="188" height="40" rx="10"/><rect class="d3-base" x="306" y="240" width="188" height="40" rx="10"/><rect x="306" y="240" width="188" height="40" rx="10" class="d-box d-accent"/><rect class="d3-sheen" x="306" y="240" width="188" height="22" rx="10" fill="url(#tf-stages-d3sheen)"/></g>
   <text x="400" y="265" class="d-text d-mono" text-anchor="middle">app</text>
-  <rect x="306" y="304" width="188" height="40" rx="10" class="d-box d-accent"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="310" y="318" width="188" height="40" rx="10" filter="url(#tf-stages-d3blur)"/><rect class="d3-side d3-accent" x="306" y="312" width="188" height="40" rx="10"/><rect class="d3-base" x="306" y="304" width="188" height="40" rx="10"/><rect x="306" y="304" width="188" height="40" rx="10" class="d-box d-accent"/><rect class="d3-sheen" x="306" y="304" width="188" height="22" rx="10" fill="url(#tf-stages-d3sheen)"/></g>
   <text x="400" y="329" class="d-text d-mono" text-anchor="middle">edge</text>
 
   <!-- Stage 3 -->
   <rect x="560" y="76" width="220" height="280" rx="10" class="d-zone"/>
   <text x="576" y="96" class="d-zone-label">AWS ORGANIZATIONS</text>
-  <rect x="576" y="112" width="188" height="60" rx="10" class="d-box"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="580" y="126" width="188" height="60" rx="10" filter="url(#tf-stages-d3blur)"/><rect class="d3-side d3-plain" x="576" y="120" width="188" height="60" rx="10"/><rect class="d3-base" x="576" y="112" width="188" height="60" rx="10"/><rect x="576" y="112" width="188" height="60" rx="10" class="d-box"/><rect class="d3-sheen" x="576" y="112" width="188" height="33" rx="10" fill="url(#tf-stages-d3sheen)"/></g>
   <text x="670" y="138" class="d-text d-mono" text-anchor="middle">prod</text>
   <text x="670" y="158" class="d-sub" text-anchor="middle">four stacks</text>
-  <rect x="576" y="196" width="188" height="60" rx="10" class="d-box"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="580" y="210" width="188" height="60" rx="10" filter="url(#tf-stages-d3blur)"/><rect class="d3-side d3-plain" x="576" y="204" width="188" height="60" rx="10"/><rect class="d3-base" x="576" y="196" width="188" height="60" rx="10"/><rect x="576" y="196" width="188" height="60" rx="10" class="d-box"/><rect class="d3-sheen" x="576" y="196" width="188" height="33" rx="10" fill="url(#tf-stages-d3sheen)"/></g>
   <text x="670" y="222" class="d-text d-mono" text-anchor="middle">staging</text>
   <text x="670" y="242" class="d-sub" text-anchor="middle">four stacks</text>
-  <rect x="576" y="280" width="188" height="60" rx="10" class="d-box"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="580" y="294" width="188" height="60" rx="10" filter="url(#tf-stages-d3blur)"/><rect class="d3-side d3-plain" x="576" y="288" width="188" height="60" rx="10"/><rect class="d3-base" x="576" y="280" width="188" height="60" rx="10"/><rect x="576" y="280" width="188" height="60" rx="10" class="d-box"/><rect class="d3-sheen" x="576" y="280" width="188" height="33" rx="10" fill="url(#tf-stages-d3sheen)"/></g>
   <text x="670" y="306" class="d-text d-mono" text-anchor="middle">shared</text>
   <text x="670" y="326" class="d-sub" text-anchor="middle">CI, logs, DNS</text>
 
@@ -226,7 +226,7 @@
   <text x="265" y="450" class="d-sub" text-anchor="middle">2+ people applying</text>
   <text x="535" y="430" class="d-sub" text-anchor="middle">trigger: prod data isolation</text>
   <text x="535" y="450" class="d-sub" text-anchor="middle">audits, a second team</text>
-</svg><figcaption>The three stages, and the signals that move you from one to the next</figcaption></figure>
+<g class="d3-badges"><rect class="d3-badge-ring" x="25" y="99" width="30" height="30" rx="9"/><image href="/assets/logos/terraform.svg" x="27" y="101" width="26" height="26" clip-path="url(#tf-stages-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="295" y="163" width="30" height="30" rx="9"/><image href="/assets/logos/aws-aurora.svg" x="297" y="165" width="26" height="26" clip-path="url(#tf-stages-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="295" y="227" width="30" height="30" rx="9"/><image href="/assets/logos/aws-lambda.svg" x="297" y="229" width="26" height="26" clip-path="url(#tf-stages-d3clip)" preserveAspectRatio="xMidYMid slice"/></g></svg><figcaption>The three stages, and the signals that move you from one to the next</figcaption></figure>
 <p>A quick word list before we start. <strong>State</strong> is the file where Terraform remembers which real AWS resources it manages. A <strong>root module</strong> is the folder you run <code>terraform plan</code> in. A <strong>stack</strong> is my name for one root module with its own state. <strong>Blast radius</strong> is how much can break if one change goes wrong.</p>
 <h2 id="stage-1-one-root-module-one-state"><a class="anchor" href="#stage-1-one-root-module-one-state" aria-hidden="true" tabindex="-1">#</a>Stage 1: one root module, one state</h2>
 <p>At the start, everything lives in one folder: VPC, Aurora, Lambda, API Gateway, SQS, CloudFront, WAF, IAM. One <code>terraform apply</code> builds the lot. This is the right choice when:</p>
@@ -260,7 +260,7 @@
 </aside>
 <h2 id="stage-2-split-state-by-lifecycle-and-blast-radius"><a class="anchor" href="#stage-2-split-state-by-lifecycle-and-blast-radius" aria-hidden="true" tabindex="-1">#</a>Stage 2: split state by lifecycle and blast radius</h2>
 <p>The single state starts to hurt in a way you can feel. A plan takes five minutes because Terraform has to check every resource. A small Lambda change shows a diff on the database. Two people want to apply at the same time and one of them waits for the lock. Every apply feels like it could break everything, because it can.</p>
-<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 440" class="diagram" role="img" aria-labelledby="tf-blast-radius-t tf-blast-radius-d">
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 440" class="diagram" role="img" aria-labelledby="tf-blast-radius-t tf-blast-radius-d"><defs><filter id="tf-blast-radius-d3blur" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="6"/></filter><linearGradient id="tf-blast-radius-d3sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="d3-sheen-a"/><stop offset="1" class="d3-sheen-b"/></linearGradient><clipPath id="tf-blast-radius-d3clip" clipPathUnits="objectBoundingBox"><rect width="1" height="1" rx="0.26"/></clipPath></defs>
   <title id="tf-blast-radius-t">Blast radius of one bad change</title>
   <desc id="tf-blast-radius-d">With one monolith state a bad change puts every resource in the plan, while with split states the same mistake in the app state leaves network, data and edge untouched.</desc>
 
@@ -331,12 +331,12 @@
 </div>
 <p>Four stacks is enough for most startups. More than six or seven, and you spend your day wiring outputs between them.</p>
 <h3 id="the-repo-layout"><a class="anchor" href="#the-repo-layout" aria-hidden="true" tabindex="-1">#</a>The repo layout</h3>
-<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 476" class="diagram" role="img" aria-labelledby="tf-repo-tree-t tf-repo-tree-d">
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 476" class="diagram" role="img" aria-labelledby="tf-repo-tree-t tf-repo-tree-d"><defs><filter id="tf-repo-tree-d3blur" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="6"/></filter><linearGradient id="tf-repo-tree-d3sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="d3-sheen-a"/><stop offset="1" class="d3-sheen-b"/></linearGradient><clipPath id="tf-repo-tree-d3clip" clipPathUnits="objectBoundingBox"><rect width="1" height="1" rx="0.26"/></clipPath></defs>
   <title id="tf-repo-tree-t">Repository layout</title>
   <desc id="tf-repo-tree-d">An infra repository with three folders: envs holding per-environment backend and tfvars files, stacks holding the network, data, app and edge root modules, and modules holding your own reusable modules next to pinned registry modules.</desc>
 
   <!-- Root -->
-  <rect x="330" y="20" width="140" height="40" rx="10" class="d-box d-accent"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="334" y="34" width="140" height="40" rx="10" filter="url(#tf-repo-tree-d3blur)"/><rect class="d3-side d3-accent" x="330" y="28" width="140" height="40" rx="10"/><rect class="d3-base" x="330" y="20" width="140" height="40" rx="10"/><rect x="330" y="20" width="140" height="40" rx="10" class="d-box d-accent"/><rect class="d3-sheen" x="330" y="20" width="140" height="22" rx="10" fill="url(#tf-repo-tree-d3sheen)"/></g>
   <text x="400" y="45" class="d-text d-mono" text-anchor="middle">infra/</text>
 
   <!-- Tree lines -->
@@ -345,14 +345,14 @@
   <!-- envs -->
   <rect x="24" y="110" width="232" height="342" rx="10" class="d-zone"/>
   <text x="40" y="129" class="d-zone-label d-mono">envs/</text>
-  <rect x="40" y="140" width="200" height="136" rx="10" class="d-box"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="44" y="154" width="200" height="136" rx="10" filter="url(#tf-repo-tree-d3blur)"/><rect class="d3-side d3-plain" x="40" y="148" width="200" height="136" rx="10"/><rect class="d3-base" x="40" y="140" width="200" height="136" rx="10"/><rect x="40" y="140" width="200" height="136" rx="10" class="d-box"/><rect class="d3-sheen" x="40" y="140" width="200" height="74.8" rx="10" fill="url(#tf-repo-tree-d3sheen)"/></g>
   <text x="140" y="166" class="d-text d-mono" text-anchor="middle">prod/</text>
   <text x="140" y="192" class="d-sub d-mono" text-anchor="middle">backend.hcl</text>
   <text x="140" y="210" class="d-sub d-mono" text-anchor="middle">network.tfvars</text>
   <text x="140" y="228" class="d-sub d-mono" text-anchor="middle">data.tfvars</text>
   <text x="140" y="246" class="d-sub d-mono" text-anchor="middle">app.tfvars</text>
   <text x="140" y="264" class="d-sub d-mono" text-anchor="middle">edge.tfvars</text>
-  <rect x="40" y="300" width="200" height="136" rx="10" class="d-box"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="44" y="314" width="200" height="136" rx="10" filter="url(#tf-repo-tree-d3blur)"/><rect class="d3-side d3-plain" x="40" y="308" width="200" height="136" rx="10"/><rect class="d3-base" x="40" y="300" width="200" height="136" rx="10"/><rect x="40" y="300" width="200" height="136" rx="10" class="d-box"/><rect class="d3-sheen" x="40" y="300" width="200" height="74.8" rx="10" fill="url(#tf-repo-tree-d3sheen)"/></g>
   <text x="140" y="326" class="d-text d-mono" text-anchor="middle">staging/</text>
   <text x="140" y="352" class="d-sub d-mono" text-anchor="middle">backend.hcl</text>
   <text x="140" y="370" class="d-sub d-mono" text-anchor="middle">network.tfvars</text>
@@ -363,35 +363,35 @@
   <!-- stacks -->
   <rect x="284" y="110" width="232" height="342" rx="10" class="d-zone"/>
   <text x="300" y="129" class="d-zone-label d-mono">stacks/</text>
-  <rect x="300" y="140" width="200" height="56" rx="10" class="d-box d-accent"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="304" y="154" width="200" height="56" rx="10" filter="url(#tf-repo-tree-d3blur)"/><rect class="d3-side d3-accent" x="300" y="148" width="200" height="56" rx="10"/><rect class="d3-base" x="300" y="140" width="200" height="56" rx="10"/><rect x="300" y="140" width="200" height="56" rx="10" class="d-box d-accent"/><rect class="d3-sheen" x="300" y="140" width="200" height="30.8" rx="10" fill="url(#tf-repo-tree-d3sheen)"/></g>
   <text x="400" y="164" class="d-text d-mono" text-anchor="middle">network/</text>
   <text x="400" y="184" class="d-sub" text-anchor="middle">VPC, subnets, endpoints</text>
-  <rect x="300" y="220" width="200" height="56" rx="10" class="d-box d-accent"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="304" y="234" width="200" height="56" rx="10" filter="url(#tf-repo-tree-d3blur)"/><rect class="d3-side d3-accent" x="300" y="228" width="200" height="56" rx="10"/><rect class="d3-base" x="300" y="220" width="200" height="56" rx="10"/><rect x="300" y="220" width="200" height="56" rx="10" class="d-box d-accent"/><rect class="d3-sheen" x="300" y="220" width="200" height="30.8" rx="10" fill="url(#tf-repo-tree-d3sheen)"/></g>
   <text x="400" y="244" class="d-text d-mono" text-anchor="middle">data/</text>
   <text x="400" y="264" class="d-sub" text-anchor="middle">Aurora, Redis, S3</text>
-  <rect x="300" y="300" width="200" height="56" rx="10" class="d-box d-accent"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="304" y="314" width="200" height="56" rx="10" filter="url(#tf-repo-tree-d3blur)"/><rect class="d3-side d3-accent" x="300" y="308" width="200" height="56" rx="10"/><rect class="d3-base" x="300" y="300" width="200" height="56" rx="10"/><rect x="300" y="300" width="200" height="56" rx="10" class="d-box d-accent"/><rect class="d3-sheen" x="300" y="300" width="200" height="30.8" rx="10" fill="url(#tf-repo-tree-d3sheen)"/></g>
   <text x="400" y="324" class="d-text d-mono" text-anchor="middle">app/</text>
   <text x="400" y="344" class="d-sub" text-anchor="middle">Lambda, API GW, SQS</text>
-  <rect x="300" y="380" width="200" height="56" rx="10" class="d-box d-accent"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="304" y="394" width="200" height="56" rx="10" filter="url(#tf-repo-tree-d3blur)"/><rect class="d3-side d3-accent" x="300" y="388" width="200" height="56" rx="10"/><rect class="d3-base" x="300" y="380" width="200" height="56" rx="10"/><rect x="300" y="380" width="200" height="56" rx="10" class="d-box d-accent"/><rect class="d3-sheen" x="300" y="380" width="200" height="30.8" rx="10" fill="url(#tf-repo-tree-d3sheen)"/></g>
   <text x="400" y="404" class="d-text d-mono" text-anchor="middle">edge/</text>
   <text x="400" y="424" class="d-sub" text-anchor="middle">CloudFront, WAF, DNS</text>
 
   <!-- modules -->
   <rect x="544" y="110" width="232" height="342" rx="10" class="d-zone"/>
   <text x="560" y="129" class="d-zone-label d-mono">modules/</text>
-  <rect x="560" y="140" width="200" height="56" rx="10" class="d-box"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="564" y="154" width="200" height="56" rx="10" filter="url(#tf-repo-tree-d3blur)"/><rect class="d3-side d3-plain" x="560" y="148" width="200" height="56" rx="10"/><rect class="d3-base" x="560" y="140" width="200" height="56" rx="10"/><rect x="560" y="140" width="200" height="56" rx="10" class="d-box"/><rect class="d3-sheen" x="560" y="140" width="200" height="30.8" rx="10" fill="url(#tf-repo-tree-d3sheen)"/></g>
   <text x="660" y="164" class="d-text d-mono" text-anchor="middle">lambda-service/</text>
   <text x="660" y="184" class="d-sub" text-anchor="middle">function, role, logs</text>
-  <rect x="560" y="220" width="200" height="56" rx="10" class="d-box"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="564" y="234" width="200" height="56" rx="10" filter="url(#tf-repo-tree-d3blur)"/><rect class="d3-side d3-plain" x="560" y="228" width="200" height="56" rx="10"/><rect class="d3-base" x="560" y="220" width="200" height="56" rx="10"/><rect x="560" y="220" width="200" height="56" rx="10" class="d-box"/><rect class="d3-sheen" x="560" y="220" width="200" height="30.8" rx="10" fill="url(#tf-repo-tree-d3sheen)"/></g>
   <text x="660" y="244" class="d-text d-mono" text-anchor="middle">queue-worker/</text>
   <text x="660" y="264" class="d-sub" text-anchor="middle">SQS, DLQ, alarms</text>
-  <rect x="560" y="300" width="200" height="56" rx="10" class="d-box"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="564" y="314" width="200" height="56" rx="10" filter="url(#tf-repo-tree-d3blur)"/><rect class="d3-side d3-plain" x="560" y="308" width="200" height="56" rx="10"/><rect class="d3-base" x="560" y="300" width="200" height="56" rx="10"/><rect x="560" y="300" width="200" height="56" rx="10" class="d-box"/><rect class="d3-sheen" x="560" y="300" width="200" height="30.8" rx="10" fill="url(#tf-repo-tree-d3sheen)"/></g>
   <text x="660" y="324" class="d-text d-mono" text-anchor="middle">static-site/</text>
   <text x="660" y="344" class="d-sub" text-anchor="middle">S3 origin, OAC</text>
-  <rect x="560" y="380" width="200" height="56" rx="10" class="d-box d-cyan"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="564" y="394" width="200" height="56" rx="10" filter="url(#tf-repo-tree-d3blur)"/><rect class="d3-side d3-cyan" x="560" y="388" width="200" height="56" rx="10"/><rect class="d3-base" x="560" y="380" width="200" height="56" rx="10"/><rect x="560" y="380" width="200" height="56" rx="10" class="d-box d-cyan"/><rect class="d3-sheen" x="560" y="380" width="200" height="30.8" rx="10" fill="url(#tf-repo-tree-d3sheen)"/></g>
   <text x="660" y="404" class="d-text" text-anchor="middle">registry modules</text>
   <text x="660" y="424" class="d-sub" text-anchor="middle">pinned versions</text>
-</svg><figcaption>One copy of the code in stacks/, small per-environment files in envs/</figcaption></figure>
+<g class="d3-badges"><rect class="d3-badge-ring" x="319" y="7" width="30" height="30" rx="9"/><image href="/assets/logos/terraform.svg" x="321" y="9" width="26" height="26" clip-path="url(#tf-repo-tree-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="549" y="367" width="30" height="30" rx="9"/><image href="/assets/logos/terraform.svg" x="551" y="369" width="26" height="26" clip-path="url(#tf-repo-tree-d3clip)" preserveAspectRatio="xMidYMid slice"/></g></svg><figcaption>One copy of the code in stacks/, small per-environment files in envs/</figcaption></figure>
 <p>Each folder under <code>stacks/</code> is a root module. The code is the same for prod and staging. What changes is a small <code>.tfvars</code> file (variable values) and the backend settings in <code>envs/&lt;env&gt;/</code>. The backend block in each stack is left empty on purpose, and you fill it in at <code>init</code> time. Terraform calls this a &quot;partial configuration&quot;.</p>
 <div class="code"><span class="code__lang">hcl</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#8B949E"># stacks/app/backend.tf</span></span>
 <span class="line"><span style="color:#FFA657">terraform</span><span style="color:#E6EDF3"> {</span></span>
@@ -420,7 +420,7 @@
 <p>Workspaces are fine for short-lived copies, like one stack per feature branch. For prod and staging, I want the name in the path.</p>
 <h3 id="passing-values-between-stacks"><a class="anchor" href="#passing-values-between-stacks" aria-hidden="true" tabindex="-1">#</a>Passing values between stacks</h3>
 <p>Once the state is split, the <code>app</code> stack still needs the subnet IDs from <code>network</code> and the database endpoint from <code>data</code>. There are two common ways to pass them.</p>
-<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" class="diagram" role="img" aria-labelledby="tf-state-deps-t tf-state-deps-d">
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" class="diagram" role="img" aria-labelledby="tf-state-deps-t tf-state-deps-d"><defs><filter id="tf-state-deps-d3blur" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="6"/></filter><linearGradient id="tf-state-deps-d3sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="d3-sheen-a"/><stop offset="1" class="d3-sheen-b"/></linearGradient><clipPath id="tf-state-deps-d3clip" clipPathUnits="objectBoundingBox"><rect width="1" height="1" rx="0.26"/></clipPath></defs>
   <title id="tf-state-deps-t">State dependency graph</title>
   <desc id="tf-state-deps-d">The network, data, app and edge states are applied in that order; each one publishes outputs to SSM Parameter Store for the next to read, or the next one reads its state directly through terraform_remote_state.</desc>
   <defs>
@@ -442,16 +442,16 @@
   <text x="699" y="84" class="d-num-text">4</text>
 
   <!-- Stacks -->
-  <rect x="24" y="110" width="150" height="70" rx="10" class="d-box d-accent"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="28" y="124" width="150" height="70" rx="10" filter="url(#tf-state-deps-d3blur)"/><rect class="d3-side d3-accent" x="24" y="118" width="150" height="70" rx="10"/><rect class="d3-base" x="24" y="110" width="150" height="70" rx="10"/><rect x="24" y="110" width="150" height="70" rx="10" class="d-box d-accent"/><rect class="d3-sheen" x="24" y="110" width="150" height="38.5" rx="10" fill="url(#tf-state-deps-d3sheen)"/></g>
   <text x="99" y="140" class="d-text d-mono" text-anchor="middle">network</text>
   <text x="99" y="161" class="d-sub" text-anchor="middle">VPC, subnets</text>
-  <rect x="224" y="110" width="150" height="70" rx="10" class="d-box d-accent"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="228" y="124" width="150" height="70" rx="10" filter="url(#tf-state-deps-d3blur)"/><rect class="d3-side d3-accent" x="224" y="118" width="150" height="70" rx="10"/><rect class="d3-base" x="224" y="110" width="150" height="70" rx="10"/><rect x="224" y="110" width="150" height="70" rx="10" class="d-box d-accent"/><rect class="d3-sheen" x="224" y="110" width="150" height="38.5" rx="10" fill="url(#tf-state-deps-d3sheen)"/></g>
   <text x="299" y="140" class="d-text d-mono" text-anchor="middle">data</text>
   <text x="299" y="161" class="d-sub" text-anchor="middle">Aurora, Redis, S3</text>
-  <rect x="424" y="110" width="150" height="70" rx="10" class="d-box d-accent"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="428" y="124" width="150" height="70" rx="10" filter="url(#tf-state-deps-d3blur)"/><rect class="d3-side d3-accent" x="424" y="118" width="150" height="70" rx="10"/><rect class="d3-base" x="424" y="110" width="150" height="70" rx="10"/><rect x="424" y="110" width="150" height="70" rx="10" class="d-box d-accent"/><rect class="d3-sheen" x="424" y="110" width="150" height="38.5" rx="10" fill="url(#tf-state-deps-d3sheen)"/></g>
   <text x="499" y="140" class="d-text d-mono" text-anchor="middle">app</text>
   <text x="499" y="161" class="d-sub" text-anchor="middle">Lambda, API, SQS</text>
-  <rect x="624" y="110" width="150" height="70" rx="10" class="d-box d-accent"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="628" y="124" width="150" height="70" rx="10" filter="url(#tf-state-deps-d3blur)"/><rect class="d3-side d3-accent" x="624" y="118" width="150" height="70" rx="10"/><rect class="d3-base" x="624" y="110" width="150" height="70" rx="10"/><rect x="624" y="110" width="150" height="70" rx="10" class="d-box d-accent"/><rect class="d3-sheen" x="624" y="110" width="150" height="38.5" rx="10" fill="url(#tf-state-deps-d3sheen)"/></g>
   <text x="699" y="140" class="d-text d-mono" text-anchor="middle">edge</text>
   <text x="699" y="161" class="d-sub" text-anchor="middle">CloudFront, WAF</text>
 
@@ -461,7 +461,7 @@
   <line x1="574" y1="145" x2="624" y2="145" class="d-edge d-dashed" marker-end="url(#tf-state-deps-arrow)"/>
 
   <!-- SSM band -->
-  <rect x="24" y="250" width="750" height="72" rx="10" class="d-box d-cyan"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="28" y="264" width="750" height="72" rx="10" filter="url(#tf-state-deps-d3blur)"/><rect class="d3-side d3-cyan" x="24" y="258" width="750" height="72" rx="10"/><rect class="d3-base" x="24" y="250" width="750" height="72" rx="10"/><rect x="24" y="250" width="750" height="72" rx="10" class="d-box d-cyan"/><rect class="d3-sheen" x="24" y="250" width="750" height="39.6" rx="10" fill="url(#tf-state-deps-d3sheen)"/></g>
   <text x="400" y="276" class="d-text" text-anchor="middle">SSM Parameter Store</text>
   <text x="99" y="304" class="d-sub d-mono" text-anchor="middle">/prod/network/*</text>
   <text x="299" y="304" class="d-sub d-mono" text-anchor="middle">/prod/data/*</text>
@@ -482,7 +482,7 @@
   <text x="264" y="368" class="d-sub">reads input</text>
   <line x1="394" y1="364" x2="434" y2="364" class="d-edge d-dashed" marker-end="url(#tf-state-deps-arrow)"/>
   <text x="444" y="368" class="d-sub d-mono">terraform_remote_state</text>
-</svg><figcaption>Apply in order: network, data, app, edge. Destroy in the reverse order</figcaption></figure>
+<g class="d3-badges"><rect class="d3-badge-ring" x="213" y="97" width="30" height="30" rx="9"/><image href="/assets/logos/aws-aurora.svg" x="215" y="99" width="26" height="26" clip-path="url(#tf-state-deps-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="413" y="97" width="30" height="30" rx="9"/><image href="/assets/logos/aws-lambda.svg" x="415" y="99" width="26" height="26" clip-path="url(#tf-state-deps-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="13" y="237" width="30" height="30" rx="9"/><image href="/assets/logos/aws-systems-manager.svg" x="15" y="239" width="26" height="26" clip-path="url(#tf-state-deps-d3clip)" preserveAspectRatio="xMidYMid slice"/></g></svg><figcaption>Apply in order: network, data, app, edge. Destroy in the reverse order</figcaption></figure>
 <p><strong>Option 1: <code>terraform_remote_state</code>.</strong> The <code>app</code> stack reads the outputs of the <code>network</code> state file directly.</p>
 <div class="code"><span class="code__lang">hcl</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FFA657">data</span><span style="color:#79C0FF"> "terraform_remote_state"</span><span style="color:#79C0FF"> "network"</span><span style="color:#E6EDF3"> {</span></span>
 <span class="line"><span style="color:#E6EDF3">  backend</span><span style="color:#FF7B72"> =</span><span style="color:#A5D6FF"> "s3"</span></span>
@@ -613,7 +613,7 @@
 </ul>
 <p>Remember that any secret Terraform reads or creates ends up in the state file in plain text. Keep the state bucket encrypted, versioned and locked down to the CI roles and one or two admins.</p>
 <h2 id="ci-plan-on-pull-request-apply-on-merge"><a class="anchor" href="#ci-plan-on-pull-request-apply-on-merge" aria-hidden="true" tabindex="-1">#</a>CI: plan on pull request, apply on merge</h2>
-<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 334" class="diagram" role="img" aria-labelledby="tf-ci-flow-t tf-ci-flow-d">
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 334" class="diagram" role="img" aria-labelledby="tf-ci-flow-t tf-ci-flow-d"><defs><filter id="tf-ci-flow-d3blur" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="6"/></filter><linearGradient id="tf-ci-flow-d3sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="d3-sheen-a"/><stop offset="1" class="d3-sheen-b"/></linearGradient><clipPath id="tf-ci-flow-d3clip" clipPathUnits="objectBoundingBox"><rect width="1" height="1" rx="0.26"/></clipPath></defs>
   <title id="tf-ci-flow-t">Plan on pull request, apply on merge</title>
   <desc id="tf-ci-flow-d">A pull request triggers a read-only plan that is posted as a comment and reviewed; merging to main applies staging automatically and applies prod only after an environment approval.</desc>
   <defs>
@@ -623,16 +623,16 @@
   <!-- Pull request lane -->
   <rect x="24" y="24" width="752" height="126" rx="10" class="d-zone"/>
   <text x="40" y="44" class="d-zone-label d-mono">on: pull_request</text>
-  <rect x="40" y="62" width="156" height="66" rx="10" class="d-box"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="44" y="76" width="156" height="66" rx="10" filter="url(#tf-ci-flow-d3blur)"/><rect class="d3-side d3-plain" x="40" y="70" width="156" height="66" rx="10"/><rect class="d3-base" x="40" y="62" width="156" height="66" rx="10"/><rect x="40" y="62" width="156" height="66" rx="10" class="d-box"/><rect class="d3-sheen" x="40" y="62" width="156" height="36.3" rx="10" fill="url(#tf-ci-flow-d3sheen)"/></g>
   <text x="118" y="90" class="d-text" text-anchor="middle">Pull request</text>
   <text x="118" y="110" class="d-sub" text-anchor="middle">touches a stack</text>
-  <rect x="228" y="62" width="156" height="66" rx="10" class="d-box d-accent"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="232" y="76" width="156" height="66" rx="10" filter="url(#tf-ci-flow-d3blur)"/><rect class="d3-side d3-accent" x="228" y="70" width="156" height="66" rx="10"/><rect class="d3-base" x="228" y="62" width="156" height="66" rx="10"/><rect x="228" y="62" width="156" height="66" rx="10" class="d-box d-accent"/><rect class="d3-sheen" x="228" y="62" width="156" height="36.3" rx="10" fill="url(#tf-ci-flow-d3sheen)"/></g>
   <text x="306" y="90" class="d-text" text-anchor="middle">Plan</text>
   <text x="306" y="110" class="d-sub" text-anchor="middle">OIDC, read-only</text>
-  <rect x="416" y="62" width="156" height="66" rx="10" class="d-box"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="420" y="76" width="156" height="66" rx="10" filter="url(#tf-ci-flow-d3blur)"/><rect class="d3-side d3-plain" x="416" y="70" width="156" height="66" rx="10"/><rect class="d3-base" x="416" y="62" width="156" height="66" rx="10"/><rect x="416" y="62" width="156" height="66" rx="10" class="d-box"/><rect class="d3-sheen" x="416" y="62" width="156" height="36.3" rx="10" fill="url(#tf-ci-flow-d3sheen)"/></g>
   <text x="494" y="90" class="d-text" text-anchor="middle">Plan comment</text>
   <text x="494" y="110" class="d-sub" text-anchor="middle">per stack and env</text>
-  <rect x="604" y="62" width="156" height="66" rx="10" class="d-box"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="608" y="76" width="156" height="66" rx="10" filter="url(#tf-ci-flow-d3blur)"/><rect class="d3-side d3-plain" x="604" y="70" width="156" height="66" rx="10"/><rect class="d3-base" x="604" y="62" width="156" height="66" rx="10"/><rect x="604" y="62" width="156" height="66" rx="10" class="d-box"/><rect class="d3-sheen" x="604" y="62" width="156" height="36.3" rx="10" fill="url(#tf-ci-flow-d3sheen)"/></g>
   <text x="682" y="90" class="d-text" text-anchor="middle">Review</text>
   <text x="682" y="110" class="d-sub" text-anchor="middle">read the diff</text>
   <line x1="196" y1="95" x2="228" y2="95" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
@@ -645,22 +645,22 @@
   <!-- Main lane -->
   <rect x="24" y="200" width="752" height="110" rx="10" class="d-zone"/>
   <text x="760" y="220" class="d-zone-label d-mono" text-anchor="end">on: push to main</text>
-  <rect x="40" y="232" width="156" height="66" rx="10" class="d-box"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="44" y="246" width="156" height="66" rx="10" filter="url(#tf-ci-flow-d3blur)"/><rect class="d3-side d3-plain" x="40" y="240" width="156" height="66" rx="10"/><rect class="d3-base" x="40" y="232" width="156" height="66" rx="10"/><rect x="40" y="232" width="156" height="66" rx="10" class="d-box"/><rect class="d3-sheen" x="40" y="232" width="156" height="36.3" rx="10" fill="url(#tf-ci-flow-d3sheen)"/></g>
   <text x="118" y="260" class="d-text" text-anchor="middle">Merge</text>
   <text x="118" y="280" class="d-sub" text-anchor="middle">into main</text>
-  <rect x="228" y="232" width="156" height="66" rx="10" class="d-box"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="232" y="246" width="156" height="66" rx="10" filter="url(#tf-ci-flow-d3blur)"/><rect class="d3-side d3-plain" x="228" y="240" width="156" height="66" rx="10"/><rect class="d3-base" x="228" y="232" width="156" height="66" rx="10"/><rect x="228" y="232" width="156" height="66" rx="10" class="d-box"/><rect class="d3-sheen" x="228" y="232" width="156" height="36.3" rx="10" fill="url(#tf-ci-flow-d3sheen)"/></g>
   <text x="306" y="260" class="d-text" text-anchor="middle">Apply staging</text>
   <text x="306" y="280" class="d-sub" text-anchor="middle">automatic</text>
-  <rect x="416" y="232" width="156" height="66" rx="10" class="d-box d-warn"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="420" y="246" width="156" height="66" rx="10" filter="url(#tf-ci-flow-d3blur)"/><rect class="d3-side d3-warn" x="416" y="240" width="156" height="66" rx="10"/><rect class="d3-base" x="416" y="232" width="156" height="66" rx="10"/><rect x="416" y="232" width="156" height="66" rx="10" class="d-box d-warn"/><rect class="d3-sheen" x="416" y="232" width="156" height="36.3" rx="10" fill="url(#tf-ci-flow-d3sheen)"/></g>
   <text x="494" y="260" class="d-text" text-anchor="middle">Approval</text>
   <text x="494" y="280" class="d-sub" text-anchor="middle">prod environment</text>
-  <rect x="604" y="232" width="156" height="66" rx="10" class="d-box d-ok"/>
+  <g class="d3-tile"><rect class="d3-shadow" x="608" y="246" width="156" height="66" rx="10" filter="url(#tf-ci-flow-d3blur)"/><rect class="d3-side d3-ok" x="604" y="240" width="156" height="66" rx="10"/><rect class="d3-base" x="604" y="232" width="156" height="66" rx="10"/><rect x="604" y="232" width="156" height="66" rx="10" class="d-box d-ok"/><rect class="d3-sheen" x="604" y="232" width="156" height="36.3" rx="10" fill="url(#tf-ci-flow-d3sheen)"/></g>
   <text x="682" y="260" class="d-text" text-anchor="middle">Apply prod</text>
   <text x="682" y="280" class="d-sub" text-anchor="middle">OIDC, apply role</text>
   <line x1="196" y1="265" x2="228" y2="265" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
   <line x1="384" y1="265" x2="416" y2="265" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
   <line x1="572" y1="265" x2="604" y2="265" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
-</svg><figcaption>Nobody runs apply from a laptop</figcaption></figure>
+<g class="d3-badges"><rect class="d3-badge-ring" x="29" y="49" width="30" height="30" rx="9"/><image href="/assets/logos/githubactions.svg" x="31" y="51" width="26" height="26" clip-path="url(#tf-ci-flow-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="217" y="49" width="30" height="30" rx="9"/><image href="/assets/logos/terraform.svg" x="219" y="51" width="26" height="26" clip-path="url(#tf-ci-flow-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="217" y="219" width="30" height="30" rx="9"/><image href="/assets/logos/terraform.svg" x="219" y="221" width="26" height="26" clip-path="url(#tf-ci-flow-d3clip)" preserveAspectRatio="xMidYMid slice"/><rect class="d3-badge-ring" x="593" y="219" width="30" height="30" rx="9"/><image href="/assets/logos/terraform.svg" x="595" y="221" width="26" height="26" clip-path="url(#tf-ci-flow-d3clip)" preserveAspectRatio="xMidYMid slice"/></g></svg><figcaption>Nobody runs apply from a laptop</figcaption></figure>
 <p>The full pipeline is covered in a separate post, so here is the short version:</p>
 <ul>
 <li>On every pull request, CI runs <code>plan</code> for each stack and environment that changed, and posts the output as a PR comment. Reviewers read the plan, not just the code.</li>

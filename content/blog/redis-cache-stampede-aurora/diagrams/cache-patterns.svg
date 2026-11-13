@@ -7,11 +7,11 @@
 
   <rect class="d-zone" x="16" y="16" width="240" height="328" rx="10"/>
   <text class="d-text" x="136" y="48" text-anchor="middle">Cache-aside</text>
-  <rect class="d-box d-accent" x="76" y="76" width="120" height="50" rx="10"/>
+  <rect class="d-box d-accent" x="76" y="76" width="120" height="50" rx="10" data-logo="nodedotjs"/>
   <text class="d-text" x="136" y="106" text-anchor="middle">App</text>
-  <rect class="d-box d-cyan" x="32" y="216" width="92" height="50" rx="10"/>
+  <rect class="d-box d-cyan" x="32" y="216" width="92" height="50" rx="10" data-logo="redis"/>
   <text class="d-text" x="78" y="246" text-anchor="middle">Redis</text>
-  <rect class="d-box" x="148" y="216" width="92" height="50" rx="10"/>
+  <rect class="d-box" x="148" y="216" width="92" height="50" rx="10" data-logo="aws-aurora"/>
   <text class="d-text" x="194" y="246" text-anchor="middle">Aurora</text>
   <path class="d-edge d-edge-ok" d="M106 126L80 214" marker-end="url(#cache-patterns-arrow)"/>
   <text class="d-sub" x="86" y="174" text-anchor="end">1  read</text>
@@ -22,11 +22,11 @@
 
   <rect class="d-zone" x="280" y="16" width="240" height="328" rx="10"/>
   <text class="d-text" x="400" y="48" text-anchor="middle">Write-through</text>
-  <rect class="d-box d-accent" x="340" y="76" width="120" height="50" rx="10"/>
+  <rect class="d-box d-accent" x="340" y="76" width="120" height="50" rx="10" data-logo="nodedotjs"/>
   <text class="d-text" x="400" y="106" text-anchor="middle">App</text>
-  <rect class="d-box d-cyan" x="296" y="216" width="92" height="50" rx="10"/>
+  <rect class="d-box d-cyan" x="296" y="216" width="92" height="50" rx="10" data-logo="redis"/>
   <text class="d-text" x="342" y="246" text-anchor="middle">Redis</text>
-  <rect class="d-box" x="412" y="216" width="92" height="50" rx="10"/>
+  <rect class="d-box" x="412" y="216" width="92" height="50" rx="10" data-logo="aws-aurora"/>
   <text class="d-text" x="458" y="246" text-anchor="middle">Aurora</text>
   <path class="d-edge d-edge-accent" d="M370 126L344 214" marker-end="url(#cache-patterns-arrow)"/>
   <text class="d-sub" x="350" y="174" text-anchor="end">2  SET</text>
@@ -37,11 +37,11 @@
 
   <rect class="d-zone" x="544" y="16" width="240" height="328" rx="10"/>
   <text class="d-text" x="664" y="48" text-anchor="middle">Write-behind</text>
-  <rect class="d-box d-accent" x="604" y="76" width="120" height="50" rx="10"/>
+  <rect class="d-box d-accent" x="604" y="76" width="120" height="50" rx="10" data-logo="nodedotjs"/>
   <text class="d-text" x="664" y="106" text-anchor="middle">App</text>
-  <rect class="d-box d-cyan" x="560" y="216" width="92" height="50" rx="10"/>
+  <rect class="d-box d-cyan" x="560" y="216" width="92" height="50" rx="10" data-logo="redis"/>
   <text class="d-text" x="606" y="246" text-anchor="middle">Redis</text>
-  <rect class="d-box" x="676" y="216" width="92" height="50" rx="10"/>
+  <rect class="d-box" x="676" y="216" width="92" height="50" rx="10" data-logo="aws-aurora"/>
   <text class="d-text" x="722" y="246" text-anchor="middle">Aurora</text>
   <path class="d-edge d-edge-accent" d="M634 126L608 214" marker-end="url(#cache-patterns-arrow)"/>
   <text class="d-sub" x="614" y="174" text-anchor="end">1  write</text>
