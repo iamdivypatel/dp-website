@@ -10,8 +10,8 @@
     "lastmod": "2026-11-13"
   },
   {
-    "path": "/blog/self-host-llm-vllm-cost-vs-api",
-    "title": "Self-hosting an LLM with vLLM: the real cost math vs an API",
+    "path": "/blog/lambda-zero-downtime-deploys-github-actions",
+    "title": "Zero-downtime Lambda deploys from GitHub Actions: OIDC, versions, aliases and canary rollback",
     "lastmod": "2026-11-13"
   },
   {
@@ -20,8 +20,8 @@
     "lastmod": "2026-10-27"
   },
   {
-    "path": "/blog/lambda-zero-downtime-deploys-github-actions",
-    "title": "Zero-downtime Lambda deploys from GitHub Actions: OIDC, versions, aliases and canary rollback",
+    "path": "/blog/self-host-llm-vllm-cost-vs-api",
+    "title": "Self-hosting an LLM with vLLM: the real cost math vs an API",
     "lastmod": "2026-11-13"
   },
   {

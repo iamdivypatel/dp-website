@@ -1,7 +1,7 @@
 ---
 title: "Zero-downtime Lambda deploys from GitHub Actions: OIDC, versions, aliases and canary rollback"
 description: "Deploy AWS Lambda from GitHub Actions with no stored AWS keys: OIDC login, versions, a weighted alias canary and automatic rollback."
-date: 2026-10-20
+date: 2026-11-03
 updated: 2026-11-13
 tags: [AWS Lambda, GitHub Actions, CI/CD, Terraform]
 draft: false
