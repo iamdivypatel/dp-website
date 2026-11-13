@@ -1,9 +1,10 @@
 ---
 title: "Terraform for a one-AWS-account startup: layout, state, and the day you split"
 description: "How to structure Terraform for a small AWS startup: one state, then split state per stack and environment, then multi-account. With real HCL."
-date: 2026-11-13
+date: 2026-10-13
 tags: [Terraform, AWS, Infrastructure as Code, DevOps]
 draft: false
+logos: [terraform, aws-aurora, aws-systems-manager, githubactions]
 ---
 
 If you are the developer who "also does the infra" at a small company, this post shows how I lay out Terraform for one AWS account, how I store state, and how I know it is time to split things up.

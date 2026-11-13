@@ -33,6 +33,10 @@ const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const slugify = (t) => t.toLowerCase().replace(/<[^>]+>/g, '').replace(/&#?\w+;/g, '').replace(/[^\w\s-]/g, '').trim().replace(/[\s_]+/g, '-').replace(/-+/g, '-');
 const isoDate = (d) => new Date(d).toISOString().slice(0, 10);
 const longDate = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+const logo = (name) => {
+  if (!existsSync(`public/assets/logos/${name}.svg`)) throw new Error(`no logo public/assets/logos/${name}.svg`);
+  return `<img src="/assets/logos/${name}.svg" width="40" height="40" alt="" loading="lazy" decoding="async">`;
+};
 const json = (data) => JSON.stringify(data, null, 2).replace(/</g, '\\u003c').split('\n').map((l) => '  ' + l).join('\n');
 
 /* ---------- Posts ---------- */
@@ -103,8 +107,12 @@ function render(post, dir = join(SRC, post.slug)) {
     },
   });
   const html = marked.parse(post.content);
-  const words = post.content.replace(/```[\s\S]*?```/g, ' ').split(/\s+/).filter(Boolean).length;
-  return { html, toc, words, minutes: Math.max(1, Math.round(words / 230)) };
+  // reading time: prose at 230 words a minute; code is mostly skimmed (~400), plus ~12 s per diagram
+  const count = (text) => text.split(/\s+/).filter(Boolean).length;
+  const code = (post.content.match(/```[\s\S]*?```/g) ?? []).join(' ');
+  const words = count(post.content.replace(/```[\s\S]*?```/g, ' '));
+  const figures = (post.content.match(/\]\(diagrams\/[\w-]+\.svg/g) ?? []).length;
+  return { html, toc, words, minutes: Math.max(1, Math.round(words / 230 + count(code) / 400 + figures * 0.2)) };
 }
 
 /* ---------- Link-preview images (1200×630, rendered with Chrome when the title changes) ---------- */
@@ -268,6 +276,7 @@ ${post.html}
 
 function card(post) {
   return `<li class="post-card"><a href="/blog/${post.slug}">
+    ${post.logos?.length ? `<span class="post-card__logos" aria-hidden="true">${post.logos.slice(0, 4).map(logo).join('')}</span>` : ''}
     <span class="post-card__meta"><time datetime="${isoDate(post.date)}">${longDate(post.date)}</time> · ${post.minutes} min read</span>
     <span class="post-card__title">${esc(post.title)}</span>
     <span class="post-card__desc">${esc(post.description)}</span>
@@ -288,8 +297,13 @@ writeFileSync(`${OUT}/index.html`, page({
   ],
   body: `    <section class="blog-index container">
       <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Divya Patel</a><span aria-hidden="true">/</span><span>Writing</span></nav>
-      <h1 class="post__title">Writing on backend, cloud and <span class="serif">system design.</span></h1>
-      <p class="post__dek">Practical guides for developers and the people who hire them: how to design, deploy and pay for production systems on AWS, drawn as diagrams first and code second.</p>
+      <div class="blog-hero">
+        <div class="blog-hero__text">
+          <h1 class="post__title">Writing on backend, cloud and <span class="serif">system design.</span></h1>
+          <p class="post__dek">Simple, practical guides on building and running backend systems on AWS. Diagrams first, then code. For developers and the people who hire them.</p>
+        </div>
+        <div class="blog-hero__art" aria-hidden="true">${['aws-lambda', 'terraform', 'redis', 'githubactions', 'aws-aurora', 'vllm', 'grafana', 'aws-sqs', 'nodedotjs'].map(logo).join('')}</div>
+      </div>
       <ul class="post-list">${built.map(card).join('')}</ul>
       <p class="blog-index__rss">Follow along with the <a href="/blog/feed.xml">RSS feed</a>.</p>
     </section>`,
@@ -315,6 +329,15 @@ ${p.tags.map((t) => `      <category>${esc(t)}</category>`).join('\n')}
 </rss>
 `;
 writeFileSync(`${OUT}/feed.xml`, rss);
+/* ---------- Homepage: the latest posts, written between markers in index.html ---------- */
+
+const latestStart = '<!-- blog:latest -->', latestEnd = '<!-- /blog:latest -->';
+const indexHtml = readFileSync('public/index.html', 'utf8');
+if (indexHtml.includes(latestStart)) {
+  const cards = `${latestStart}\n          <ul class="post-list post-list--home">${built.slice(0, 3).map(card).join('')}</ul>\n          ${latestEnd}`;
+  writeFileSync('public/index.html', indexHtml.replace(new RegExp(`${latestStart}[\\s\\S]*?${latestEnd}`), cards));
+}
+
 /* ---------- Standalone pages: content/pages/<slug>.md → /<slug> (e.g. the Ahmedabad page) ---------- */
 
 const PAGES = 'content/pages';

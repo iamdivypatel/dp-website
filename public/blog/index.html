@@ -55,13 +55,13 @@
         },
         "blogPost": [
           {
-            "@id": "https://divypatel.in/blog/lambda-zero-downtime-deploys-github-actions#article"
+            "@id": "https://divypatel.in/blog/self-host-llm-vllm-cost-vs-api#article"
           },
           {
             "@id": "https://divypatel.in/blog/redis-cache-stampede-aurora#article"
           },
           {
-            "@id": "https://divypatel.in/blog/self-host-llm-vllm-cost-vs-api#article"
+            "@id": "https://divypatel.in/blog/lambda-zero-downtime-deploys-github-actions#article"
           },
           {
             "@id": "https://divypatel.in/blog/terraform-aws-startup-layout#article"
@@ -139,25 +139,34 @@
   <main id="main">
     <section class="blog-index container">
       <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Divya Patel</a><span aria-hidden="true">/</span><span>Writing</span></nav>
-      <h1 class="post__title">Writing on backend, cloud and <span class="serif">system design.</span></h1>
-      <p class="post__dek">Practical guides for developers and the people who hire them: how to design, deploy and pay for production systems on AWS, drawn as diagrams first and code second.</p>
-      <ul class="post-list"><li class="post-card"><a href="/blog/lambda-zero-downtime-deploys-github-actions">
-    <span class="post-card__meta"><time datetime="2026-11-13">13 November 2026</time> · 12 min read</span>
-    <span class="post-card__title">Zero-downtime Lambda deploys from GitHub Actions: OIDC, versions, aliases and canary rollback</span>
-    <span class="post-card__desc">Deploy AWS Lambda from GitHub Actions with no stored AWS keys: OIDC login, versions, a weighted alias canary and automatic rollback.</span>
-    <span class="post-card__tags">AWS Lambda · GitHub Actions · CI/CD</span>
-  </a></li><li class="post-card"><a href="/blog/redis-cache-stampede-aurora">
-    <span class="post-card__meta"><time datetime="2026-11-13">13 November 2026</time> · 12 min read</span>
-    <span class="post-card__title">Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL</span>
-    <span class="post-card__desc">Redis caching patterns for Postgres in plain words: cache-aside vs write-through, cache stampede prevention, TTL jitter and safe invalidation.</span>
-    <span class="post-card__tags">Redis · PostgreSQL · AWS</span>
-  </a></li><li class="post-card"><a href="/blog/self-host-llm-vllm-cost-vs-api">
-    <span class="post-card__meta"><time datetime="2026-11-13">13 November 2026</time> · 12 min read</span>
+      <div class="blog-hero">
+        <div class="blog-hero__text">
+          <h1 class="post__title">Writing on backend, cloud and <span class="serif">system design.</span></h1>
+          <p class="post__dek">Simple, practical guides on building and running backend systems on AWS. Diagrams first, then code. For developers and the people who hire them.</p>
+        </div>
+        <div class="blog-hero__art" aria-hidden="true"><img src="/assets/logos/aws-lambda.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/terraform.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/redis.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/githubactions.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/aws-aurora.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/vllm.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/grafana.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/aws-sqs.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/nodedotjs.svg" width="40" height="40" alt="" loading="lazy" decoding="async"></div>
+      </div>
+      <ul class="post-list"><li class="post-card"><a href="/blog/self-host-llm-vllm-cost-vs-api">
+    <span class="post-card__logos" aria-hidden="true"><img src="/assets/logos/vllm.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/prometheus.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/grafana.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/docker.svg" width="40" height="40" alt="" loading="lazy" decoding="async"></span>
+    <span class="post-card__meta"><time datetime="2026-11-03">3 November 2026</time> · 14 min read</span>
     <span class="post-card__title">Self-hosting an LLM with vLLM: the real cost math vs an API</span>
     <span class="post-card__desc">A neutral break-even model for self-hosting an LLM with vLLM vs paying an API per token, with a worked example, real prices and a small production setup.</span>
     <span class="post-card__tags">LLM · vLLM · Cost</span>
+  </a></li><li class="post-card"><a href="/blog/redis-cache-stampede-aurora">
+    <span class="post-card__logos" aria-hidden="true"><img src="/assets/logos/redis.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/aws-aurora.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/nodedotjs.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/typescript.svg" width="40" height="40" alt="" loading="lazy" decoding="async"></span>
+    <span class="post-card__meta"><time datetime="2026-10-27">27 October 2026</time> · 16 min read</span>
+    <span class="post-card__title">Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL</span>
+    <span class="post-card__desc">Redis caching patterns for Postgres in plain words: cache-aside vs write-through, cache stampede prevention, TTL jitter and safe invalidation.</span>
+    <span class="post-card__tags">Redis · PostgreSQL · AWS</span>
+  </a></li><li class="post-card"><a href="/blog/lambda-zero-downtime-deploys-github-actions">
+    <span class="post-card__logos" aria-hidden="true"><img src="/assets/logos/aws-lambda.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/githubactions.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/aws-api-gateway.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/terraform.svg" width="40" height="40" alt="" loading="lazy" decoding="async"></span>
+    <span class="post-card__meta"><time datetime="2026-10-20">20 October 2026</time> · 15 min read</span>
+    <span class="post-card__title">Zero-downtime Lambda deploys from GitHub Actions: OIDC, versions, aliases and canary rollback</span>
+    <span class="post-card__desc">Deploy AWS Lambda from GitHub Actions with no stored AWS keys: OIDC login, versions, a weighted alias canary and automatic rollback.</span>
+    <span class="post-card__tags">AWS Lambda · GitHub Actions · CI/CD</span>
   </a></li><li class="post-card"><a href="/blog/terraform-aws-startup-layout">
-    <span class="post-card__meta"><time datetime="2026-11-13">13 November 2026</time> · 12 min read</span>
+    <span class="post-card__logos" aria-hidden="true"><img src="/assets/logos/terraform.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/aws-aurora.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/aws-systems-manager.svg" width="40" height="40" alt="" loading="lazy" decoding="async"><img src="/assets/logos/githubactions.svg" width="40" height="40" alt="" loading="lazy" decoding="async"></span>
+    <span class="post-card__meta"><time datetime="2026-10-13">13 October 2026</time> · 14 min read</span>
     <span class="post-card__title">Terraform for a one-AWS-account startup: layout, state, and the day you split</span>
     <span class="post-card__desc">How to structure Terraform for a small AWS startup: one state, then split state per stack and environment, then multi-account. With real HCL.</span>
     <span class="post-card__tags">Terraform · AWS · Infrastructure as Code</span>

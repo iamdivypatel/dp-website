@@ -13,19 +13,19 @@
     <lastmod>2026-11-13</lastmod>
   </url>
   <url>
-    <loc>https://divypatel.in/blog/lambda-zero-downtime-deploys-github-actions</loc>
-    <lastmod>2026-11-13</lastmod>
-  </url>
-  <url>
-    <loc>https://divypatel.in/blog/redis-cache-stampede-aurora</loc>
-    <lastmod>2026-11-13</lastmod>
-  </url>
-  <url>
     <loc>https://divypatel.in/blog/self-host-llm-vllm-cost-vs-api</loc>
     <lastmod>2026-11-13</lastmod>
   </url>
   <url>
-    <loc>https://divypatel.in/blog/terraform-aws-startup-layout</loc>
+    <loc>https://divypatel.in/blog/redis-cache-stampede-aurora</loc>
+    <lastmod>2026-10-27</lastmod>
+  </url>
+  <url>
+    <loc>https://divypatel.in/blog/lambda-zero-downtime-deploys-github-actions</loc>
     <lastmod>2026-11-13</lastmod>
+  </url>
+  <url>
+    <loc>https://divypatel.in/blog/terraform-aws-startup-layout</loc>
+    <lastmod>2026-10-13</lastmod>
   </url>
 </urlset>

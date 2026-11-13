@@ -12,6 +12,7 @@ description: "One or two sentences, at most 155 characters. Shown in Google and 
 date: 2026-11-13          # first published
 updated: 2026-11-13       # optional; last real content change
 tags: [Redis, AWS, System design]
+logos: [redis, aws-aurora, nodedotjs] # 2–4 file names from public/assets/logos, shown on the post card
 draft: false              # true keeps it out of the build
 ---
 ```

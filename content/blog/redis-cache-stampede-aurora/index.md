@@ -1,9 +1,10 @@
 ---
 title: "Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL"
 description: "Redis caching patterns for Postgres in plain words: cache-aside vs write-through, cache stampede prevention, TTL jitter and safe invalidation."
-date: 2026-11-13
+date: 2026-10-27
 tags: [Redis, PostgreSQL, AWS, System design]
 draft: false
+logos: [redis, aws-aurora, nodedotjs, typescript]
 ---
 
 Putting Redis in front of Aurora PostgreSQL is easy. Keeping it correct when traffic spikes, keys expire and Redis goes down is the hard part, so this post is about that part, with Node.js and TypeScript code you can copy.

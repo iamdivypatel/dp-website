@@ -1,9 +1,11 @@
 ---
 title: "Self-hosting an LLM with vLLM: the real cost math vs an API"
 description: "A neutral break-even model for self-hosting an LLM with vLLM vs paying an API per token, with a worked example, real prices and a small production setup."
-date: 2026-11-13
+date: 2026-11-03
+updated: 2026-11-13
 tags: [LLM, vLLM, Cost, AI infrastructure]
 draft: false
+logos: [vllm, prometheus, grafana, docker]
 ---
 
 "Should we run our own model or pay for an API?" The honest answer is a formula, not a feeling. This post is for founders and CTOs who need a quick decision, and for engineers who need the numbers and a setup they can run.
