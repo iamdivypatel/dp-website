@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Divya Patel – Writing</title>
+    <link>https://divypatel.in/blog</link>
+    <description>Writing by Divya Patel, Backend &amp; Cloud Engineer: practical guides on system design, AWS, Terraform, caching with Redis, CI/CD and self-hosted LLM infrastructure, with diagrams.</description>
+    <language>en</language>
+    <atom:link href="https://divypatel.in/blog/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Zero-downtime Lambda deploys from GitHub Actions: OIDC, versions, aliases and canary rollback</title>
+      <link>https://divypatel.in/blog/lambda-zero-downtime-deploys-github-actions</link>
+      <guid>https://divypatel.in/blog/lambda-zero-downtime-deploys-github-actions</guid>
+      <pubDate>Fri, 13 Nov 2026 00:00:00 GMT</pubDate>
+      <description>Deploy AWS Lambda from GitHub Actions with no stored AWS keys: OIDC login, versions, a weighted alias canary and automatic rollback.</description>
+      <category>AWS Lambda</category>
+      <category>GitHub Actions</category>
+      <category>CI/CD</category>
+      <category>Terraform</category>
+    </item>
+    <item>
+      <title>Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL</title>
+      <link>https://divypatel.in/blog/redis-cache-stampede-aurora</link>
+      <guid>https://divypatel.in/blog/redis-cache-stampede-aurora</guid>
+      <pubDate>Fri, 13 Nov 2026 00:00:00 GMT</pubDate>
+      <description>Redis caching patterns for Postgres in plain words: cache-aside vs write-through, cache stampede prevention, TTL jitter and safe invalidation.</description>
+      <category>Redis</category>
+      <category>PostgreSQL</category>
+      <category>AWS</category>
+      <category>System design</category>
+    </item>
+    <item>
+      <title>Self-hosting an LLM with vLLM: the real cost math vs an API</title>
+      <link>https://divypatel.in/blog/self-host-llm-vllm-cost-vs-api</link>
+      <guid>https://divypatel.in/blog/self-host-llm-vllm-cost-vs-api</guid>
+      <pubDate>Fri, 13 Nov 2026 00:00:00 GMT</pubDate>
+      <description>A neutral break-even model for self-hosting an LLM with vLLM vs paying an API per token, with a worked example, real prices and a small production setup.</description>
+      <category>LLM</category>
+      <category>vLLM</category>
+      <category>Cost</category>
+      <category>AI infrastructure</category>
+    </item>
+    <item>
+      <title>Terraform for a one-AWS-account startup: layout, state, and the day you split</title>
+      <link>https://divypatel.in/blog/terraform-aws-startup-layout</link>
+      <guid>https://divypatel.in/blog/terraform-aws-startup-layout</guid>
+      <pubDate>Fri, 13 Nov 2026 00:00:00 GMT</pubDate>
+      <description>How to structure Terraform for a small AWS startup: one state, then split state per stack and environment, then multi-account. With real HCL.</description>
+      <category>Terraform</category>
+      <category>AWS</category>
+      <category>Infrastructure as Code</category>
+      <category>DevOps</category>
+    </item>
+  </channel>
+</rss>

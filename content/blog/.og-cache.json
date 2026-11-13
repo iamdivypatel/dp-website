@@ -1,0 +1,6 @@
+{
+  "lambda-zero-downtime-deploys-github-actions": "d432573864",
+  "redis-cache-stampede-aurora": "29cfef7917",
+  "self-host-llm-vllm-cost-vs-api": "0f3b47ccbb",
+  "terraform-aws-startup-layout": "f3705dde72"
+}

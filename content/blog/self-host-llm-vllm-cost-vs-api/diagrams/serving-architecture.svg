@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 380" class="diagram" role="img" aria-labelledby="serving-architecture-t serving-architecture-d">
+<title id="serving-architecture-t">Minimal production setup for vLLM</title>
+<desc id="serving-architecture-d">The app calls Nginx over HTTPS; Nginx handles TLS, rate limits and the API key and forwards to vLLM's OpenAI-compatible server on the GPU, while Prometheus scrapes vLLM metrics and Grafana shows dashboards and alerts.</desc>
+<defs><marker id="serving-architecture-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker></defs>
+<rect x="181" y="30" width="603" height="330" rx="10" class="d-zone"/>
+<text x="194" y="52" class="d-zone-label">YOUR NETWORK / GPU HOST</text>
+
+<rect x="12" y="90" width="122" height="80" rx="10" class="d-box"/>
+<text x="73" y="124" class="d-text" text-anchor="middle">Your app</text>
+<text x="73" y="146" class="d-sub" text-anchor="middle">OpenAI SDK</text>
+
+<rect x="194" y="80" width="160" height="100" rx="10" class="d-box d-cyan"/>
+<text x="274" y="112" class="d-text" text-anchor="middle">Nginx</text>
+<text x="274" y="136" class="d-sub" text-anchor="middle">TLS, rate limit</text>
+<text x="274" y="156" class="d-sub" text-anchor="middle">API key check</text>
+
+<rect x="390" y="80" width="180" height="100" rx="10" class="d-box d-accent"/>
+<text x="480" y="112" class="d-text" text-anchor="middle">vLLM server</text>
+<text x="480" y="136" class="d-sub" text-anchor="middle">OpenAI-compatible</text>
+<text x="480" y="156" class="d-sub d-mono" text-anchor="middle">:8000/v1</text>
+
+<rect x="606" y="80" width="160" height="100" rx="10" class="d-box"/>
+<text x="686" y="120" class="d-text" text-anchor="middle">GPU</text>
+<text x="686" y="144" class="d-sub" text-anchor="middle">model weights</text>
+<text x="686" y="162" class="d-sub" text-anchor="middle">+ KV cache</text>
+
+<rect x="390" y="250" width="180" height="80" rx="10" class="d-box"/>
+<text x="480" y="284" class="d-text" text-anchor="middle">Prometheus</text>
+<text x="480" y="306" class="d-sub" text-anchor="middle">scrapes every 15 s</text>
+
+<rect x="194" y="250" width="160" height="80" rx="10" class="d-box d-ok"/>
+<text x="274" y="284" class="d-text" text-anchor="middle">Grafana</text>
+<text x="274" y="306" class="d-sub" text-anchor="middle">dashboards, alerts</text>
+
+<path d="M134 130H190" class="d-edge d-edge-accent" marker-end="url(#serving-architecture-arrow)"/>
+<text x="157" y="118" class="d-sub" text-anchor="middle">HTTPS</text>
+<path d="M354 130H386" class="d-edge d-edge-accent" marker-end="url(#serving-architecture-arrow)"/>
+<path d="M570 130H602" class="d-edge" marker-end="url(#serving-architecture-arrow)"/>
+<path d="M480 250V184" class="d-edge d-dashed" marker-end="url(#serving-architecture-arrow)"/>
+<text x="490" y="222" class="d-sub d-mono">GET /metrics</text>
+<path d="M390 290H358" class="d-edge" marker-end="url(#serving-architecture-arrow)"/>
+</svg>

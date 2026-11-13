@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 470" class="diagram" role="img" aria-labelledby="tf-stages-t tf-stages-d">
+  <title id="tf-stages-t">Three stages of a Terraform layout</title>
+  <desc id="tf-stages-d">Stage one is a single root module with one state file, stage two splits the same account into network, data, app and edge states, and stage three moves prod, staging and shared into separate AWS accounts, with the signals that trigger each move shown on a timeline.</desc>
+  <defs>
+    <marker id="tf-stages-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker>
+  </defs>
+
+  <!-- Stage headings -->
+  <text x="130" y="38" class="d-text" text-anchor="middle">Stage 1</text>
+  <text x="130" y="58" class="d-sub" text-anchor="middle">one state</text>
+  <text x="400" y="38" class="d-text" text-anchor="middle">Stage 2</text>
+  <text x="400" y="58" class="d-sub" text-anchor="middle">split by lifecycle</text>
+  <text x="670" y="38" class="d-text" text-anchor="middle">Stage 3</text>
+  <text x="670" y="58" class="d-sub" text-anchor="middle">multi-account</text>
+
+  <!-- Stage 1 -->
+  <rect x="20" y="76" width="220" height="280" rx="10" class="d-zone"/>
+  <text x="36" y="96" class="d-zone-label">AWS ACCOUNT</text>
+  <rect x="36" y="112" width="188" height="228" rx="10" class="d-box"/>
+  <text x="130" y="180" class="d-text d-mono" text-anchor="middle">root module</text>
+  <text x="130" y="202" class="d-sub" text-anchor="middle">one state file</text>
+  <text x="130" y="242" class="d-sub d-mono" text-anchor="middle">VPC · Aurora · SQS</text>
+  <text x="130" y="262" class="d-sub d-mono" text-anchor="middle">Lambda · API GW</text>
+  <text x="130" y="282" class="d-sub d-mono" text-anchor="middle">CloudFront · WAF</text>
+
+  <!-- Stage 2 -->
+  <rect x="290" y="76" width="220" height="280" rx="10" class="d-zone"/>
+  <text x="306" y="96" class="d-zone-label">AWS ACCOUNT</text>
+  <rect x="306" y="112" width="188" height="40" rx="10" class="d-box d-accent"/>
+  <text x="400" y="137" class="d-text d-mono" text-anchor="middle">network</text>
+  <rect x="306" y="176" width="188" height="40" rx="10" class="d-box d-accent"/>
+  <text x="400" y="201" class="d-text d-mono" text-anchor="middle">data</text>
+  <rect x="306" y="240" width="188" height="40" rx="10" class="d-box d-accent"/>
+  <text x="400" y="265" class="d-text d-mono" text-anchor="middle">app</text>
+  <rect x="306" y="304" width="188" height="40" rx="10" class="d-box d-accent"/>
+  <text x="400" y="329" class="d-text d-mono" text-anchor="middle">edge</text>
+
+  <!-- Stage 3 -->
+  <rect x="560" y="76" width="220" height="280" rx="10" class="d-zone"/>
+  <text x="576" y="96" class="d-zone-label">AWS ORGANIZATIONS</text>
+  <rect x="576" y="112" width="188" height="60" rx="10" class="d-box"/>
+  <text x="670" y="138" class="d-text d-mono" text-anchor="middle">prod</text>
+  <text x="670" y="158" class="d-sub" text-anchor="middle">four stacks</text>
+  <rect x="576" y="196" width="188" height="60" rx="10" class="d-box"/>
+  <text x="670" y="222" class="d-text d-mono" text-anchor="middle">staging</text>
+  <text x="670" y="242" class="d-sub" text-anchor="middle">four stacks</text>
+  <rect x="576" y="280" width="188" height="60" rx="10" class="d-box"/>
+  <text x="670" y="306" class="d-text d-mono" text-anchor="middle">shared</text>
+  <text x="670" y="326" class="d-sub" text-anchor="middle">CI, logs, DNS</text>
+
+  <!-- Stage arrows -->
+  <line x1="240" y1="216" x2="290" y2="216" class="d-edge d-edge-accent" marker-end="url(#tf-stages-arrow)"/>
+  <line x1="510" y1="216" x2="560" y2="216" class="d-edge d-edge-accent" marker-end="url(#tf-stages-arrow)"/>
+
+  <!-- Trigger timeline -->
+  <line x1="20" y1="396" x2="780" y2="396" class="d-edge" marker-end="url(#tf-stages-arrow)"/>
+  <circle cx="265" cy="396" r="11" class="d-num"/>
+  <text x="265" y="396" class="d-num-text">1</text>
+  <circle cx="535" cy="396" r="11" class="d-num"/>
+  <text x="535" y="396" class="d-num-text">2</text>
+  <text x="265" y="430" class="d-sub" text-anchor="middle">trigger: slow, scary plans</text>
+  <text x="265" y="450" class="d-sub" text-anchor="middle">2+ people applying</text>
+  <text x="535" y="430" class="d-sub" text-anchor="middle">trigger: prod data isolation</text>
+  <text x="535" y="450" class="d-sub" text-anchor="middle">audits, a second team</text>
+</svg>

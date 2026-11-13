@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560" class="diagram" role="img" aria-labelledby="decision-flow-t decision-flow-d">
+<title id="decision-flow-t">Self-host or API: decision flow</title>
+<desc id="decision-flow-d">Four questions in order: must data stay in your network, is volume steadily above break-even, will GPU use stay above about half, and can the team run on-call; the answers lead to self-host, API, or a hybrid.</desc>
+<defs><marker id="decision-flow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker></defs>
+<rect x="40" y="24" width="340" height="68" rx="10" class="d-box"/>
+<circle cx="68" cy="58.0" r="11" class="d-num"/><text x="68" y="58.0" class="d-num-text">1</text>
+<text x="226" y="63.0" class="d-text" text-anchor="middle">Data must stay in your network?</text>
+<rect x="480" y="24" width="290" height="68" rx="10" class="d-box d-accent"/>
+<text x="625" y="53" class="d-text" text-anchor="middle">Self-host</text>
+<text x="625" y="75" class="d-sub" text-anchor="middle">or a private endpoint</text>
+<path d="M380 58.0H476" class="d-edge d-edge-accent" marker-end="url(#decision-flow-arrow)"/>
+<text x="428" y="50.0" class="d-sub" text-anchor="middle">yes</text>
+<path d="M210 92V132" class="d-edge" marker-end="url(#decision-flow-arrow)"/>
+<text x="222" y="119" class="d-sub">no</text>
+<rect x="40" y="136" width="340" height="68" rx="10" class="d-box"/>
+<circle cx="68" cy="170.0" r="11" class="d-num"/><text x="68" y="170.0" class="d-num-text">2</text>
+<text x="226" y="175.0" class="d-text" text-anchor="middle">Steady volume above break-even?</text>
+<rect x="480" y="136" width="290" height="68" rx="10" class="d-box d-cyan"/>
+<text x="625" y="165" class="d-text" text-anchor="middle">Use an API</text>
+<text x="625" y="187" class="d-sub" text-anchor="middle">pay per token</text>
+<path d="M380 170.0H476" class="d-edge" marker-end="url(#decision-flow-arrow)"/>
+<text x="428" y="162.0" class="d-sub" text-anchor="middle">no</text>
+<path d="M210 204V244" class="d-edge d-edge-accent" marker-end="url(#decision-flow-arrow)"/>
+<text x="222" y="231" class="d-sub">yes</text>
+<rect x="40" y="248" width="340" height="68" rx="10" class="d-box"/>
+<circle cx="68" cy="282.0" r="11" class="d-num"/><text x="68" y="282.0" class="d-num-text">3</text>
+<text x="226" y="287.0" class="d-text" text-anchor="middle">GPU busy over ~50% of the time?</text>
+<rect x="480" y="248" width="290" height="68" rx="10" class="d-box"/>
+<text x="625" y="277" class="d-text" text-anchor="middle">Hybrid</text>
+<text x="625" y="299" class="d-sub" text-anchor="middle">self-host base, API for peaks</text>
+<path d="M380 282.0H476" class="d-edge" marker-end="url(#decision-flow-arrow)"/>
+<text x="428" y="274.0" class="d-sub" text-anchor="middle">no</text>
+<path d="M210 316V356" class="d-edge d-edge-accent" marker-end="url(#decision-flow-arrow)"/>
+<text x="222" y="343" class="d-sub">yes</text>
+<rect x="40" y="360" width="340" height="68" rx="10" class="d-box"/>
+<circle cx="68" cy="394.0" r="11" class="d-num"/><text x="68" y="394.0" class="d-num-text">4</text>
+<text x="226" y="399.0" class="d-text" text-anchor="middle">Team can run on-call for it?</text>
+<rect x="480" y="360" width="290" height="68" rx="10" class="d-box d-cyan"/>
+<text x="625" y="389" class="d-text" text-anchor="middle">Use an API</text>
+<text x="625" y="411" class="d-sub" text-anchor="middle">or a managed endpoint</text>
+<path d="M380 394.0H476" class="d-edge" marker-end="url(#decision-flow-arrow)"/>
+<text x="428" y="386.0" class="d-sub" text-anchor="middle">no</text>
+<path d="M210 428V468" class="d-edge d-edge-accent" marker-end="url(#decision-flow-arrow)"/>
+<text x="222" y="455" class="d-sub">yes</text>
+<rect x="40" y="472" width="340" height="68" rx="10" class="d-box d-ok"/>
+<text x="210" y="501" class="d-text" text-anchor="middle">Self-host with vLLM</text>
+<text x="210" y="523" class="d-sub" text-anchor="middle">re-check the math every quarter</text>
+</svg>

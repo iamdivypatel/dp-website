@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" class="diagram" role="img" aria-labelledby="stampede-timeline-t stampede-timeline-d">
+  <title id="stampede-timeline-t">Cache stampede with and without a lock</title>
+  <desc id="stampede-timeline-d">Two bar charts of Aurora queries over time: without a lock, many queries hit Aurora right after a hot key expires; with a lock, only one query does.</desc>
+  <defs>
+    <marker id="stampede-timeline-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker>
+  </defs>
+  <text class="d-text" x="772" y="38" text-anchor="end">Without a lock</text>
+  <path class="d-grid" d="M100 137H772"/>
+  <path class="d-grid" d="M100 94H772"/>
+  <path class="d-axis" d="M100 50V180H772"/>
+  <text class="d-sub" x="90" y="111" text-anchor="end">Aurora</text>
+  <text class="d-sub" x="90" y="127" text-anchor="end">queries</text>
+  <rect class="d-fill-warn" x="317" y="70" width="28" height="110" rx="3"/>
+  <rect class="d-fill-warn" x="359" y="76" width="28" height="104" rx="3"/>
+  <rect class="d-fill-warn" x="401" y="84" width="28" height="96" rx="3"/>
+  <rect class="d-fill-warn" x="443" y="128" width="28" height="52" rx="3"/>
+  <path class="d-edge d-dashed" d="M310 50V180"/>
+  <text class="d-sub" x="310" y="38" text-anchor="middle">key expires</text>
+  <text class="d-sub" x="500" y="111">every request that misses</text>
+  <text class="d-sub" x="500" y="129">runs the same SELECT</text>
+  <text class="d-text" x="772" y="250" text-anchor="end">With a lock (single flight)</text>
+  <path class="d-grid" d="M100 349H772"/>
+  <path class="d-grid" d="M100 306H772"/>
+  <path class="d-axis" d="M100 262V392H772"/>
+  <text class="d-sub" x="90" y="323" text-anchor="end">Aurora</text>
+  <text class="d-sub" x="90" y="339" text-anchor="end">queries</text>
+  <rect class="d-fill-ok" x="317" y="380" width="28" height="12" rx="3"/>
+  <path class="d-edge d-dashed" d="M310 262V392"/>
+  <text class="d-sub" x="310" y="250" text-anchor="middle">key expires</text>
+  <text class="d-sub" x="500" y="323">one request rebuilds the key</text>
+  <text class="d-sub" x="500" y="341">the rest wait or get stale data</text>
+  <path class="d-edge" d="M100 424H300" marker-end="url(#stampede-timeline-arrow)"/>
+  <text class="d-sub" x="312" y="428">time (illustrative, not measured)</text>
+</svg>

@@ -5,18 +5,22 @@
   "description": "Portfolio of Divya Patel, Backend & Cloud Engineer. Static site: HTML + Tailwind CSS + vanilla JavaScript.",
   "type": "module",
   "scripts": {
-    "build": "npm run build:css && npm run build:js && npm run csp && npm run sections",
+    "build": "npm run blog && npm run build:css && npm run build:js && npm run csp && npm run sections",
     "build:css": "tailwindcss -i ./src/input.css -o ./public/assets/css/styles.css --minify",
-    "build:js": "node scripts/clean-js.mjs && esbuild src/js/main.js --bundle --format=esm --splitting --minify --target=es2020 --outdir=public/assets/js --chunk-names=chunks/[name]-[hash] --legal-comments=none",
+    "build:js": "node scripts/clean-js.mjs && esbuild src/js/main.js src/js/blog.js --bundle --format=esm --splitting --minify --target=es2020 --outdir=public/assets/js --chunk-names=chunks/[name]-[hash] --legal-comments=none",
+    "blog": "node scripts/blog.mjs",
     "csp": "node scripts/csp-hash.mjs",
     "sections": "node scripts/sections.mjs",
-    "dev": "npm run build && (npm run build:css -- --watch & npx esbuild src/js/main.js --bundle --format=esm --splitting --target=es2020 --outdir=public/assets/js --chunk-names=chunks/[name]-[hash] --watch & wait)",
+    "dev": "npm run build && (npm run build:css -- --watch & npx esbuild src/js/main.js src/js/blog.js --bundle --format=esm --splitting --target=es2020 --outdir=public/assets/js --chunk-names=chunks/[name]-[hash] --watch & wait)",
     "serve": "node scripts/serve.mjs",
     "set-domain": "node scripts/set-domain.mjs"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.3.5",
     "esbuild": "^0.28.2",
+    "gray-matter": "^4.0.3",
+    "marked": "^16.4.2",
+    "shiki": "^3.23.0",
     "tailwindcss": "^4.3.5"
   },
   "dependencies": {

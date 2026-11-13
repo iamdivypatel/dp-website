@@ -1,0 +1,770 @@
+<!doctype html>
+<!-- Built by scripts/blog.mjs from content/blog. Edit the Markdown, not this file. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.googletagmanager.com 'sha256-/LbKt0MibuWw3TF4uF0TA4kkd2452qY8QG2QS7CZnw8=' 'sha256-iLDnONK3Z3/vV4tWZdatHdq72Zjn7Q8OR2HSRTqTurU='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; font-src 'self'; connect-src 'self' https://formsubmit.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; manifest-src 'self'; frame-src https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action https://formsubmit.co">
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-M75XC5GH');</script>
+  <!-- End Google Tag Manager -->
+  <title>Terraform for a one-AWS-account startup: layout, state, and the day you split – Divya Patel</title>
+  <meta name="description" content="How to structure Terraform for a small AWS startup: one state, then split state per stack and environment, then multi-account. With real HCL.">
+  <meta name="author" content="Divya Patel">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="theme-color" content="#08090b">
+  <meta name="color-scheme" content="dark">
+  <link rel="canonical" href="https://divypatel.in/blog/terraform-aws-startup-layout">
+  <link rel="alternate" type="application/rss+xml" title="Divya Patel – Writing" href="https://divypatel.in/blog/feed.xml">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://divypatel.in/blog/terraform-aws-startup-layout">
+  <meta property="og:site_name" content="Divya Patel">
+  <meta property="og:locale" content="en_IN">
+  <meta property="og:title" content="Terraform for a one-AWS-account startup: layout, state, and the day you split – Divya Patel">
+  <meta property="og:description" content="How to structure Terraform for a small AWS startup: one state, then split state per stack and environment, then multi-account. With real HCL.">
+  <meta property="og:image" content="https://divypatel.in/assets/img/og/terraform-aws-startup-layout.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="article:published_time" content="2026-11-13">
+  <meta property="article:modified_time" content="2026-11-13">
+  <meta property="article:author" content="https://divypatel.in/">
+  <meta property="article:tag" content="Terraform">
+  <meta property="article:tag" content="AWS">
+  <meta property="article:tag" content="Infrastructure as Code">
+  <meta property="article:tag" content="DevOps">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="/assets/fonts/Archivo-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BlogPosting",
+        "@id": "https://divypatel.in/blog/terraform-aws-startup-layout#article",
+        "headline": "Terraform for a one-AWS-account startup: layout, state, and the day you split",
+        "description": "How to structure Terraform for a small AWS startup: one state, then split state per stack and environment, then multi-account. With real HCL.",
+        "datePublished": "2026-11-13",
+        "dateModified": "2026-11-13",
+        "url": "https://divypatel.in/blog/terraform-aws-startup-layout",
+        "mainEntityOfPage": "https://divypatel.in/blog/terraform-aws-startup-layout",
+        "image": "https://divypatel.in/assets/img/og/terraform-aws-startup-layout.png",
+        "keywords": "Terraform, AWS, Infrastructure as Code, DevOps",
+        "wordCount": 2725,
+        "inLanguage": "en",
+        "author": {
+          "@id": "https://divypatel.in/#person",
+          "@type": "Person",
+          "name": "Divya Patel",
+          "url": "https://divypatel.in/"
+        },
+        "publisher": {
+          "@id": "https://divypatel.in/#person",
+          "@type": "Person",
+          "name": "Divya Patel"
+        },
+        "isPartOf": {
+          "@id": "https://divypatel.in/blog#blog"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Divya Patel",
+            "item": "https://divypatel.in/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Writing",
+            "item": "https://divypatel.in/blog"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Terraform for a one-AWS-account startup: layout, state, and the day you split",
+            "item": "https://divypatel.in/blog/terraform-aws-startup-layout"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+  <script type="module" src="/assets/js/blog.js"></script>
+</head>
+<body class="blog-page">
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M75XC5GH" height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a href="/" class="brand" aria-label="Divya Patel, home"><span class="brand__mark">DP</span><span class="brand__name">Divya Patel</span></a>
+      <nav aria-label="Sections" class="nav">
+        <a href="/about">About</a>
+        <a href="/how-i-build">How I build</a>
+        <a href="/journey">Journey</a>
+        <a href="/projects">Projects</a>
+        <a href="/skills">Skills</a>
+        <a aria-current="page" href="/blog">Writing</a>
+      </nav>
+      <a href="/contact" class="btn btn--accent btn--sm magnetic header-cta">Let’s talk <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span></span><span></span></button>
+    </div>
+    <div class="progress" aria-hidden="true"><i></i></div>
+  </header>
+
+  <div class="menu" id="menu" hidden>
+    <nav aria-label="Sections (mobile)">
+      <a href="/about"><small>01</small>About</a>
+      <a href="/how-i-build"><small>02</small>How I build</a>
+      <a href="/journey"><small>03</small>Journey</a>
+      <a href="/projects"><small>04</small>Projects</a>
+      <a href="/skills"><small>05</small>Skills</a>
+      <a aria-current="page" href="/blog"><small>06</small>Writing</a>
+      <a href="/contact"><small>07</small>Contact</a>
+    </nav>
+    <p class="menu__foot">iamdivypatel@gmail.com<br>Ahmedabad, India (UTC+5:30)</p>
+  </div>
+
+  <main id="main">
+    <article class="post" itemscope>
+      <header class="post__head container">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Divya Patel</a><span aria-hidden="true">/</span><a href="/blog">Writing</a></nav>
+        <ul class="tags" aria-label="Topics"><li>Terraform</li><li>AWS</li><li>Infrastructure as Code</li><li>DevOps</li></ul>
+        <h1 class="post__title">Terraform for a one-AWS-account startup: layout, state, and the day you split</h1>
+        <p class="post__dek">How to structure Terraform for a small AWS startup: one state, then split state per stack and environment, then multi-account. With real HCL.</p>
+        <p class="post__meta"><span>By <a href="/about" rel="author">Divya Patel</a></span><span><time datetime="2026-11-13">13 November 2026</time></span><span>12 min read</span></p>
+      </header>
+      <div class="post__layout container">
+        <aside class="toc" aria-label="On this page">
+          <details open><summary>On this page</summary><ol><li><a href="#tldr">TL;DR</a></li><li><a href="#stage-1-one-root-module-one-state">Stage 1: one root module, one state</a></li><li><a href="#stage-2-split-state-by-lifecycle-and-blast-radius">Stage 2: split state by lifecycle and blast radius</a></li><li><a href="#modules-write-your-own-or-use-the-registry">Modules: write your own or use the registry?</a></li><li><a href="#protect-your-data-stores">Protect your data stores</a></li><li><a href="#bringing-in-resources-made-by-hand">Bringing in resources made by hand</a></li><li><a href="#tags-everywhere-with-default-tags">Tags everywhere, with default_tags</a></li><li><a href="#secrets-never-go-in-tfvars">Secrets never go in tfvars</a></li><li><a href="#ci-plan-on-pull-request-apply-on-merge">CI: plan on pull request, apply on merge</a></li><li><a href="#catching-drift-on-a-schedule">Catching drift on a schedule</a></li><li><a href="#stage-3-the-day-you-split-into-accounts">Stage 3: the day you split into accounts</a></li><li><a href="#gotchas">Gotchas</a></li><li><a href="#when-not-to-use-this">When not to use this</a></li><li><a href="#checklist">Checklist</a></li><li><a href="#further-reading">Further reading</a></li></ol></details>
+        </aside>
+        <div class="prose">
+<p>If you are the developer who &quot;also does the infra&quot; at a small company, this post shows how I lay out Terraform for one AWS account, how I store state, and how I know it is time to split things up.</p>
+<h2 id="tldr"><a class="anchor" href="#tldr" aria-hidden="true" tabindex="-1">#</a>TL;DR</h2>
+<ul>
+<li><strong>Start with one folder and one state file.</strong> It is fine for a small team with a small account. Don&#39;t build for a scale you don&#39;t have yet.</li>
+<li><strong>When plans get slow or scary, split state by how often things change:</strong> <code>network</code>, <code>data</code>, <code>app</code>, <code>edge</code>. Each one becomes a separate state per environment.</li>
+<li><strong>Keep state in S3 with <code>use_lockfile = true</code>.</strong> S3-native locking is generally available from Terraform 1.11, and the old DynamoDB lock table is deprecated.</li>
+<li><strong>Use folders for environments, not workspaces.</strong> The environment name sits in the path, so you can see where you are applying.</li>
+<li><strong>Move to several AWS accounts</strong> when you need hard walls around prod data, or when a second team starts working in the same account.</li>
+</ul>
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 470" class="diagram" role="img" aria-labelledby="tf-stages-t tf-stages-d">
+  <title id="tf-stages-t">Three stages of a Terraform layout</title>
+  <desc id="tf-stages-d">Stage one is a single root module with one state file, stage two splits the same account into network, data, app and edge states, and stage three moves prod, staging and shared into separate AWS accounts, with the signals that trigger each move shown on a timeline.</desc>
+  <defs>
+    <marker id="tf-stages-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker>
+  </defs>
+
+  <!-- Stage headings -->
+  <text x="130" y="38" class="d-text" text-anchor="middle">Stage 1</text>
+  <text x="130" y="58" class="d-sub" text-anchor="middle">one state</text>
+  <text x="400" y="38" class="d-text" text-anchor="middle">Stage 2</text>
+  <text x="400" y="58" class="d-sub" text-anchor="middle">split by lifecycle</text>
+  <text x="670" y="38" class="d-text" text-anchor="middle">Stage 3</text>
+  <text x="670" y="58" class="d-sub" text-anchor="middle">multi-account</text>
+
+  <!-- Stage 1 -->
+  <rect x="20" y="76" width="220" height="280" rx="10" class="d-zone"/>
+  <text x="36" y="96" class="d-zone-label">AWS ACCOUNT</text>
+  <rect x="36" y="112" width="188" height="228" rx="10" class="d-box"/>
+  <text x="130" y="180" class="d-text d-mono" text-anchor="middle">root module</text>
+  <text x="130" y="202" class="d-sub" text-anchor="middle">one state file</text>
+  <text x="130" y="242" class="d-sub d-mono" text-anchor="middle">VPC · Aurora · SQS</text>
+  <text x="130" y="262" class="d-sub d-mono" text-anchor="middle">Lambda · API GW</text>
+  <text x="130" y="282" class="d-sub d-mono" text-anchor="middle">CloudFront · WAF</text>
+
+  <!-- Stage 2 -->
+  <rect x="290" y="76" width="220" height="280" rx="10" class="d-zone"/>
+  <text x="306" y="96" class="d-zone-label">AWS ACCOUNT</text>
+  <rect x="306" y="112" width="188" height="40" rx="10" class="d-box d-accent"/>
+  <text x="400" y="137" class="d-text d-mono" text-anchor="middle">network</text>
+  <rect x="306" y="176" width="188" height="40" rx="10" class="d-box d-accent"/>
+  <text x="400" y="201" class="d-text d-mono" text-anchor="middle">data</text>
+  <rect x="306" y="240" width="188" height="40" rx="10" class="d-box d-accent"/>
+  <text x="400" y="265" class="d-text d-mono" text-anchor="middle">app</text>
+  <rect x="306" y="304" width="188" height="40" rx="10" class="d-box d-accent"/>
+  <text x="400" y="329" class="d-text d-mono" text-anchor="middle">edge</text>
+
+  <!-- Stage 3 -->
+  <rect x="560" y="76" width="220" height="280" rx="10" class="d-zone"/>
+  <text x="576" y="96" class="d-zone-label">AWS ORGANIZATIONS</text>
+  <rect x="576" y="112" width="188" height="60" rx="10" class="d-box"/>
+  <text x="670" y="138" class="d-text d-mono" text-anchor="middle">prod</text>
+  <text x="670" y="158" class="d-sub" text-anchor="middle">four stacks</text>
+  <rect x="576" y="196" width="188" height="60" rx="10" class="d-box"/>
+  <text x="670" y="222" class="d-text d-mono" text-anchor="middle">staging</text>
+  <text x="670" y="242" class="d-sub" text-anchor="middle">four stacks</text>
+  <rect x="576" y="280" width="188" height="60" rx="10" class="d-box"/>
+  <text x="670" y="306" class="d-text d-mono" text-anchor="middle">shared</text>
+  <text x="670" y="326" class="d-sub" text-anchor="middle">CI, logs, DNS</text>
+
+  <!-- Stage arrows -->
+  <line x1="240" y1="216" x2="290" y2="216" class="d-edge d-edge-accent" marker-end="url(#tf-stages-arrow)"/>
+  <line x1="510" y1="216" x2="560" y2="216" class="d-edge d-edge-accent" marker-end="url(#tf-stages-arrow)"/>
+
+  <!-- Trigger timeline -->
+  <line x1="20" y1="396" x2="780" y2="396" class="d-edge" marker-end="url(#tf-stages-arrow)"/>
+  <circle cx="265" cy="396" r="11" class="d-num"/>
+  <text x="265" y="396" class="d-num-text">1</text>
+  <circle cx="535" cy="396" r="11" class="d-num"/>
+  <text x="535" y="396" class="d-num-text">2</text>
+  <text x="265" y="430" class="d-sub" text-anchor="middle">trigger: slow, scary plans</text>
+  <text x="265" y="450" class="d-sub" text-anchor="middle">2+ people applying</text>
+  <text x="535" y="430" class="d-sub" text-anchor="middle">trigger: prod data isolation</text>
+  <text x="535" y="450" class="d-sub" text-anchor="middle">audits, a second team</text>
+</svg><figcaption>The three stages, and the signals that move you from one to the next</figcaption></figure>
+<p>A quick word list before we start. <strong>State</strong> is the file where Terraform remembers which real AWS resources it manages. A <strong>root module</strong> is the folder you run <code>terraform plan</code> in. A <strong>stack</strong> is my name for one root module with its own state. <strong>Blast radius</strong> is how much can break if one change goes wrong.</p>
+<h2 id="stage-1-one-root-module-one-state"><a class="anchor" href="#stage-1-one-root-module-one-state" aria-hidden="true" tabindex="-1">#</a>Stage 1: one root module, one state</h2>
+<p>At the start, everything lives in one folder: VPC, Aurora, Lambda, API Gateway, SQS, CloudFront, WAF, IAM. One <code>terraform apply</code> builds the lot. This is the right choice when:</p>
+<ul>
+<li>one or two people make infra changes;</li>
+<li><code>terraform plan</code> finishes in a minute or two;</li>
+<li>you have one environment, or staging is a cheap copy you rebuild often.</li>
+</ul>
+<p>Even here, the state must not live on your laptop. Put it in S3 from day one.</p>
+<div class="code"><span class="code__lang">hcl</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FFA657">terraform</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">  required_version</span><span style="color:#FF7B72"> =</span><span style="color:#A5D6FF"> ">= 1.11"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FFA657">  required_providers</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">    aws</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">      source  </span><span style="color:#FF7B72">=</span><span style="color:#A5D6FF"> "hashicorp/aws"</span></span>
+<span class="line"><span style="color:#E6EDF3">      version </span><span style="color:#FF7B72">=</span><span style="color:#A5D6FF"> "~> 6.0"</span></span>
+<span class="line"><span style="color:#E6EDF3">    }</span></span>
+<span class="line"><span style="color:#E6EDF3">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FFA657">  backend</span><span style="color:#79C0FF"> "s3"</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">    bucket</span><span style="color:#FF7B72">       =</span><span style="color:#A5D6FF"> "example-tfstate"</span></span>
+<span class="line"><span style="color:#E6EDF3">    key</span><span style="color:#FF7B72">          =</span><span style="color:#A5D6FF"> "main.tfstate"</span></span>
+<span class="line"><span style="color:#E6EDF3">    region</span><span style="color:#FF7B72">       =</span><span style="color:#A5D6FF"> "eu-west-1"</span></span>
+<span class="line"><span style="color:#E6EDF3">    encrypt</span><span style="color:#FF7B72">      =</span><span style="color:#79C0FF"> true</span></span>
+<span class="line"><span style="color:#E6EDF3">    use_lockfile</span><span style="color:#FF7B72"> =</span><span style="color:#79C0FF"> true</span></span>
+<span class="line"><span style="color:#E6EDF3">  }</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
+<p><code>use_lockfile = true</code> tells Terraform to write a small lock file next to the state file in S3. While one person runs <code>apply</code>, nobody else can. Terraform 1.10 added this as an experiment. Terraform 1.11 made it generally available and deprecated the DynamoDB-related backend arguments. The current S3 backend docs say DynamoDB locking &quot;will be removed in a future minor version&quot;. So for a new setup, you don&#39;t need a DynamoDB table at all. If you already have one, you can set both <code>dynamodb_table</code> and <code>use_lockfile</code> while you move over; Terraform then takes both locks.</p>
+<p>Turn on versioning for the state bucket. If a bad apply or a bad manual edit damages the state, you can go back to an older version.</p>
+<aside class="callout callout--tip"><p><strong>Tip:</strong> Create the state bucket by hand or with a tiny separate &quot;bootstrap&quot; config. Don&#39;t manage the bucket from the same state that lives inside it.</p>
+</aside>
+<h2 id="stage-2-split-state-by-lifecycle-and-blast-radius"><a class="anchor" href="#stage-2-split-state-by-lifecycle-and-blast-radius" aria-hidden="true" tabindex="-1">#</a>Stage 2: split state by lifecycle and blast radius</h2>
+<p>The single state starts to hurt in a way you can feel. A plan takes five minutes because Terraform has to check every resource. A small Lambda change shows a diff on the database. Two people want to apply at the same time and one of them waits for the lock. Every apply feels like it could break everything, because it can.</p>
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 440" class="diagram" role="img" aria-labelledby="tf-blast-radius-t tf-blast-radius-d">
+  <title id="tf-blast-radius-t">Blast radius of one bad change</title>
+  <desc id="tf-blast-radius-d">With one monolith state a bad change puts every resource in the plan, while with split states the same mistake in the app state leaves network, data and edge untouched.</desc>
+
+  <text x="200" y="40" class="d-text" text-anchor="middle">One state</text>
+  <text x="600" y="40" class="d-text" text-anchor="middle">Split states</text>
+
+  <!-- Monolith -->
+  <circle cx="200" cy="230" r="148" class="d-box d-warn"/>
+  <circle cx="200" cy="230" r="100" class="d-zone"/>
+  <text x="200" y="160" class="d-text d-mono" text-anchor="middle">monolith</text>
+  <text x="200" y="206" class="d-sub d-mono" text-anchor="middle">VPC · Aurora</text>
+  <text x="200" y="234" class="d-sub d-mono" text-anchor="middle">Lambda · SQS</text>
+  <text x="200" y="262" class="d-sub d-mono" text-anchor="middle">CloudFront · WAF</text>
+  <text x="200" y="304" class="d-sub" text-anchor="middle">all in one plan</text>
+
+  <!-- Split -->
+  <circle cx="520" cy="150" r="68" class="d-box d-ok"/>
+  <text x="520" y="146" class="d-text d-mono" text-anchor="middle">network</text>
+  <text x="520" y="168" class="d-sub" text-anchor="middle">untouched</text>
+  <circle cx="680" cy="150" r="68" class="d-box d-ok"/>
+  <text x="680" y="146" class="d-text d-mono" text-anchor="middle">data</text>
+  <text x="680" y="168" class="d-sub" text-anchor="middle">untouched</text>
+  <circle cx="520" cy="310" r="68" class="d-box d-warn"/>
+  <text x="520" y="306" class="d-text d-mono" text-anchor="middle">app</text>
+  <text x="520" y="328" class="d-sub" text-anchor="middle">bad change</text>
+  <circle cx="680" cy="310" r="68" class="d-box d-ok"/>
+  <text x="680" y="306" class="d-text d-mono" text-anchor="middle">edge</text>
+  <text x="680" y="328" class="d-sub" text-anchor="middle">untouched</text>
+
+  <text x="200" y="414" class="d-sub" text-anchor="middle">blast radius: the whole account</text>
+  <text x="600" y="414" class="d-sub" text-anchor="middle">blast radius: one stack</text>
+</svg><figcaption>A bad change in a split setup stays inside one stack</figcaption></figure>
+<p>The fix is to split one big state into a few smaller ones. I split by <strong>lifecycle</strong>, which means how often a thing changes, and by <strong>blast radius</strong>:</p>
+<div class="table-wrap" tabindex="0"><table>
+<thead>
+<tr>
+<th>Stack</th>
+<th>What&#39;s inside</th>
+<th>How often it changes</th>
+<th>Cost of a mistake</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>network</code></td>
+<td>VPC, subnets, NAT, VPC endpoints</td>
+<td>a few times a year</td>
+<td>very high</td>
+</tr>
+<tr>
+<td><code>data</code></td>
+<td>Aurora, Redis, S3 buckets</td>
+<td>monthly</td>
+<td>very high (data loss)</td>
+</tr>
+<tr>
+<td><code>app</code></td>
+<td>Lambda, API Gateway, SQS, EventBridge, IAM roles</td>
+<td>daily</td>
+<td>medium</td>
+</tr>
+<tr>
+<td><code>edge</code></td>
+<td>CloudFront, WAF, Route 53 records</td>
+<td>weekly</td>
+<td>high (whole site down)</td>
+</tr>
+</tbody></table>
+</div>
+<p>Four stacks is enough for most startups. More than six or seven, and you spend your day wiring outputs between them.</p>
+<h3 id="the-repo-layout"><a class="anchor" href="#the-repo-layout" aria-hidden="true" tabindex="-1">#</a>The repo layout</h3>
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 476" class="diagram" role="img" aria-labelledby="tf-repo-tree-t tf-repo-tree-d">
+  <title id="tf-repo-tree-t">Repository layout</title>
+  <desc id="tf-repo-tree-d">An infra repository with three folders: envs holding per-environment backend and tfvars files, stacks holding the network, data, app and edge root modules, and modules holding your own reusable modules next to pinned registry modules.</desc>
+
+  <!-- Root -->
+  <rect x="330" y="20" width="140" height="40" rx="10" class="d-box d-accent"/>
+  <text x="400" y="45" class="d-text d-mono" text-anchor="middle">infra/</text>
+
+  <!-- Tree lines -->
+  <path d="M400 60V84M140 84H660M140 84V110M400 84V110M660 84V110" class="d-edge"/>
+
+  <!-- envs -->
+  <rect x="24" y="110" width="232" height="342" rx="10" class="d-zone"/>
+  <text x="40" y="129" class="d-zone-label d-mono">envs/</text>
+  <rect x="40" y="140" width="200" height="136" rx="10" class="d-box"/>
+  <text x="140" y="166" class="d-text d-mono" text-anchor="middle">prod/</text>
+  <text x="140" y="192" class="d-sub d-mono" text-anchor="middle">backend.hcl</text>
+  <text x="140" y="210" class="d-sub d-mono" text-anchor="middle">network.tfvars</text>
+  <text x="140" y="228" class="d-sub d-mono" text-anchor="middle">data.tfvars</text>
+  <text x="140" y="246" class="d-sub d-mono" text-anchor="middle">app.tfvars</text>
+  <text x="140" y="264" class="d-sub d-mono" text-anchor="middle">edge.tfvars</text>
+  <rect x="40" y="300" width="200" height="136" rx="10" class="d-box"/>
+  <text x="140" y="326" class="d-text d-mono" text-anchor="middle">staging/</text>
+  <text x="140" y="352" class="d-sub d-mono" text-anchor="middle">backend.hcl</text>
+  <text x="140" y="370" class="d-sub d-mono" text-anchor="middle">network.tfvars</text>
+  <text x="140" y="388" class="d-sub d-mono" text-anchor="middle">data.tfvars</text>
+  <text x="140" y="406" class="d-sub d-mono" text-anchor="middle">app.tfvars</text>
+  <text x="140" y="424" class="d-sub d-mono" text-anchor="middle">edge.tfvars</text>
+
+  <!-- stacks -->
+  <rect x="284" y="110" width="232" height="342" rx="10" class="d-zone"/>
+  <text x="300" y="129" class="d-zone-label d-mono">stacks/</text>
+  <rect x="300" y="140" width="200" height="56" rx="10" class="d-box d-accent"/>
+  <text x="400" y="164" class="d-text d-mono" text-anchor="middle">network/</text>
+  <text x="400" y="184" class="d-sub" text-anchor="middle">VPC, subnets, endpoints</text>
+  <rect x="300" y="220" width="200" height="56" rx="10" class="d-box d-accent"/>
+  <text x="400" y="244" class="d-text d-mono" text-anchor="middle">data/</text>
+  <text x="400" y="264" class="d-sub" text-anchor="middle">Aurora, Redis, S3</text>
+  <rect x="300" y="300" width="200" height="56" rx="10" class="d-box d-accent"/>
+  <text x="400" y="324" class="d-text d-mono" text-anchor="middle">app/</text>
+  <text x="400" y="344" class="d-sub" text-anchor="middle">Lambda, API GW, SQS</text>
+  <rect x="300" y="380" width="200" height="56" rx="10" class="d-box d-accent"/>
+  <text x="400" y="404" class="d-text d-mono" text-anchor="middle">edge/</text>
+  <text x="400" y="424" class="d-sub" text-anchor="middle">CloudFront, WAF, DNS</text>
+
+  <!-- modules -->
+  <rect x="544" y="110" width="232" height="342" rx="10" class="d-zone"/>
+  <text x="560" y="129" class="d-zone-label d-mono">modules/</text>
+  <rect x="560" y="140" width="200" height="56" rx="10" class="d-box"/>
+  <text x="660" y="164" class="d-text d-mono" text-anchor="middle">lambda-service/</text>
+  <text x="660" y="184" class="d-sub" text-anchor="middle">function, role, logs</text>
+  <rect x="560" y="220" width="200" height="56" rx="10" class="d-box"/>
+  <text x="660" y="244" class="d-text d-mono" text-anchor="middle">queue-worker/</text>
+  <text x="660" y="264" class="d-sub" text-anchor="middle">SQS, DLQ, alarms</text>
+  <rect x="560" y="300" width="200" height="56" rx="10" class="d-box"/>
+  <text x="660" y="324" class="d-text d-mono" text-anchor="middle">static-site/</text>
+  <text x="660" y="344" class="d-sub" text-anchor="middle">S3 origin, OAC</text>
+  <rect x="560" y="380" width="200" height="56" rx="10" class="d-box d-cyan"/>
+  <text x="660" y="404" class="d-text" text-anchor="middle">registry modules</text>
+  <text x="660" y="424" class="d-sub" text-anchor="middle">pinned versions</text>
+</svg><figcaption>One copy of the code in stacks/, small per-environment files in envs/</figcaption></figure>
+<p>Each folder under <code>stacks/</code> is a root module. The code is the same for prod and staging. What changes is a small <code>.tfvars</code> file (variable values) and the backend settings in <code>envs/&lt;env&gt;/</code>. The backend block in each stack is left empty on purpose, and you fill it in at <code>init</code> time. Terraform calls this a &quot;partial configuration&quot;.</p>
+<div class="code"><span class="code__lang">hcl</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#8B949E"># stacks/app/backend.tf</span></span>
+<span class="line"><span style="color:#FFA657">terraform</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#FFA657">  backend</span><span style="color:#79C0FF"> "s3"</span><span style="color:#E6EDF3"> {}</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8B949E"># envs/prod/backend.hcl</span></span>
+<span class="line"><span style="color:#E6EDF3">bucket</span><span style="color:#FF7B72">       =</span><span style="color:#A5D6FF"> "example-tfstate-prod"</span></span>
+<span class="line"><span style="color:#E6EDF3">region</span><span style="color:#FF7B72">       =</span><span style="color:#A5D6FF"> "eu-west-1"</span></span>
+<span class="line"><span style="color:#E6EDF3">encrypt</span><span style="color:#FF7B72">      =</span><span style="color:#79C0FF"> true</span></span>
+<span class="line"><span style="color:#E6EDF3">use_lockfile</span><span style="color:#FF7B72"> =</span><span style="color:#79C0FF"> true</span></span></code></pre></div>
+<div class="code"><span class="code__lang">bash</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#8B949E"># run from infra/</span></span>
+<span class="line"><span style="color:#E6EDF3">env</span><span style="color:#FF7B72">=</span><span style="color:#A5D6FF">prod</span><span style="color:#E6EDF3"> stack</span><span style="color:#FF7B72">=</span><span style="color:#A5D6FF">app</span></span>
+<span class="line"><span style="color:#FFA657">terraform</span><span style="color:#79C0FF"> -chdir=stacks/</span><span style="color:#E6EDF3">$stack</span><span style="color:#A5D6FF"> init</span><span style="color:#79C0FF"> -reconfigure</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#79C0FF">  -backend-config=../../envs/</span><span style="color:#E6EDF3">$env</span><span style="color:#79C0FF">/backend.hcl</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#79C0FF">  -backend-config=</span><span style="color:#A5D6FF">"key=</span><span style="color:#E6EDF3">$env</span><span style="color:#A5D6FF">/</span><span style="color:#E6EDF3">$stack</span><span style="color:#A5D6FF">.tfstate"</span></span>
+<span class="line"><span style="color:#FFA657">terraform</span><span style="color:#79C0FF"> -chdir=stacks/</span><span style="color:#E6EDF3">$stack</span><span style="color:#A5D6FF"> plan</span><span style="color:#79C0FF"> -var-file=../../envs/</span><span style="color:#E6EDF3">$env</span><span style="color:#79C0FF">/</span><span style="color:#E6EDF3">$stack</span><span style="color:#79C0FF">.tfvars</span></span></code></pre></div>
+<p>Each stack in each environment gets its own state key, like <code>prod/app.tfstate</code>. A tiny <code>Makefile</code> or script wraps these two commands so nobody types them by hand.</p>
+<h3 id="why-folders-and-not-workspaces"><a class="anchor" href="#why-folders-and-not-workspaces" aria-hidden="true" tabindex="-1">#</a>Why folders and not workspaces</h3>
+<p>Terraform <strong>workspaces</strong> let one folder hold several states, and you switch between them with <code>terraform workspace select</code>. They look perfect for environments. I don&#39;t use them for that, for three reasons:</p>
+<ol>
+<li><strong>The environment is hidden.</strong> It lives in a local setting, not in the command or the path. Sooner or later someone applies to prod while thinking they are in staging.</li>
+<li><strong>Differences creep into the code.</strong> You end up with <code>terraform.workspace == &quot;prod&quot; ? 3 : 1</code> all over the place. A tfvars file per environment keeps those numbers in one small, readable place.</li>
+<li><strong>Same backend for everything.</strong> All workspaces share one bucket and the same access rights. With folders, prod state can live in its own bucket with tighter IAM.</li>
+</ol>
+<p>Workspaces are fine for short-lived copies, like one stack per feature branch. For prod and staging, I want the name in the path.</p>
+<h3 id="passing-values-between-stacks"><a class="anchor" href="#passing-values-between-stacks" aria-hidden="true" tabindex="-1">#</a>Passing values between stacks</h3>
+<p>Once the state is split, the <code>app</code> stack still needs the subnet IDs from <code>network</code> and the database endpoint from <code>data</code>. There are two common ways to pass them.</p>
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" class="diagram" role="img" aria-labelledby="tf-state-deps-t tf-state-deps-d">
+  <title id="tf-state-deps-t">State dependency graph</title>
+  <desc id="tf-state-deps-d">The network, data, app and edge states are applied in that order; each one publishes outputs to SSM Parameter Store for the next to read, or the next one reads its state directly through terraform_remote_state.</desc>
+  <defs>
+    <marker id="tf-state-deps-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker>
+  </defs>
+
+  <!-- Apply order -->
+  <text x="24" y="34" class="d-sub">apply order</text>
+  <text x="776" y="34" class="d-sub" text-anchor="end">destroy runs in reverse</text>
+  <line x1="24" y1="50" x2="776" y2="50" class="d-edge d-edge-accent" marker-end="url(#tf-state-deps-arrow)"/>
+
+  <circle cx="99" cy="84" r="11" class="d-num"/>
+  <text x="99" y="84" class="d-num-text">1</text>
+  <circle cx="299" cy="84" r="11" class="d-num"/>
+  <text x="299" y="84" class="d-num-text">2</text>
+  <circle cx="499" cy="84" r="11" class="d-num"/>
+  <text x="499" y="84" class="d-num-text">3</text>
+  <circle cx="699" cy="84" r="11" class="d-num"/>
+  <text x="699" y="84" class="d-num-text">4</text>
+
+  <!-- Stacks -->
+  <rect x="24" y="110" width="150" height="70" rx="10" class="d-box d-accent"/>
+  <text x="99" y="140" class="d-text d-mono" text-anchor="middle">network</text>
+  <text x="99" y="161" class="d-sub" text-anchor="middle">VPC, subnets</text>
+  <rect x="224" y="110" width="150" height="70" rx="10" class="d-box d-accent"/>
+  <text x="299" y="140" class="d-text d-mono" text-anchor="middle">data</text>
+  <text x="299" y="161" class="d-sub" text-anchor="middle">Aurora, Redis, S3</text>
+  <rect x="424" y="110" width="150" height="70" rx="10" class="d-box d-accent"/>
+  <text x="499" y="140" class="d-text d-mono" text-anchor="middle">app</text>
+  <text x="499" y="161" class="d-sub" text-anchor="middle">Lambda, API, SQS</text>
+  <rect x="624" y="110" width="150" height="70" rx="10" class="d-box d-accent"/>
+  <text x="699" y="140" class="d-text d-mono" text-anchor="middle">edge</text>
+  <text x="699" y="161" class="d-sub" text-anchor="middle">CloudFront, WAF</text>
+
+  <!-- remote_state reads (dashed, direct) -->
+  <line x1="174" y1="145" x2="224" y2="145" class="d-edge d-dashed" marker-end="url(#tf-state-deps-arrow)"/>
+  <line x1="374" y1="145" x2="424" y2="145" class="d-edge d-dashed" marker-end="url(#tf-state-deps-arrow)"/>
+  <line x1="574" y1="145" x2="624" y2="145" class="d-edge d-dashed" marker-end="url(#tf-state-deps-arrow)"/>
+
+  <!-- SSM band -->
+  <rect x="24" y="250" width="750" height="72" rx="10" class="d-box d-cyan"/>
+  <text x="400" y="276" class="d-text" text-anchor="middle">SSM Parameter Store</text>
+  <text x="99" y="304" class="d-sub d-mono" text-anchor="middle">/prod/network/*</text>
+  <text x="299" y="304" class="d-sub d-mono" text-anchor="middle">/prod/data/*</text>
+  <text x="499" y="304" class="d-sub d-mono" text-anchor="middle">/prod/app/*</text>
+
+  <!-- writes (down) and reads (up) -->
+  <line x1="99" y1="180" x2="99" y2="250" class="d-edge d-edge-ok" marker-end="url(#tf-state-deps-arrow)"/>
+  <line x1="279" y1="250" x2="279" y2="180" class="d-edge d-edge-accent" marker-end="url(#tf-state-deps-arrow)"/>
+  <line x1="319" y1="180" x2="319" y2="250" class="d-edge d-edge-ok" marker-end="url(#tf-state-deps-arrow)"/>
+  <line x1="479" y1="250" x2="479" y2="180" class="d-edge d-edge-accent" marker-end="url(#tf-state-deps-arrow)"/>
+  <line x1="519" y1="180" x2="519" y2="250" class="d-edge d-edge-ok" marker-end="url(#tf-state-deps-arrow)"/>
+  <line x1="699" y1="250" x2="699" y2="180" class="d-edge d-edge-accent" marker-end="url(#tf-state-deps-arrow)"/>
+
+  <!-- Legend -->
+  <line x1="24" y1="364" x2="64" y2="364" class="d-edge d-edge-ok" marker-end="url(#tf-state-deps-arrow)"/>
+  <text x="74" y="368" class="d-sub">writes output</text>
+  <line x1="214" y1="364" x2="254" y2="364" class="d-edge d-edge-accent" marker-end="url(#tf-state-deps-arrow)"/>
+  <text x="264" y="368" class="d-sub">reads input</text>
+  <line x1="394" y1="364" x2="434" y2="364" class="d-edge d-dashed" marker-end="url(#tf-state-deps-arrow)"/>
+  <text x="444" y="368" class="d-sub d-mono">terraform_remote_state</text>
+</svg><figcaption>Apply in order: network, data, app, edge. Destroy in the reverse order</figcaption></figure>
+<p><strong>Option 1: <code>terraform_remote_state</code>.</strong> The <code>app</code> stack reads the outputs of the <code>network</code> state file directly.</p>
+<div class="code"><span class="code__lang">hcl</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FFA657">data</span><span style="color:#79C0FF"> "terraform_remote_state"</span><span style="color:#79C0FF"> "network"</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">  backend</span><span style="color:#FF7B72"> =</span><span style="color:#A5D6FF"> "s3"</span></span>
+<span class="line"><span style="color:#E6EDF3">  config</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">    bucket </span><span style="color:#FF7B72">=</span><span style="color:#A5D6FF"> "example-tfstate-prod"</span></span>
+<span class="line"><span style="color:#E6EDF3">    key    </span><span style="color:#FF7B72">=</span><span style="color:#A5D6FF"> "prod/network.tfstate"</span></span>
+<span class="line"><span style="color:#E6EDF3">    region </span><span style="color:#FF7B72">=</span><span style="color:#A5D6FF"> "eu-west-1"</span></span>
+<span class="line"><span style="color:#E6EDF3">  }</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FFA657">resource</span><span style="color:#79C0FF"> "aws_lambda_function"</span><span style="color:#79C0FF"> "api"</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#8B949E">  # ...</span></span>
+<span class="line"><span style="color:#FFA657">  vpc_config</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">    subnet_ids</span><span style="color:#FF7B72">         =</span><span style="color:#E6EDF3"> data</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">terraform_remote_state</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">network</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">outputs</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">private_subnet_ids</span></span>
+<span class="line"><span style="color:#E6EDF3">    security_group_ids</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> [aws_security_group</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">api</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">id]</span></span>
+<span class="line"><span style="color:#E6EDF3">  }</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
+<p>It is quick to set up. The catch: the reader needs permission to read the whole state file of the other stack, and that file can hold secrets. It also ties the two stacks together tightly. Rename an output, and the other stack breaks on its next plan.</p>
+<p><strong>Option 2: SSM Parameter Store.</strong> The <code>network</code> stack writes the values it wants to share as parameters. Other stacks read only those values.</p>
+<div class="code"><span class="code__lang">hcl</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#8B949E"># stacks/network: publish</span></span>
+<span class="line"><span style="color:#FFA657">resource</span><span style="color:#79C0FF"> "aws_ssm_parameter"</span><span style="color:#79C0FF"> "private_subnet_ids"</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">  name</span><span style="color:#FF7B72">  =</span><span style="color:#A5D6FF"> "/</span><span style="color:#FF7B72">${</span><span style="color:#E6EDF3">var</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">env</span><span style="color:#FF7B72">}</span><span style="color:#A5D6FF">/network/private_subnet_ids"</span></span>
+<span class="line"><span style="color:#E6EDF3">  type</span><span style="color:#FF7B72">  =</span><span style="color:#A5D6FF"> "StringList"</span></span>
+<span class="line"><span style="color:#E6EDF3">  value</span><span style="color:#FF7B72"> =</span><span style="color:#79C0FF"> join</span><span style="color:#E6EDF3">(</span><span style="color:#A5D6FF">","</span><span style="color:#E6EDF3">, module</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">vpc</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">private_subnets)</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8B949E"># stacks/app: consume</span></span>
+<span class="line"><span style="color:#FFA657">data</span><span style="color:#79C0FF"> "aws_ssm_parameter"</span><span style="color:#79C0FF"> "private_subnet_ids"</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">  name</span><span style="color:#FF7B72"> =</span><span style="color:#A5D6FF"> "/</span><span style="color:#FF7B72">${</span><span style="color:#E6EDF3">var</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">env</span><span style="color:#FF7B72">}</span><span style="color:#A5D6FF">/network/private_subnet_ids"</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FFA657">locals</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">  private_subnet_ids</span><span style="color:#FF7B72"> =</span><span style="color:#79C0FF"> split</span><span style="color:#E6EDF3">(</span><span style="color:#A5D6FF">","</span><span style="color:#E6EDF3">, data</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">aws_ssm_parameter</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">private_subnet_ids</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">insecure_value)</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
+<p>I use <code>insecure_value</code> because subnet IDs are not secret. The normal <code>value</code> attribute is marked as sensitive, which hides it in the plan output and makes the plan harder to review.</p>
+<div class="table-wrap" tabindex="0"><table>
+<thead>
+<tr>
+<th></th>
+<th><code>terraform_remote_state</code></th>
+<th>SSM parameters</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Setup effort</td>
+<td>lowest</td>
+<td>one resource per value</td>
+</tr>
+<tr>
+<td>Who can read what</td>
+<td>whole state file</td>
+<td>only the shared values</td>
+</tr>
+<tr>
+<td>Coupling</td>
+<td>tight, to output names</td>
+<td>loose, to a parameter path</td>
+</tr>
+<tr>
+<td>Readable by non-Terraform tools</td>
+<td>no</td>
+<td>yes (scripts, Lambda, CI)</td>
+</tr>
+<tr>
+<td>Failure mode</td>
+<td>output renamed, reader breaks</td>
+<td>parameter missing, plan fails with a clear error</td>
+</tr>
+</tbody></table>
+</div>
+<p>I start with SSM. The parameter paths become a small, clear contract between stacks, and Lambda code or scripts can read the same values at runtime.</p>
+<h2 id="modules-write-your-own-or-use-the-registry"><a class="anchor" href="#modules-write-your-own-or-use-the-registry" aria-hidden="true" tabindex="-1">#</a>Modules: write your own or use the registry?</h2>
+<p>A <strong>module</strong> is a folder of Terraform code you can call many times with different inputs. My rule is simple:</p>
+<ul>
+<li><strong>Use <a href="https://registry.terraform.io/namespaces/terraform-aws-modules" target="_blank" rel="noopener">terraform-aws-modules</a></strong> for big, well-known building blocks like the VPC. They handle many edge cases you would otherwise learn about the hard way.</li>
+<li><strong>Write your own small module</strong> when it captures how <em>your</em> company does something. For example, <code>lambda-service</code> creates a function, its IAM role, its log group with a retention period, and its alarms, all with your naming rules.</li>
+<li><strong>Don&#39;t wrap a registry module in your own module</strong> just to rename its inputs. That adds a layer and saves nothing.</li>
+</ul>
+<p>Always pin versions. <code>version = &quot;~&gt; 6.0&quot;</code> lets in bug fixes and new features, but not the next major version, which may break things. Upgrade on purpose, in its own pull request, and read the plan.</p>
+<h2 id="protect-your-data-stores"><a class="anchor" href="#protect-your-data-stores" aria-hidden="true" tabindex="-1">#</a>Protect your data stores</h2>
+<p>The <code>data</code> stack holds things you can&#39;t get back by re-running Terraform. Protect them twice: once in Terraform and once in AWS.</p>
+<div class="code"><span class="code__lang">hcl</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FFA657">resource</span><span style="color:#79C0FF"> "aws_rds_cluster"</span><span style="color:#79C0FF"> "main"</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">  cluster_identifier</span><span style="color:#FF7B72">          =</span><span style="color:#A5D6FF"> "</span><span style="color:#FF7B72">${</span><span style="color:#E6EDF3">var</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">env</span><span style="color:#FF7B72">}</span><span style="color:#A5D6FF">-main"</span></span>
+<span class="line"><span style="color:#E6EDF3">  engine</span><span style="color:#FF7B72">                      =</span><span style="color:#A5D6FF"> "aurora-postgresql"</span></span>
+<span class="line"><span style="color:#E6EDF3">  master_username</span><span style="color:#FF7B72">             =</span><span style="color:#A5D6FF"> "app_admin"</span></span>
+<span class="line"><span style="color:#E6EDF3">  manage_master_user_password</span><span style="color:#FF7B72"> =</span><span style="color:#79C0FF"> true</span><span style="color:#8B949E"> # RDS keeps the password in Secrets Manager</span></span>
+<span class="line"><span style="color:#E6EDF3">  deletion_protection</span><span style="color:#FF7B72">         =</span><span style="color:#79C0FF"> true</span><span style="color:#8B949E"> # AWS refuses to delete it</span></span>
+<span class="line"><span style="color:#E6EDF3">  skip_final_snapshot</span><span style="color:#FF7B72">         =</span><span style="color:#79C0FF"> false</span></span>
+<span class="line"><span style="color:#E6EDF3">  final_snapshot_identifier</span><span style="color:#FF7B72">   =</span><span style="color:#A5D6FF"> "</span><span style="color:#FF7B72">${</span><span style="color:#E6EDF3">var</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">env</span><span style="color:#FF7B72">}</span><span style="color:#A5D6FF">-main-final"</span></span>
+<span class="line"><span style="color:#E6EDF3">  storage_encrypted</span><span style="color:#FF7B72">           =</span><span style="color:#79C0FF"> true</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FFA657">  lifecycle</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">    prevent_destroy</span><span style="color:#FF7B72"> =</span><span style="color:#79C0FF"> true</span><span style="color:#8B949E"> # Terraform refuses to plan a destroy</span></span>
+<span class="line"><span style="color:#E6EDF3">  }</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
+<p><code>prevent_destroy</code> makes any plan that would delete this resource fail. That includes the sneaky case where you change a field that forces a &quot;replace&quot;, which is a delete plus a create. <code>deletion_protection</code> is the AWS-side lock, and it also stops someone clicking &quot;Delete&quot; in the console. Add <code>prevent_destroy</code> to S3 buckets with user data too.</p>
+<aside class="callout callout--warning"><p><strong>Warning:</strong> <code>prevent_destroy</code> only works while the resource block is in your code. If someone deletes the whole block, the protection goes with it. This is why <code>deletion_protection</code> on the AWS side matters.</p>
+</aside>
+<h2 id="bringing-in-resources-made-by-hand"><a class="anchor" href="#bringing-in-resources-made-by-hand" aria-hidden="true" tabindex="-1">#</a>Bringing in resources made by hand</h2>
+<p>Most startups have a few things someone created in the console before Terraform arrived. Since Terraform 1.5 you can import them with an <code>import</code> block in your code, instead of the older one-off <code>terraform import</code> command.</p>
+<div class="code"><span class="code__lang">hcl</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FFA657">import</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">  to</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> aws_s3_bucket</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">uploads</span></span>
+<span class="line"><span style="color:#E6EDF3">  id</span><span style="color:#FF7B72"> =</span><span style="color:#A5D6FF"> "example-uploads-prod"</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
+<div class="code"><span class="code__lang">bash</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FFA657">terraform</span><span style="color:#A5D6FF"> plan</span><span style="color:#79C0FF"> -generate-config-out=generated.tf</span></span></code></pre></div>
+<p>Terraform reads the real bucket and writes a matching <code>resource</code> block into <code>generated.tf</code>. Clean that file up, move the block where it belongs, and run <code>plan</code> again until it shows no changes apart from the import. Then apply. Because the import is in code, it goes through the same pull request review as every other change. You can delete the <code>import</code> block after the apply.</p>
+<h2 id="tags-everywhere-with-default-tags"><a class="anchor" href="#tags-everywhere-with-default-tags" aria-hidden="true" tabindex="-1">#</a>Tags everywhere, with <code>default_tags</code></h2>
+<p>Tags are labels on AWS resources. They power cost reports and help you find out who owns what. Set them once on the provider, and every resource the provider creates gets them.</p>
+<div class="code"><span class="code__lang">hcl</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FFA657">provider</span><span style="color:#79C0FF"> "aws"</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">  region</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> var</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">region</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FFA657">  default_tags</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">    tags</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">      env        </span><span style="color:#FF7B72">=</span><span style="color:#E6EDF3"> var.env</span></span>
+<span class="line"><span style="color:#E6EDF3">      stack      </span><span style="color:#FF7B72">=</span><span style="color:#A5D6FF"> "app"</span></span>
+<span class="line"><span style="color:#E6EDF3">      managed_by </span><span style="color:#FF7B72">=</span><span style="color:#A5D6FF"> "terraform"</span></span>
+<span class="line"><span style="color:#E6EDF3">      repo       </span><span style="color:#FF7B72">=</span><span style="color:#A5D6FF"> "infra"</span></span>
+<span class="line"><span style="color:#E6EDF3">    }</span></span>
+<span class="line"><span style="color:#E6EDF3">  }</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
+<p>Now you can filter Cost Explorer by <code>stack</code> and see what <code>data</code> costs compared with <code>app</code>. You&#39;ll need to turn these tags on as cost allocation tags in the Billing console first.</p>
+<h2 id="secrets-never-go-in-tfvars"><a class="anchor" href="#secrets-never-go-in-tfvars" aria-hidden="true" tabindex="-1">#</a>Secrets never go in tfvars</h2>
+<p>tfvars files are committed to Git. Anything in them is readable by everyone with repo access, forever. So:</p>
+<ul>
+<li>let AWS create and store secrets where it can, like <code>manage_master_user_password</code> on Aurora above;</li>
+<li>for your own secrets (API keys for other services), create the <code>aws_secretsmanager_secret</code> in Terraform but set the value outside Terraform, by hand or from a script;</li>
+<li>give the Lambda function permission to read the secret at runtime, and pass only the secret&#39;s ARN (its AWS address) in an environment variable.</li>
+</ul>
+<p>Remember that any secret Terraform reads or creates ends up in the state file in plain text. Keep the state bucket encrypted, versioned and locked down to the CI roles and one or two admins.</p>
+<h2 id="ci-plan-on-pull-request-apply-on-merge"><a class="anchor" href="#ci-plan-on-pull-request-apply-on-merge" aria-hidden="true" tabindex="-1">#</a>CI: plan on pull request, apply on merge</h2>
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 334" class="diagram" role="img" aria-labelledby="tf-ci-flow-t tf-ci-flow-d">
+  <title id="tf-ci-flow-t">Plan on pull request, apply on merge</title>
+  <desc id="tf-ci-flow-d">A pull request triggers a read-only plan that is posted as a comment and reviewed; merging to main applies staging automatically and applies prod only after an environment approval.</desc>
+  <defs>
+    <marker id="tf-ci-flow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker>
+  </defs>
+
+  <!-- Pull request lane -->
+  <rect x="24" y="24" width="752" height="126" rx="10" class="d-zone"/>
+  <text x="40" y="44" class="d-zone-label d-mono">on: pull_request</text>
+  <rect x="40" y="62" width="156" height="66" rx="10" class="d-box"/>
+  <text x="118" y="90" class="d-text" text-anchor="middle">Pull request</text>
+  <text x="118" y="110" class="d-sub" text-anchor="middle">touches a stack</text>
+  <rect x="228" y="62" width="156" height="66" rx="10" class="d-box d-accent"/>
+  <text x="306" y="90" class="d-text" text-anchor="middle">Plan</text>
+  <text x="306" y="110" class="d-sub" text-anchor="middle">OIDC, read-only</text>
+  <rect x="416" y="62" width="156" height="66" rx="10" class="d-box"/>
+  <text x="494" y="90" class="d-text" text-anchor="middle">Plan comment</text>
+  <text x="494" y="110" class="d-sub" text-anchor="middle">per stack and env</text>
+  <rect x="604" y="62" width="156" height="66" rx="10" class="d-box"/>
+  <text x="682" y="90" class="d-text" text-anchor="middle">Review</text>
+  <text x="682" y="110" class="d-sub" text-anchor="middle">read the diff</text>
+  <line x1="196" y1="95" x2="228" y2="95" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
+  <line x1="384" y1="95" x2="416" y2="95" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
+  <line x1="572" y1="95" x2="604" y2="95" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
+
+  <!-- Hand-off -->
+  <path d="M682 128V175H118V232" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
+
+  <!-- Main lane -->
+  <rect x="24" y="200" width="752" height="110" rx="10" class="d-zone"/>
+  <text x="760" y="220" class="d-zone-label d-mono" text-anchor="end">on: push to main</text>
+  <rect x="40" y="232" width="156" height="66" rx="10" class="d-box"/>
+  <text x="118" y="260" class="d-text" text-anchor="middle">Merge</text>
+  <text x="118" y="280" class="d-sub" text-anchor="middle">into main</text>
+  <rect x="228" y="232" width="156" height="66" rx="10" class="d-box"/>
+  <text x="306" y="260" class="d-text" text-anchor="middle">Apply staging</text>
+  <text x="306" y="280" class="d-sub" text-anchor="middle">automatic</text>
+  <rect x="416" y="232" width="156" height="66" rx="10" class="d-box d-warn"/>
+  <text x="494" y="260" class="d-text" text-anchor="middle">Approval</text>
+  <text x="494" y="280" class="d-sub" text-anchor="middle">prod environment</text>
+  <rect x="604" y="232" width="156" height="66" rx="10" class="d-box d-ok"/>
+  <text x="682" y="260" class="d-text" text-anchor="middle">Apply prod</text>
+  <text x="682" y="280" class="d-sub" text-anchor="middle">OIDC, apply role</text>
+  <line x1="196" y1="265" x2="228" y2="265" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
+  <line x1="384" y1="265" x2="416" y2="265" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
+  <line x1="572" y1="265" x2="604" y2="265" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
+</svg><figcaption>Nobody runs apply from a laptop</figcaption></figure>
+<p>The full pipeline is covered in a separate post, so here is the short version:</p>
+<ul>
+<li>On every pull request, CI runs <code>plan</code> for each stack and environment that changed, and posts the output as a PR comment. Reviewers read the plan, not just the code.</li>
+<li>CI logs in to AWS with <strong>OIDC</strong>, which lets GitHub Actions get short-lived AWS credentials without storing any access keys. The plan job uses a read-only role.</li>
+<li>On merge to <code>main</code>, CI applies staging automatically. Prod uses a GitHub environment with required reviewers, so a person has to click &quot;approve&quot; first. The apply job uses a separate role that only that protected environment can assume.</li>
+</ul>
+<h2 id="catching-drift-on-a-schedule"><a class="anchor" href="#catching-drift-on-a-schedule" aria-hidden="true" tabindex="-1">#</a>Catching drift on a schedule</h2>
+<p><strong>Drift</strong> is when the real AWS setup no longer matches your code, usually because someone fixed something in the console at 2 a.m. Run a scheduled job, say every night, that plans every stack:</p>
+<div class="code"><span class="code__lang">bash</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FFA657">terraform</span><span style="color:#79C0FF"> -chdir=stacks/</span><span style="color:#E6EDF3">$stack</span><span style="color:#A5D6FF"> plan</span><span style="color:#79C0FF"> -detailed-exitcode</span><span style="color:#79C0FF"> -lock=false</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#79C0FF">  -var-file=../../envs/</span><span style="color:#E6EDF3">$env</span><span style="color:#79C0FF">/</span><span style="color:#E6EDF3">$stack</span><span style="color:#79C0FF">.tfvars</span></span>
+<span class="line"><span style="color:#E6EDF3">status</span><span style="color:#FF7B72">=</span><span style="color:#79C0FF">$?</span></span>
+<span class="line"><span style="color:#8B949E"># 0 = no changes, 1 = error, 2 = drift found</span></span>
+<span class="line"><span style="color:#FF7B72">if</span><span style="color:#E6EDF3"> [ </span><span style="color:#A5D6FF">"</span><span style="color:#E6EDF3">$status</span><span style="color:#A5D6FF">"</span><span style="color:#FF7B72"> -eq</span><span style="color:#79C0FF"> 2</span><span style="color:#E6EDF3"> ]; </span><span style="color:#FF7B72">then</span></span>
+<span class="line"><span style="color:#79C0FF">  echo</span><span style="color:#A5D6FF"> "Drift in </span><span style="color:#E6EDF3">$env</span><span style="color:#A5D6FF">/</span><span style="color:#E6EDF3">$stack</span><span style="color:#A5D6FF">"</span><span style="color:#8B949E"> # post to Slack or open an issue</span></span>
+<span class="line"><span style="color:#FF7B72">fi</span></span></code></pre></div>
+<p><code>-detailed-exitcode</code> makes the exit code tell you if there is a diff. <code>-lock=false</code> is safe here because this job only reads. Fix drift by changing the code or by re-applying, never by ignoring the alert.</p>
+<h2 id="stage-3-the-day-you-split-into-accounts"><a class="anchor" href="#stage-3-the-day-you-split-into-accounts" aria-hidden="true" tabindex="-1">#</a>Stage 3: the day you split into accounts</h2>
+<p>One account with split states goes a long way. These are the signals that it&#39;s time for separate AWS accounts, managed with <strong>AWS Organizations</strong> (the AWS service for grouping accounts under one bill and one set of rules):</p>
+<ul>
+<li><strong>You need a hard wall around prod data.</strong> IAM rules inside one account can do a lot, but a mistake in one policy can still reach prod. A separate account is a much stronger boundary.</li>
+<li><strong>Customers or audits ask for it.</strong> Security reviews often ask whether prod is isolated from dev. &quot;It&#39;s a different account&quot; is an easy answer.</li>
+<li><strong>A second team arrives.</strong> They need admin rights in staging, but they should not have them in prod.</li>
+<li><strong>Service limits clash.</strong> A load test in staging uses up the account-wide Lambda concurrency limit and slows down prod.</li>
+</ul>
+<p>The good news: if you followed Stage 2, the move is mostly config. The stacks stay the same. Each environment gets its own account, and <code>envs/prod/backend.hcl</code> points to a state bucket inside the prod account. The provider assumes a role in the right account. A <code>shared</code> account holds the things that sit above the environments, like CI roles, central logs and the top-level DNS zone.</p>
+<h2 id="gotchas"><a class="anchor" href="#gotchas" aria-hidden="true" tabindex="-1">#</a>Gotchas</h2>
+<ul>
+<li><strong>Moving resources between states.</strong> Splitting a monolith means moving resources from one state to another without deleting them. Use <code>removed</code> blocks in the old stack (with <code>lifecycle { destroy = false }</code>) and <code>import</code> blocks in the new stack, or <code>terraform state mv</code>. Practise on staging first.</li>
+<li><strong>Circular dependencies.</strong> If <code>network</code> needs a value from <code>app</code>, your split is wrong. Values should only flow in the apply order.</li>
+<li><strong>Destroying in the wrong order.</strong> Tear down <code>edge</code> first and <code>network</code> last, or the destroy gets stuck on resources that are still in use.</li>
+<li><strong><code>default_tags</code> don&#39;t reach everything.</strong> Resources AWS creates for you, like log groups a Lambda creates on its own, are not managed by Terraform and get no tags. Create those resources in Terraform yourself.</li>
+<li><strong>Lock left behind.</strong> If CI is killed during an apply, the lock file stays. Check that nothing is running, then use <code>terraform force-unlock</code>.</li>
+</ul>
+<h2 id="when-not-to-use-this"><a class="anchor" href="#when-not-to-use-this" aria-hidden="true" tabindex="-1">#</a>When not to use this</h2>
+<ul>
+<li><strong>A side project or a prototype.</strong> One state and one environment is enough. Split later.</li>
+<li><strong>Your team already runs Terragrunt or HCP Terraform.</strong> Those tools have their own way of handling the same problems. Follow their model instead of mixing two.</li>
+<li><strong>The workload is mostly Kubernetes.</strong> You may want Terraform only for the cluster and the network, and a different tool for what runs inside it.</li>
+</ul>
+<h2 id="checklist"><a class="anchor" href="#checklist" aria-hidden="true" tabindex="-1">#</a>Checklist</h2>
+<ul>
+<li><input disabled="" type="checkbox"> State in a versioned, encrypted S3 bucket with <code>use_lockfile = true</code> and Terraform 1.11 or newer</li>
+<li><input disabled="" type="checkbox"> One state per stack per environment, with the environment in the path</li>
+<li><input disabled="" type="checkbox"> Values shared through SSM parameters, read in apply order</li>
+<li><input disabled="" type="checkbox"> <code>prevent_destroy</code> and <code>deletion_protection</code> on Aurora and important buckets</li>
+<li><input disabled="" type="checkbox"> No secrets in tfvars; <code>default_tags</code> on every provider</li>
+<li><input disabled="" type="checkbox"> Plan on PR, apply on merge, OIDC roles, approval for prod</li>
+<li><input disabled="" type="checkbox"> A nightly drift check that alerts someone</li>
+</ul>
+<h2 id="further-reading"><a class="anchor" href="#further-reading" aria-hidden="true" tabindex="-1">#</a>Further reading</h2>
+<ul>
+<li><a href="https://developer.hashicorp.com/terraform/language/backend/s3" target="_blank" rel="noopener">Terraform S3 backend</a>: <code>use_lockfile</code>, partial configuration and the DynamoDB deprecation</li>
+<li><a href="https://developer.hashicorp.com/terraform/language/v1.11.x/upgrade-guides" target="_blank" rel="noopener">Upgrading to Terraform v1.11</a>: S3-native locking becomes generally available</li>
+<li><a href="https://developer.hashicorp.com/terraform/language/block/import" target="_blank" rel="noopener">The <code>import</code> block</a> and <a href="https://developer.hashicorp.com/terraform/language/import" target="_blank" rel="noopener">importing resources</a></li>
+<li><a href="https://developer.hashicorp.com/terraform/language/state/remote-state-data" target="_blank" rel="noopener">The <code>terraform_remote_state</code> data source</a></li>
+<li><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs#default_tags-configuration-block" target="_blank" rel="noopener">AWS provider <code>default_tags</code></a></li>
+<li><a href="https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services" target="_blank" rel="noopener">Configuring OpenID Connect in Amazon Web Services (GitHub docs)</a></li>
+<li><a href="https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/organizing-your-aws-environment.html" target="_blank" rel="noopener">Organizing your AWS environment using multiple accounts (AWS whitepaper)</a></li>
+</ul>
+
+        </div>
+      </div>
+      <footer class="post__foot container">
+        <div class="author">
+          <span class="brand__mark" aria-hidden="true">DP</span>
+          <div>
+            <p class="author__name">Divya Patel</p>
+            <p class="author__bio">Backend &amp; Cloud Engineer in Ahmedabad, India. I design AWS infrastructure with Terraform and build the serverless services that run on it. Open to remote roles and contract work.</p>
+          </div>
+          <a class="btn btn--accent btn--sm" href="/contact">Work with me</a>
+        </div>
+        <h2 class="more__title">More writing</h2><ul class="post-list post-list--compact"><li class="post-card"><a href="/blog/lambda-zero-downtime-deploys-github-actions">
+    <span class="post-card__meta"><time datetime="2026-11-13">13 November 2026</time> · 12 min read</span>
+    <span class="post-card__title">Zero-downtime Lambda deploys from GitHub Actions: OIDC, versions, aliases and canary rollback</span>
+    <span class="post-card__desc">Deploy AWS Lambda from GitHub Actions with no stored AWS keys: OIDC login, versions, a weighted alias canary and automatic rollback.</span>
+    <span class="post-card__tags">AWS Lambda · GitHub Actions · CI/CD</span>
+  </a></li><li class="post-card"><a href="/blog/redis-cache-stampede-aurora">
+    <span class="post-card__meta"><time datetime="2026-11-13">13 November 2026</time> · 12 min read</span>
+    <span class="post-card__title">Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL</span>
+    <span class="post-card__desc">Redis caching patterns for Postgres in plain words: cache-aside vs write-through, cache stampede prevention, TTL jitter and safe invalidation.</span>
+    <span class="post-card__tags">Redis · PostgreSQL · AWS</span>
+  </a></li><li class="post-card"><a href="/blog/self-host-llm-vllm-cost-vs-api">
+    <span class="post-card__meta"><time datetime="2026-11-13">13 November 2026</time> · 12 min read</span>
+    <span class="post-card__title">Self-hosting an LLM with vLLM: the real cost math vs an API</span>
+    <span class="post-card__desc">A neutral break-even model for self-hosting an LLM with vLLM vs paying an API per token, with a worked example, real prices and a small production setup.</span>
+    <span class="post-card__tags">LLM · vLLM · Cost</span>
+  </a></li></ul>
+      </footer>
+    </article>
+  </main>
+
+  <footer class="footer blog-footer">
+    <div class="container">
+      <div class="footer__links">
+        <a href="/">Portfolio</a>
+        <a href="/blog">Writing</a>
+        <a href="/blog/feed.xml">RSS</a>
+        <a href="/contact">Contact</a>
+        <a href="/backend-developer-ahmedabad">Backend developer in Ahmedabad</a>
+        <a href="https://www.linkedin.com/in/divyapatel5113" target="_blank" rel="me noopener">LinkedIn</a>
+        <a href="#main" class="footer__top">Back to top ↑</a>
+      </div>
+    </div>
+    <p class="container footer__fine">© 2026 Divya Patel. Writing on backend, cloud infrastructure and system design.</p>
+  </footer>
+</body>
+</html>

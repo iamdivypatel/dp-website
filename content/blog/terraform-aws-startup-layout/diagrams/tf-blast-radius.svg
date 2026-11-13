@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 440" class="diagram" role="img" aria-labelledby="tf-blast-radius-t tf-blast-radius-d">
+  <title id="tf-blast-radius-t">Blast radius of one bad change</title>
+  <desc id="tf-blast-radius-d">With one monolith state a bad change puts every resource in the plan, while with split states the same mistake in the app state leaves network, data and edge untouched.</desc>
+
+  <text x="200" y="40" class="d-text" text-anchor="middle">One state</text>
+  <text x="600" y="40" class="d-text" text-anchor="middle">Split states</text>
+
+  <!-- Monolith -->
+  <circle cx="200" cy="230" r="148" class="d-box d-warn"/>
+  <circle cx="200" cy="230" r="100" class="d-zone"/>
+  <text x="200" y="160" class="d-text d-mono" text-anchor="middle">monolith</text>
+  <text x="200" y="206" class="d-sub d-mono" text-anchor="middle">VPC · Aurora</text>
+  <text x="200" y="234" class="d-sub d-mono" text-anchor="middle">Lambda · SQS</text>
+  <text x="200" y="262" class="d-sub d-mono" text-anchor="middle">CloudFront · WAF</text>
+  <text x="200" y="304" class="d-sub" text-anchor="middle">all in one plan</text>
+
+  <!-- Split -->
+  <circle cx="520" cy="150" r="68" class="d-box d-ok"/>
+  <text x="520" y="146" class="d-text d-mono" text-anchor="middle">network</text>
+  <text x="520" y="168" class="d-sub" text-anchor="middle">untouched</text>
+  <circle cx="680" cy="150" r="68" class="d-box d-ok"/>
+  <text x="680" y="146" class="d-text d-mono" text-anchor="middle">data</text>
+  <text x="680" y="168" class="d-sub" text-anchor="middle">untouched</text>
+  <circle cx="520" cy="310" r="68" class="d-box d-warn"/>
+  <text x="520" y="306" class="d-text d-mono" text-anchor="middle">app</text>
+  <text x="520" y="328" class="d-sub" text-anchor="middle">bad change</text>
+  <circle cx="680" cy="310" r="68" class="d-box d-ok"/>
+  <text x="680" y="306" class="d-text d-mono" text-anchor="middle">edge</text>
+  <text x="680" y="328" class="d-sub" text-anchor="middle">untouched</text>
+
+  <text x="200" y="414" class="d-sub" text-anchor="middle">blast radius: the whole account</text>
+  <text x="600" y="414" class="d-sub" text-anchor="middle">blast radius: one stack</text>
+</svg>

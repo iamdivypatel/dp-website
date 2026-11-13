@@ -15,7 +15,7 @@ const types = {
 createServer(async (req, res) => {
   // normalize() on an absolute path can't climb above it, so requests stay inside public/.
   const path = normalize(decodeURIComponent(new URL(req.url, 'http://localhost').pathname));
-  for (const file of path.endsWith('/') ? [join(path, 'index.html')] : [path, `${path}.html`]) {
+  for (const file of path.endsWith('/') ? [join(path, 'index.html')] : [path, `${path}.html`, join(path, 'index.html')]) {
     try {
       const body = await readFile(join(root, file));
       res.writeHead(200, { 'Content-Type': types[extname(file)] || 'application/octet-stream' });

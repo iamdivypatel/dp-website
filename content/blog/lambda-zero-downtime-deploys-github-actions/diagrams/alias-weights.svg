@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" class="diagram" role="img" aria-labelledby="alias-weights-t alias-weights-d">
+  <title id="alias-weights-t">Alias traffic weights over time</title>
+  <desc id="alias-weights-d">Three stacked bars for the live alias: before the deploy v7 gets 100 percent, at t0 v7 gets 90 percent and v8 gets 10 percent, and at t plus 5 minutes v8 gets 100 percent.</desc>
+
+  <!-- Legend -->
+  <rect class="d-fill-cyan" x="190" y="22" width="16" height="16" rx="3"/>
+  <text class="d-sub" x="214" y="35">v7 (current)</text>
+  <rect class="d-fill-accent" x="320" y="22" width="16" height="16" rx="3"/>
+  <text class="d-sub" x="344" y="35">v8 (new)</text>
+
+  <!-- Gridlines -->
+  <line class="d-grid" x1="190" y1="60" x2="190" y2="250"/>
+  <line class="d-grid" x1="330" y1="60" x2="330" y2="250"/>
+  <line class="d-grid" x1="470" y1="60" x2="470" y2="250"/>
+  <line class="d-grid" x1="610" y1="60" x2="610" y2="250"/>
+  <line class="d-grid" x1="750" y1="60" x2="750" y2="250"/>
+
+  <!-- Row labels -->
+  <text class="d-text" x="170" y="92" text-anchor="end">Before</text>
+  <text class="d-text" x="170" y="157" text-anchor="end">t0: canary</text>
+  <text class="d-text" x="170" y="222" text-anchor="end">t+5 min: done</text>
+
+  <!-- Bars (560 px = 100%) -->
+  <rect class="d-fill-cyan" x="190" y="68" width="560" height="40"/>
+  <text class="d-text" x="470" y="93" text-anchor="middle">v7 · 100%</text>
+
+  <rect class="d-fill-cyan" x="190" y="133" width="504" height="40"/>
+  <rect class="d-fill-accent" x="694" y="133" width="56" height="40"/>
+  <text class="d-text" x="442" y="158" text-anchor="middle">v7 · 90%</text>
+  <text class="d-text" x="722" y="158" text-anchor="middle">10%</text>
+
+  <rect class="d-fill-accent" x="190" y="198" width="560" height="40"/>
+  <text class="d-text" x="470" y="223" text-anchor="middle">v8 · 100%</text>
+
+  <!-- Axis -->
+  <line class="d-axis" x1="190" y1="250" x2="750" y2="250"/>
+  <text class="d-sub" x="190" y="272" text-anchor="middle">0%</text>
+  <text class="d-sub" x="330" y="272" text-anchor="middle">25%</text>
+  <text class="d-sub" x="470" y="272" text-anchor="middle">50%</text>
+  <text class="d-sub" x="610" y="272" text-anchor="middle">75%</text>
+  <text class="d-sub" x="750" y="272" text-anchor="middle">100%</text>
+  <text class="d-sub" x="470" y="292" text-anchor="middle">share of calls to the live alias</text>
+</svg>

@@ -1,0 +1,33 @@
+/* Diagram vocabulary for blog SVGs (see content/blog/README.md). Inlined SVGs inherit the page font. */
+.diagram { display: block; width: 100%; height: auto; font-family: var(--font-sans, "Archivo", system-ui, sans-serif);
+  stroke: none; fill: none; stroke-linecap: butt; stroke-linejoin: miter; } /* undo the site-wide icon svg defaults */
+.diagram text { stroke: none; fill: var(--text); }
+.diagram .d-box { fill: var(--card); stroke: var(--line-2); stroke-width: 1.5; }
+.diagram .d-box.d-accent { fill: rgb(77 141 255 / 0.14); stroke: var(--accent); }
+.diagram .d-box.d-cyan { fill: rgb(124 231 255 / 0.1); stroke: var(--accent-2); }
+.diagram .d-box.d-warn { fill: rgb(255 143 143 / 0.12); stroke: var(--error); }
+.diagram .d-box.d-ok { fill: rgb(61 220 151 / 0.12); stroke: var(--ok); }
+.diagram .d-zone { fill: rgb(255 255 255 / 0.015); stroke: var(--line-2); stroke-width: 1.25; stroke-dasharray: 6 5; }
+.diagram .d-zone-label { fill: var(--faint); font-size: 12px; letter-spacing: 0.04em; }
+.diagram .d-text { fill: var(--text); font-size: 15px; font-weight: 600; }
+.diagram .d-sub { fill: var(--muted); font-size: 12.5px; }
+.diagram .d-mono { font-family: var(--font-mono, "JetBrains Mono", ui-monospace, monospace); font-weight: 400; }
+.diagram .d-edge { fill: none; stroke: var(--muted); stroke-width: 1.6; }
+.diagram .d-edge.d-edge-accent { stroke: var(--accent); }
+.diagram .d-edge.d-edge-warn { stroke: var(--error); }
+.diagram .d-edge.d-edge-ok { stroke: var(--ok); }
+.diagram .d-edge.d-dashed { stroke-dasharray: 5 5; }
+.diagram .d-head { fill: context-stroke; }
+.diagram .d-grid { stroke: var(--line); stroke-width: 1; }
+.diagram .d-axis { stroke: var(--line-2); stroke-width: 1.5; fill: none; }
+.diagram .d-line { fill: none; stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.diagram .d-accent-stroke { stroke: var(--accent); }
+.diagram .d-cyan-stroke { stroke: var(--accent-2); }
+.diagram .d-warn-stroke { stroke: var(--error); }
+.diagram .d-ok-stroke { stroke: var(--ok); }
+.diagram .d-fill-accent { fill: rgb(77 141 255 / 0.35); }
+.diagram .d-fill-cyan { fill: rgb(124 231 255 / 0.3); }
+.diagram .d-fill-warn { fill: rgb(255 143 143 / 0.3); }
+.diagram .d-fill-ok { fill: rgb(61 220 151 / 0.3); }
+.diagram .d-num { fill: var(--accent); }
+.diagram .d-num-text { fill: var(--on-accent); font-size: 12px; font-weight: 700; text-anchor: middle; dominant-baseline: central; }

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" class="diagram" role="img" aria-labelledby="cache-aside-path-t cache-aside-path-d">
+  <title id="cache-aside-path-t">Cache-aside read path</title>
+  <desc id="cache-aside-path-d">The app asks Redis first; on a hit it returns, on a miss it queries Aurora PostgreSQL and writes the row back to Redis with a TTL.</desc>
+  <defs>
+    <marker id="cache-aside-path-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker>
+  </defs>
+
+  <rect class="d-zone" x="200" y="24" width="584" height="356" rx="10"/>
+  <text class="d-zone-label" x="216" y="46">VPC</text>
+
+  <rect class="d-box" x="24" y="80" width="140" height="70" rx="10"/>
+  <text class="d-text" x="94" y="112" text-anchor="middle">Client</text>
+  <text class="d-sub" x="94" y="132" text-anchor="middle">HTTP request</text>
+
+  <rect class="d-box d-accent" x="260" y="80" width="200" height="70" rx="10"/>
+  <text class="d-text" x="360" y="112" text-anchor="middle">App (Node.js)</text>
+  <text class="d-sub d-mono" x="360" y="132" text-anchor="middle">ioredis + pg</text>
+
+  <rect class="d-box d-cyan" x="576" y="80" width="184" height="70" rx="10"/>
+  <text class="d-text" x="668" y="112" text-anchor="middle">ElastiCache</text>
+  <text class="d-sub" x="668" y="132" text-anchor="middle">Valkey / Redis OSS</text>
+
+  <rect class="d-box" x="260" y="290" width="200" height="70" rx="10"/>
+  <text class="d-text" x="360" y="322" text-anchor="middle">Aurora PostgreSQL</text>
+  <text class="d-sub" x="360" y="342" text-anchor="middle">source of truth</text>
+
+  <!-- client <-> app -->
+  <path class="d-edge" d="M164 103H258" marker-end="url(#cache-aside-path-arrow)"/>
+  <path class="d-edge d-dashed" d="M260 128H166" marker-end="url(#cache-aside-path-arrow)"/>
+
+  <!-- 1 GET -->
+  <path class="d-edge d-edge-ok" d="M460 100H574" marker-end="url(#cache-aside-path-arrow)"/>
+  <circle class="d-num" cx="482" cy="86" r="9"/><text class="d-num-text" x="482" y="86">1</text>
+  <text class="d-sub d-mono" x="497" y="90">GET key</text>
+
+  <!-- 2 hit / nil -->
+  <path class="d-edge d-edge-ok d-dashed" d="M576 130H462" marker-end="url(#cache-aside-path-arrow)"/>
+  <circle class="d-num" cx="482" cy="146" r="9"/><text class="d-num-text" x="482" y="146">2</text>
+  <text class="d-sub" x="497" y="150">hit or nil</text>
+
+  <!-- 3 SELECT -->
+  <path class="d-edge d-edge-accent" d="M300 150V288" marker-end="url(#cache-aside-path-arrow)"/>
+  <circle class="d-num" cx="232" cy="219" r="9"/><text class="d-num-text" x="232" y="219">3</text>
+  <text class="d-sub d-mono" x="290" y="223" text-anchor="end">SELECT</text>
+
+  <!-- 4 rows -->
+  <path class="d-edge d-edge-accent d-dashed" d="M360 290V152" marker-end="url(#cache-aside-path-arrow)"/>
+  <circle class="d-num" cx="378" cy="219" r="9"/><text class="d-num-text" x="378" y="219">4</text>
+  <text class="d-sub" x="393" y="223">row</text>
+
+  <!-- 5 SET -->
+  <path class="d-edge d-edge-accent" d="M440 150V240H668V152" marker-end="url(#cache-aside-path-arrow)"/>
+  <circle class="d-num" cx="500" cy="224" r="9"/><text class="d-num-text" x="500" y="224">5</text>
+  <text class="d-sub d-mono" x="515" y="228">SET key EX ttl</text>
+
+  <text class="d-sub" x="560" y="300">miss path: steps 3 to 5</text>
+  <text class="d-sub" x="560" y="320">hit path: steps 1 and 2</text>
+</svg>

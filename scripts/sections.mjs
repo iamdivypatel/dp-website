@@ -1,9 +1,11 @@
 // Build one page per section address (/about, /journey… listed in src/js/routes.js).
-// Each is a copy of index.html with that section's title, description and canonical URL:
-// the same one-page site, so search results and shared links get their own title, and
-// main.js scrolls to the section on load. Also writes sitemap.xml.
+// Each is a copy of index.html with that section's title and description, so a shared link
+// gets its own preview, and main.js scrolls to the section on load. The body is the same
+// one-page site, so the canonical stays "/": Google would fold identical copies into it
+// anyway. The search pages with their own content are the blog and the pages from
+// scripts/blog.mjs. Also writes sitemap.xml (canonical pages only).
 // Runs last in `npm run build` (after the CSP step, so the copies carry the right hash).
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { routes } from '../src/js/routes.js';
 
 const html = readFileSync('public/index.html', 'utf8');
@@ -20,13 +22,10 @@ for (const route of sections) {
   const heads = [
     [/<title>[^<]*<\/title>/, `<title>${esc(route.title)}</title>`],
     [/(<meta name="description" content=")[^"]*/, `$1${esc(route.description)}`],
-    [/(<link rel="canonical" href=")[^"]*/, `$1${url}`],
     [/(<meta property="og:url" content=")[^"]*/, `$1${url}`],
     [/(<meta property="og:title" content=")[^"]*/, `$1${esc(route.title)}`],
     [/(<meta property="og:description" content=")[^"]*/, `$1${esc(route.description)}`],
     [/<!doctype html>\n/, `<!doctype html>\n<!-- Built from index.html by scripts/sections.mjs. Edit index.html, not this file. -->\n`],
-    // breadcrumb trail for search results: Divya Patel › About
-    [/("@graph": \[\n)/, `$1      { "@type": "BreadcrumbList", "itemListElement": [{ "@type": "ListItem", "position": 1, "name": "Divya Patel", "item": "${base}/" }, { "@type": "ListItem", "position": 2, "name": "${esc(route.title.split(' – ')[0])}", "item": "${url}" }] },\n`],
   ];
   let page = html;
   for (const [pattern, replacement] of heads) {
@@ -38,6 +37,9 @@ for (const route of sections) {
 
 const modified = html.match(/"dateModified": "([\d-]+)"/)?.[1];
 if (!modified) throw new Error('index.html JSON-LD has no dateModified');
-const urls = routes.map((route) => `  <url>\n    <loc>${base}${route.path}</loc>\n    <lastmod>${modified}</lastmod>\n  </url>`).join('\n');
+// the blog and standalone pages (scripts/blog.mjs) list themselves in posts.json
+const posts = existsSync('public/blog/posts.json') ? JSON.parse(readFileSync('public/blog/posts.json', 'utf8')) : [];
+const pages = [{ path: '/', lastmod: modified }, ...posts];
+const urls = pages.map((page) => `  <url>\n    <loc>${base}${page.path}</loc>\n    <lastmod>${page.lastmod}</lastmod>\n  </url>`).join('\n');
 writeFileSync('public/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
 console.log(`Section pages: ${sections.map((r) => r.path).join(' ')} (+ sitemap.xml)`);

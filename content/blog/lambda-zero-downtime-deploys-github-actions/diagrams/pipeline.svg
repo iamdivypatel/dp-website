@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" class="diagram" role="img" aria-labelledby="pipeline-t pipeline-d">
+  <title id="pipeline-t">Lambda deploy pipeline</title>
+  <desc id="pipeline-d">A push runs tests, builds a zip, updates the function code and publishes version 8, then shifts 10 percent of the live alias to it, watches the alarms for five minutes, and either promotes v8 to 100 percent or rolls back to v7.</desc>
+  <defs>
+    <marker id="pipeline-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker>
+  </defs>
+
+  <!-- Row 1: build -->
+  <rect class="d-box" x="20" y="40" width="160" height="64" rx="10"/>
+  <text class="d-text" x="100" y="68" text-anchor="middle">git push</text>
+  <text class="d-sub" x="100" y="88" text-anchor="middle">to main</text>
+
+  <rect class="d-box" x="220" y="40" width="160" height="64" rx="10"/>
+  <text class="d-text" x="300" y="68" text-anchor="middle">Test</text>
+  <text class="d-sub" x="300" y="88" text-anchor="middle">npm ci, npm test</text>
+
+  <rect class="d-box" x="420" y="40" width="160" height="64" rx="10"/>
+  <text class="d-text" x="500" y="68" text-anchor="middle">Build zip</text>
+  <text class="d-sub" x="500" y="88" text-anchor="middle">function.zip</text>
+
+  <rect class="d-box" x="620" y="40" width="160" height="64" rx="10"/>
+  <text class="d-text" x="700" y="68" text-anchor="middle">Update code</text>
+  <text class="d-sub" x="700" y="88" text-anchor="middle">lands on $LATEST</text>
+
+  <line class="d-edge" x1="180" y1="72" x2="220" y2="72" marker-end="url(#pipeline-arrow)"/>
+  <line class="d-edge" x1="380" y1="72" x2="420" y2="72" marker-end="url(#pipeline-arrow)"/>
+  <line class="d-edge" x1="580" y1="72" x2="620" y2="72" marker-end="url(#pipeline-arrow)"/>
+  <line class="d-edge" x1="700" y1="104" x2="700" y2="180" marker-end="url(#pipeline-arrow)"/>
+
+  <!-- Row 2: release (right to left) -->
+  <rect class="d-box d-accent" x="620" y="180" width="160" height="64" rx="10"/>
+  <text class="d-text" x="700" y="208" text-anchor="middle">Publish v8</text>
+  <text class="d-sub" x="700" y="228" text-anchor="middle">frozen copy</text>
+
+  <rect class="d-box d-accent" x="420" y="180" width="160" height="64" rx="10"/>
+  <text class="d-text" x="500" y="208" text-anchor="middle">Shift alias</text>
+  <text class="d-sub" x="500" y="228" text-anchor="middle">10% to v8</text>
+
+  <rect class="d-box" x="220" y="180" width="160" height="64" rx="10"/>
+  <text class="d-text" x="300" y="208" text-anchor="middle">Watch alarms</text>
+  <text class="d-sub" x="300" y="228" text-anchor="middle">for 5 minutes</text>
+
+  <line class="d-edge" x1="620" y1="212" x2="580" y2="212" marker-end="url(#pipeline-arrow)"/>
+  <line class="d-edge" x1="420" y1="212" x2="380" y2="212" marker-end="url(#pipeline-arrow)"/>
+
+  <!-- Outcomes -->
+  <rect class="d-box d-ok" x="20" y="140" width="160" height="56" rx="10"/>
+  <text class="d-text" x="100" y="164" text-anchor="middle">Promote</text>
+  <text class="d-sub" x="100" y="183" text-anchor="middle">100% to v8</text>
+
+  <rect class="d-box d-warn" x="20" y="228" width="160" height="56" rx="10"/>
+  <text class="d-text" x="100" y="252" text-anchor="middle">Roll back</text>
+  <text class="d-sub" x="100" y="271" text-anchor="middle">100% to v7</text>
+
+  <path class="d-edge d-edge-ok" d="M220 200 L180 172" marker-end="url(#pipeline-arrow)"/>
+  <path class="d-edge d-edge-warn" d="M220 224 L180 252" marker-end="url(#pipeline-arrow)"/>
+</svg>

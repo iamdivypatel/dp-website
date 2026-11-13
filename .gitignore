@@ -7,3 +7,6 @@ tools/og.bundle.js
 # kept locally, not published: the old v1 design and full-resolution personal photos
 archive/
 photos/
+
+# Chrome profile used to render blog link-preview images
+tools/.chrome-og/

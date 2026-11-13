@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 390" class="diagram" role="img" aria-labelledby="where-things-point-t where-things-point-d">
+  <title id="where-things-point-t">Callers point at the alias</title>
+  <desc id="where-things-point-d">API Gateway, an SQS event source mapping and an EventBridge rule all call the live alias, which sends 90 percent of calls to version 7 and 10 percent to version 8; an unqualified ARN would call $LATEST, which you should never point at.</desc>
+  <defs>
+    <marker id="where-things-point-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker>
+  </defs>
+
+  <!-- Callers -->
+  <rect class="d-box" x="20" y="30" width="190" height="60" rx="10"/>
+  <text class="d-text" x="115" y="56" text-anchor="middle">API Gateway</text>
+  <text class="d-sub" x="115" y="76" text-anchor="middle">HTTP requests</text>
+
+  <rect class="d-box" x="20" y="120" width="190" height="60" rx="10"/>
+  <text class="d-text" x="115" y="146" text-anchor="middle">SQS mapping</text>
+  <text class="d-sub" x="115" y="166" text-anchor="middle">batches</text>
+
+  <rect class="d-box" x="20" y="210" width="190" height="60" rx="10"/>
+  <text class="d-text" x="115" y="236" text-anchor="middle">EventBridge rule</text>
+  <text class="d-sub" x="115" y="256" text-anchor="middle">async events</text>
+
+  <!-- Alias -->
+  <rect class="d-box d-accent" x="300" y="105" width="170" height="90" rx="10"/>
+  <text class="d-text" x="385" y="140" text-anchor="middle">alias: live</text>
+  <text class="d-sub d-mono" x="385" y="164" text-anchor="middle">orders:live</text>
+
+  <line class="d-edge d-edge-accent" x1="210" y1="60" x2="300" y2="128" marker-end="url(#where-things-point-arrow)"/>
+  <line class="d-edge d-edge-accent" x1="210" y1="150" x2="300" y2="150" marker-end="url(#where-things-point-arrow)"/>
+  <line class="d-edge d-edge-accent" x1="210" y1="240" x2="300" y2="172" marker-end="url(#where-things-point-arrow)"/>
+
+  <!-- Versions -->
+  <rect class="d-box" x="590" y="40" width="190" height="64" rx="10"/>
+  <text class="d-text" x="685" y="68" text-anchor="middle">Version 7</text>
+  <text class="d-sub" x="685" y="88" text-anchor="middle">current code</text>
+
+  <rect class="d-box" x="590" y="196" width="190" height="64" rx="10"/>
+  <text class="d-text" x="685" y="224" text-anchor="middle">Version 8</text>
+  <text class="d-sub" x="685" y="244" text-anchor="middle">new code</text>
+
+  <line class="d-edge" x1="470" y1="130" x2="590" y2="76" marker-end="url(#where-things-point-arrow)"/>
+  <text class="d-sub" x="530" y="88" text-anchor="middle">90%</text>
+  <line class="d-edge" x1="470" y1="170" x2="590" y2="224" marker-end="url(#where-things-point-arrow)"/>
+  <text class="d-sub" x="530" y="226" text-anchor="middle">10%</text>
+
+  <!-- Never here -->
+  <rect class="d-box d-warn" x="20" y="306" width="190" height="60" rx="10"/>
+  <text class="d-text" x="115" y="332" text-anchor="middle">Plain function ARN</text>
+  <text class="d-sub d-mono" x="115" y="352" text-anchor="middle">orders</text>
+
+  <rect class="d-box d-warn" x="590" y="306" width="190" height="60" rx="10"/>
+  <text class="d-text" x="685" y="332" text-anchor="middle">$LATEST</text>
+  <text class="d-sub" x="685" y="352" text-anchor="middle">never point here</text>
+
+  <line class="d-edge d-edge-warn d-dashed" x1="210" y1="336" x2="590" y2="336" marker-end="url(#where-things-point-arrow)"/>
+  <text class="d-sub" x="400" y="326" text-anchor="middle">changes on every upload</text>
+</svg>

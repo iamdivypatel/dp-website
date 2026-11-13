@@ -1,0 +1,879 @@
+<!doctype html>
+<!-- Built by scripts/blog.mjs from content/blog. Edit the Markdown, not this file. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.googletagmanager.com 'sha256-/LbKt0MibuWw3TF4uF0TA4kkd2452qY8QG2QS7CZnw8=' 'sha256-iLDnONK3Z3/vV4tWZdatHdq72Zjn7Q8OR2HSRTqTurU='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; font-src 'self'; connect-src 'self' https://formsubmit.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; manifest-src 'self'; frame-src https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action https://formsubmit.co">
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-M75XC5GH');</script>
+  <!-- End Google Tag Manager -->
+  <title>Zero-downtime Lambda deploys from GitHub Actions: OIDC, versions, aliases and canary rollback – Divya Patel</title>
+  <meta name="description" content="Deploy AWS Lambda from GitHub Actions with no stored AWS keys: OIDC login, versions, a weighted alias canary and automatic rollback.">
+  <meta name="author" content="Divya Patel">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="theme-color" content="#08090b">
+  <meta name="color-scheme" content="dark">
+  <link rel="canonical" href="https://divypatel.in/blog/lambda-zero-downtime-deploys-github-actions">
+  <link rel="alternate" type="application/rss+xml" title="Divya Patel – Writing" href="https://divypatel.in/blog/feed.xml">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://divypatel.in/blog/lambda-zero-downtime-deploys-github-actions">
+  <meta property="og:site_name" content="Divya Patel">
+  <meta property="og:locale" content="en_IN">
+  <meta property="og:title" content="Zero-downtime Lambda deploys from GitHub Actions: OIDC, versions, aliases and canary rollback – Divya Patel">
+  <meta property="og:description" content="Deploy AWS Lambda from GitHub Actions with no stored AWS keys: OIDC login, versions, a weighted alias canary and automatic rollback.">
+  <meta property="og:image" content="https://divypatel.in/assets/img/og/lambda-zero-downtime-deploys-github-actions.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="article:published_time" content="2026-11-13">
+  <meta property="article:modified_time" content="2026-11-13">
+  <meta property="article:author" content="https://divypatel.in/">
+  <meta property="article:tag" content="AWS Lambda">
+  <meta property="article:tag" content="GitHub Actions">
+  <meta property="article:tag" content="CI/CD">
+  <meta property="article:tag" content="Terraform">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="/assets/fonts/Archivo-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BlogPosting",
+        "@id": "https://divypatel.in/blog/lambda-zero-downtime-deploys-github-actions#article",
+        "headline": "Zero-downtime Lambda deploys from GitHub Actions: OIDC, versions, aliases and canary rollback",
+        "description": "Deploy AWS Lambda from GitHub Actions with no stored AWS keys: OIDC login, versions, a weighted alias canary and automatic rollback.",
+        "datePublished": "2026-11-13",
+        "dateModified": "2026-11-13",
+        "url": "https://divypatel.in/blog/lambda-zero-downtime-deploys-github-actions",
+        "mainEntityOfPage": "https://divypatel.in/blog/lambda-zero-downtime-deploys-github-actions",
+        "image": "https://divypatel.in/assets/img/og/lambda-zero-downtime-deploys-github-actions.png",
+        "keywords": "AWS Lambda, GitHub Actions, CI/CD, Terraform",
+        "wordCount": 2650,
+        "inLanguage": "en",
+        "author": {
+          "@id": "https://divypatel.in/#person",
+          "@type": "Person",
+          "name": "Divya Patel",
+          "url": "https://divypatel.in/"
+        },
+        "publisher": {
+          "@id": "https://divypatel.in/#person",
+          "@type": "Person",
+          "name": "Divya Patel"
+        },
+        "isPartOf": {
+          "@id": "https://divypatel.in/blog#blog"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Divya Patel",
+            "item": "https://divypatel.in/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Writing",
+            "item": "https://divypatel.in/blog"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Zero-downtime Lambda deploys from GitHub Actions: OIDC, versions, aliases and canary rollback",
+            "item": "https://divypatel.in/blog/lambda-zero-downtime-deploys-github-actions"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+  <script type="module" src="/assets/js/blog.js"></script>
+</head>
+<body class="blog-page">
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M75XC5GH" height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a href="/" class="brand" aria-label="Divya Patel, home"><span class="brand__mark">DP</span><span class="brand__name">Divya Patel</span></a>
+      <nav aria-label="Sections" class="nav">
+        <a href="/about">About</a>
+        <a href="/how-i-build">How I build</a>
+        <a href="/journey">Journey</a>
+        <a href="/projects">Projects</a>
+        <a href="/skills">Skills</a>
+        <a aria-current="page" href="/blog">Writing</a>
+      </nav>
+      <a href="/contact" class="btn btn--accent btn--sm magnetic header-cta">Let’s talk <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span></span><span></span></button>
+    </div>
+    <div class="progress" aria-hidden="true"><i></i></div>
+  </header>
+
+  <div class="menu" id="menu" hidden>
+    <nav aria-label="Sections (mobile)">
+      <a href="/about"><small>01</small>About</a>
+      <a href="/how-i-build"><small>02</small>How I build</a>
+      <a href="/journey"><small>03</small>Journey</a>
+      <a href="/projects"><small>04</small>Projects</a>
+      <a href="/skills"><small>05</small>Skills</a>
+      <a aria-current="page" href="/blog"><small>06</small>Writing</a>
+      <a href="/contact"><small>07</small>Contact</a>
+    </nav>
+    <p class="menu__foot">iamdivypatel@gmail.com<br>Ahmedabad, India (UTC+5:30)</p>
+  </div>
+
+  <main id="main">
+    <article class="post" itemscope>
+      <header class="post__head container">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Divya Patel</a><span aria-hidden="true">/</span><a href="/blog">Writing</a></nav>
+        <ul class="tags" aria-label="Topics"><li>AWS Lambda</li><li>GitHub Actions</li><li>CI/CD</li><li>Terraform</li></ul>
+        <h1 class="post__title">Zero-downtime Lambda deploys from GitHub Actions: OIDC, versions, aliases and canary rollback</h1>
+        <p class="post__dek">Deploy AWS Lambda from GitHub Actions with no stored AWS keys: OIDC login, versions, a weighted alias canary and automatic rollback.</p>
+        <p class="post__meta"><span>By <a href="/about" rel="author">Divya Patel</a></span><span><time datetime="2026-11-13">13 November 2026</time></span><span>12 min read</span></p>
+      </header>
+      <div class="post__layout container">
+        <aside class="toc" aria-label="On this page">
+          <details open><summary>On this page</summary><ol><li><a href="#tldr">TL;DR</a></li><li><a href="#four-words-you-need-first">Four words you need first</a></li><li><a href="#step-1-let-github-log-in-to-aws-without-keys">Step 1: let GitHub log in to AWS without keys</a></li><li><a href="#step-2-point-everything-at-the-alias">Step 2: point everything at the alias</a></li><li><a href="#step-3-upload-wait-publish">Step 3: upload, wait, publish</a></li><li><a href="#step-4-move-traffic-slowly">Step 4: move traffic slowly</a></li><li><a href="#the-full-workflow-option-b-monorepo-ready">The full workflow (option B, monorepo-ready)</a></li><li><a href="#triggers-that-behave-differently-under-a-weighted-alias">Triggers that behave differently under a weighted alias</a></li><li><a href="#rollback-and-cleanup">Rollback and cleanup</a></li><li><a href="#codedeploy-or-the-script">CodeDeploy or the script?</a></li><li><a href="#gotchas">Gotchas</a></li><li><a href="#when-not-to-use-this">When not to use this</a></li><li><a href="#checklist">Checklist</a></li><li><a href="#further-reading">Further reading</a></li></ol></details>
+        </aside>
+        <div class="prose">
+<p>If you deploy Lambda functions from GitHub Actions with plain AWS CLI calls (no SAM, no CDK pipeline), this post shows you how to ship new code to a small slice of traffic first, roll back on its own when errors go up, and do all of it without a single AWS access key stored in GitHub.</p>
+<h2 id="tldr"><a class="anchor" href="#tldr" aria-hidden="true" tabindex="-1">#</a>TL;DR</h2>
+<ul>
+<li><strong>No stored keys.</strong> GitHub Actions logs in to AWS with OIDC. The job gets short-lived credentials from AWS STS, and the IAM role only trusts one repo and one GitHub environment.</li>
+<li><strong>Never send traffic to <code>$LATEST</code>.</strong> Every deploy uploads the code, waits for the update to finish, and publishes a numbered version. API Gateway and all event sources call an alias named <code>live</code>.</li>
+<li><strong>Move traffic slowly.</strong> Point 10% of <code>live</code> at the new version, watch the errors for five minutes, then move it to 100% or put it back. CodeDeploy can do this for you, or a 40-line shell script can.</li>
+<li><strong>Rollback is one API call.</strong> You point the alias back at the old version. You don&#39;t rebuild anything.</li>
+<li><strong>Monorepos:</strong> work out which function folders changed and deploy only those, one matrix job per function. Prod waits for a reviewer to approve it.</li>
+</ul>
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" class="diagram" role="img" aria-labelledby="pipeline-t pipeline-d">
+  <title id="pipeline-t">Lambda deploy pipeline</title>
+  <desc id="pipeline-d">A push runs tests, builds a zip, updates the function code and publishes version 8, then shifts 10 percent of the live alias to it, watches the alarms for five minutes, and either promotes v8 to 100 percent or rolls back to v7.</desc>
+  <defs>
+    <marker id="pipeline-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker>
+  </defs>
+
+  <!-- Row 1: build -->
+  <rect class="d-box" x="20" y="40" width="160" height="64" rx="10"/>
+  <text class="d-text" x="100" y="68" text-anchor="middle">git push</text>
+  <text class="d-sub" x="100" y="88" text-anchor="middle">to main</text>
+
+  <rect class="d-box" x="220" y="40" width="160" height="64" rx="10"/>
+  <text class="d-text" x="300" y="68" text-anchor="middle">Test</text>
+  <text class="d-sub" x="300" y="88" text-anchor="middle">npm ci, npm test</text>
+
+  <rect class="d-box" x="420" y="40" width="160" height="64" rx="10"/>
+  <text class="d-text" x="500" y="68" text-anchor="middle">Build zip</text>
+  <text class="d-sub" x="500" y="88" text-anchor="middle">function.zip</text>
+
+  <rect class="d-box" x="620" y="40" width="160" height="64" rx="10"/>
+  <text class="d-text" x="700" y="68" text-anchor="middle">Update code</text>
+  <text class="d-sub" x="700" y="88" text-anchor="middle">lands on $LATEST</text>
+
+  <line class="d-edge" x1="180" y1="72" x2="220" y2="72" marker-end="url(#pipeline-arrow)"/>
+  <line class="d-edge" x1="380" y1="72" x2="420" y2="72" marker-end="url(#pipeline-arrow)"/>
+  <line class="d-edge" x1="580" y1="72" x2="620" y2="72" marker-end="url(#pipeline-arrow)"/>
+  <line class="d-edge" x1="700" y1="104" x2="700" y2="180" marker-end="url(#pipeline-arrow)"/>
+
+  <!-- Row 2: release (right to left) -->
+  <rect class="d-box d-accent" x="620" y="180" width="160" height="64" rx="10"/>
+  <text class="d-text" x="700" y="208" text-anchor="middle">Publish v8</text>
+  <text class="d-sub" x="700" y="228" text-anchor="middle">frozen copy</text>
+
+  <rect class="d-box d-accent" x="420" y="180" width="160" height="64" rx="10"/>
+  <text class="d-text" x="500" y="208" text-anchor="middle">Shift alias</text>
+  <text class="d-sub" x="500" y="228" text-anchor="middle">10% to v8</text>
+
+  <rect class="d-box" x="220" y="180" width="160" height="64" rx="10"/>
+  <text class="d-text" x="300" y="208" text-anchor="middle">Watch alarms</text>
+  <text class="d-sub" x="300" y="228" text-anchor="middle">for 5 minutes</text>
+
+  <line class="d-edge" x1="620" y1="212" x2="580" y2="212" marker-end="url(#pipeline-arrow)"/>
+  <line class="d-edge" x1="420" y1="212" x2="380" y2="212" marker-end="url(#pipeline-arrow)"/>
+
+  <!-- Outcomes -->
+  <rect class="d-box d-ok" x="20" y="140" width="160" height="56" rx="10"/>
+  <text class="d-text" x="100" y="164" text-anchor="middle">Promote</text>
+  <text class="d-sub" x="100" y="183" text-anchor="middle">100% to v8</text>
+
+  <rect class="d-box d-warn" x="20" y="228" width="160" height="56" rx="10"/>
+  <text class="d-text" x="100" y="252" text-anchor="middle">Roll back</text>
+  <text class="d-sub" x="100" y="271" text-anchor="middle">100% to v7</text>
+
+  <path class="d-edge d-edge-ok" d="M220 200 L180 172" marker-end="url(#pipeline-arrow)"/>
+  <path class="d-edge d-edge-warn" d="M220 224 L180 252" marker-end="url(#pipeline-arrow)"/>
+</svg><figcaption>The whole path. Everything after 'publish' changes only where the alias points.</figcaption></figure>
+<h2 id="four-words-you-need-first"><a class="anchor" href="#four-words-you-need-first" aria-hidden="true" tabindex="-1">#</a>Four words you need first</h2>
+<p>Here is the vocabulary, one plain sentence each:</p>
+<ul>
+<li><strong><code>$LATEST</code></strong> is the editable copy of your function. When you upload code, it lands here.</li>
+<li>A <strong>version</strong> (<code>1</code>, <code>2</code>, … <code>8</code>) is a frozen copy of <code>$LATEST</code>. You can&#39;t change its code or settings after you publish it.</li>
+<li>An <strong>alias</strong> (like <code>live</code>) is a named pointer to a version. You can move it at any time, and it can split traffic between <strong>two</strong> versions by weight.</li>
+<li>A <strong>canary</strong> is a small share of real traffic (say 10%) that tries the new version first, so a bad release hurts only a few requests.</li>
+</ul>
+<p>That&#39;s the whole trick. Versions are the &quot;what&quot;. The alias is the &quot;where&quot;. A deploy just publishes a new &quot;what&quot; and then slowly moves the &quot;where&quot;.</p>
+<h2 id="step-1-let-github-log-in-to-aws-without-keys"><a class="anchor" href="#step-1-let-github-log-in-to-aws-without-keys" aria-hidden="true" tabindex="-1">#</a>Step 1: let GitHub log in to AWS without keys</h2>
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" class="diagram" role="img" aria-labelledby="oidc-trust-t oidc-trust-d">
+  <title id="oidc-trust-t">GitHub OIDC to AWS trust flow</title>
+  <desc id="oidc-trust-d">The GitHub Actions job gets a signed JWT from GitHub's OIDC service, sends it to AWS STS, which checks the IAM role's trust policy conditions on aud and sub and returns short-lived credentials that the job uses to call the Lambda API.</desc>
+  <defs>
+    <marker id="oidc-trust-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker>
+  </defs>
+
+  <!-- Zones -->
+  <rect class="d-zone" x="20" y="20" width="240" height="380" rx="10"/>
+  <text class="d-zone-label" x="36" y="40">GITHUB</text>
+  <rect class="d-zone" x="340" y="20" width="440" height="380" rx="10"/>
+  <text class="d-zone-label" x="356" y="40">AWS ACCOUNT</text>
+
+  <!-- GitHub side -->
+  <rect class="d-box d-accent" x="40" y="60" width="200" height="80" rx="10"/>
+  <text class="d-text" x="140" y="92" text-anchor="middle">Actions job</text>
+  <text class="d-sub" x="140" y="114" text-anchor="middle">id-token: write</text>
+
+  <rect class="d-box" x="40" y="250" width="200" height="70" rx="10"/>
+  <text class="d-text" x="140" y="280" text-anchor="middle">GitHub OIDC</text>
+  <text class="d-sub" x="140" y="300" text-anchor="middle">signs a JWT</text>
+
+  <line class="d-edge" x1="100" y1="140" x2="100" y2="250" marker-end="url(#oidc-trust-arrow)"/>
+  <line class="d-edge d-dashed" x1="180" y1="250" x2="180" y2="140" marker-end="url(#oidc-trust-arrow)"/>
+  <circle class="d-num" cx="82" cy="195" r="10"/><text class="d-num-text" x="82" y="195">1</text>
+  <circle class="d-num" cx="198" cy="195" r="10"/><text class="d-num-text" x="198" y="195">2</text>
+  <text class="d-sub" x="140" y="236" text-anchor="middle">JWT</text>
+
+  <!-- AWS side -->
+  <rect class="d-box" x="360" y="60" width="190" height="80" rx="10"/>
+  <text class="d-text" x="455" y="92" text-anchor="middle">AWS STS</text>
+  <text class="d-sub" x="455" y="114" text-anchor="middle">checks the JWT</text>
+
+  <rect class="d-box" x="590" y="60" width="170" height="80" rx="10"/>
+  <text class="d-text" x="675" y="92" text-anchor="middle">IAM role</text>
+  <text class="d-sub" x="675" y="114" text-anchor="middle">trust policy</text>
+
+  <rect class="d-box d-ok" x="360" y="180" width="190" height="64" rx="10"/>
+  <text class="d-text" x="455" y="208" text-anchor="middle">Lambda API</text>
+  <text class="d-sub" x="455" y="228" text-anchor="middle">update, publish, alias</text>
+
+  <!-- Job to STS and back -->
+  <line class="d-edge d-edge-accent" x1="240" y1="80" x2="360" y2="80" marker-end="url(#oidc-trust-arrow)"/>
+  <text class="d-sub" x="300" y="70" text-anchor="middle">JWT + role</text>
+  <circle class="d-num" cx="300" cy="96" r="10"/><text class="d-num-text" x="300" y="96">3</text>
+  <line class="d-edge d-dashed" x1="360" y1="116" x2="240" y2="116" marker-end="url(#oidc-trust-arrow)"/>
+  <text class="d-sub" x="300" y="134" text-anchor="middle">1-hour creds</text>
+
+  <line class="d-edge" x1="550" y1="100" x2="590" y2="100" marker-end="url(#oidc-trust-arrow)"/>
+
+  <!-- Job to Lambda -->
+  <path class="d-edge d-edge-ok" d="M225 140 V212 H360" marker-end="url(#oidc-trust-arrow)"/>
+  <text class="d-sub" x="300" y="202" text-anchor="middle">deploy</text>
+
+  <!-- Trust condition -->
+  <line class="d-edge d-dashed" x1="675" y1="140" x2="675" y2="280"/>
+  <rect class="d-box d-cyan" x="360" y="280" width="400" height="100" rx="10"/>
+  <text class="d-text" x="560" y="306" text-anchor="middle">Trust condition</text>
+  <text class="d-sub d-mono" x="560" y="330" text-anchor="middle">aud = sts.amazonaws.com</text>
+  <text class="d-sub d-mono" x="560" y="352" text-anchor="middle">sub = repo:my-org/my-repo:</text>
+  <text class="d-sub d-mono" x="560" y="370" text-anchor="middle">environment:production</text>
+</svg><figcaption>The job proves who it is with a signed token. The role's trust policy decides if that is enough.</figcaption></figure>
+<p>OIDC (OpenID Connect) is a standard way for one system to prove its identity to another with a signed token. Here is how it works:</p>
+<ol>
+<li>Your job asks GitHub for a token. This needs <code>permissions: id-token: write</code> in the workflow.</li>
+<li>GitHub signs a JWT (a JSON Web Token: a small signed JSON document). Its <code>sub</code> claim says who is asking, for example <code>repo:my-org/my-repo:environment:production</code>.</li>
+<li>The <code>aws-actions/configure-aws-credentials</code> action sends this token to AWS STS (Security Token Service) with <code>AssumeRoleWithWebIdentity</code>.</li>
+<li>STS checks the signature and the role&#39;s trust policy, then gives back credentials that expire within hours.</li>
+</ol>
+<p>The trust policy is where your security lives. Here is the one I use for prod:</p>
+<div class="code"><span class="code__lang">json</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#E6EDF3">{</span></span>
+<span class="line"><span style="color:#7EE787">  "Version"</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">"2012-10-17"</span><span style="color:#E6EDF3">,</span></span>
+<span class="line"><span style="color:#7EE787">  "Statement"</span><span style="color:#E6EDF3">: [{</span></span>
+<span class="line"><span style="color:#7EE787">    "Effect"</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">"Allow"</span><span style="color:#E6EDF3">,</span></span>
+<span class="line"><span style="color:#7EE787">    "Principal"</span><span style="color:#E6EDF3">: {</span></span>
+<span class="line"><span style="color:#7EE787">      "Federated"</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">"arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com"</span></span>
+<span class="line"><span style="color:#E6EDF3">    },</span></span>
+<span class="line"><span style="color:#7EE787">    "Action"</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">"sts:AssumeRoleWithWebIdentity"</span><span style="color:#E6EDF3">,</span></span>
+<span class="line"><span style="color:#7EE787">    "Condition"</span><span style="color:#E6EDF3">: {</span></span>
+<span class="line"><span style="color:#7EE787">      "StringEquals"</span><span style="color:#E6EDF3">: {</span></span>
+<span class="line"><span style="color:#7EE787">        "token.actions.githubusercontent.com:aud"</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">"sts.amazonaws.com"</span><span style="color:#E6EDF3">,</span></span>
+<span class="line"><span style="color:#7EE787">        "token.actions.githubusercontent.com:sub"</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">"repo:my-org/my-repo:environment:production"</span></span>
+<span class="line"><span style="color:#E6EDF3">      }</span></span>
+<span class="line"><span style="color:#E6EDF3">    }</span></span>
+<span class="line"><span style="color:#E6EDF3">  }]</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
+<p>One detail trips up a lot of people. <strong>If the job uses a GitHub environment, the <code>sub</code> claim uses the environment form (<code>…:environment:production</code>), not the branch form (<code>…:ref:refs/heads/main</code>).</strong> If your trust policy expects the branch but the job has <code>environment: production</code>, the login fails with &quot;Not authorized to perform sts:AssumeRoleWithWebIdentity&quot;. Write the condition for the form your job really sends.</p>
+<p>IAM also refuses a GitHub trust policy that has no <code>sub</code> condition, or one whose value is only <code>*</code>. That&#39;s good: without it, any GitHub repo in the world could take on your role.</p>
+<p>Here is the Terraform for the provider and the role:</p>
+<div class="code"><span class="code__lang">hcl</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FFA657">resource</span><span style="color:#79C0FF"> "aws_iam_openid_connect_provider"</span><span style="color:#79C0FF"> "github"</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">  url</span><span style="color:#FF7B72">            =</span><span style="color:#A5D6FF"> "https://token.actions.githubusercontent.com"</span></span>
+<span class="line"><span style="color:#E6EDF3">  client_id_list</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> [</span><span style="color:#A5D6FF">"sts.amazonaws.com"</span><span style="color:#E6EDF3">]</span></span>
+<span class="line"><span style="color:#8B949E">  # No thumbprint_list: for GitHub, AWS checks the certificate against its own trusted CAs.</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FFA657">data</span><span style="color:#79C0FF"> "aws_iam_policy_document"</span><span style="color:#79C0FF"> "gha_trust"</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#FFA657">  statement</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">    actions</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> [</span><span style="color:#A5D6FF">"sts:AssumeRoleWithWebIdentity"</span><span style="color:#E6EDF3">]</span></span>
+<span class="line"><span style="color:#FFA657">    principals</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">      type</span><span style="color:#FF7B72">        =</span><span style="color:#A5D6FF"> "Federated"</span></span>
+<span class="line"><span style="color:#E6EDF3">      identifiers</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> [aws_iam_openid_connect_provider</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">github</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">arn]</span></span>
+<span class="line"><span style="color:#E6EDF3">    }</span></span>
+<span class="line"><span style="color:#FFA657">    condition</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">      test</span><span style="color:#FF7B72">     =</span><span style="color:#A5D6FF"> "StringEquals"</span></span>
+<span class="line"><span style="color:#E6EDF3">      variable</span><span style="color:#FF7B72"> =</span><span style="color:#A5D6FF"> "token.actions.githubusercontent.com:aud"</span></span>
+<span class="line"><span style="color:#E6EDF3">      values</span><span style="color:#FF7B72">   =</span><span style="color:#E6EDF3"> [</span><span style="color:#A5D6FF">"sts.amazonaws.com"</span><span style="color:#E6EDF3">]</span></span>
+<span class="line"><span style="color:#E6EDF3">    }</span></span>
+<span class="line"><span style="color:#FFA657">    condition</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">      test</span><span style="color:#FF7B72">     =</span><span style="color:#A5D6FF"> "StringEquals"</span></span>
+<span class="line"><span style="color:#E6EDF3">      variable</span><span style="color:#FF7B72"> =</span><span style="color:#A5D6FF"> "token.actions.githubusercontent.com:sub"</span></span>
+<span class="line"><span style="color:#E6EDF3">      values</span><span style="color:#FF7B72">   =</span><span style="color:#E6EDF3"> [</span><span style="color:#A5D6FF">"repo:my-org/my-repo:environment:production"</span><span style="color:#E6EDF3">]</span></span>
+<span class="line"><span style="color:#E6EDF3">    }</span></span>
+<span class="line"><span style="color:#E6EDF3">  }</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FFA657">resource</span><span style="color:#79C0FF"> "aws_iam_role"</span><span style="color:#79C0FF"> "gha_deploy_prod"</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">  name</span><span style="color:#FF7B72">               =</span><span style="color:#A5D6FF"> "gha-lambda-deploy-prod"</span></span>
+<span class="line"><span style="color:#E6EDF3">  assume_role_policy</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> data</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">aws_iam_policy_document</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">gha_trust</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">json</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
+<aside class="callout callout--note"><p><strong>Note:</strong> Older guides tell you to work out a certificate thumbprint for GitHub. You don&#39;t need to anymore. Since July 2023, AWS checks GitHub&#39;s certificate against its own list of trusted root CAs and ignores any thumbprint you set. In current versions of the Terraform AWS provider, <code>thumbprint_list</code> is optional, so leave it out. On very old provider versions it was required, so upgrade if Terraform complains.</p>
+</aside>
+<p>Give the role only what the deploy needs: <code>lambda:UpdateFunctionCode</code>, <code>GetFunction</code>, <code>GetFunctionConfiguration</code>, <code>PublishVersion</code>, <code>GetAlias</code>, <code>UpdateAlias</code>, <code>ListVersionsByFunction</code>, <code>ListAliases</code> and <code>DeleteFunction</code> (for cleanup), plus <code>cloudwatch:DescribeAlarms</code> and <code>cloudwatch:GetMetricStatistics</code>. Scope the Lambda actions to your function ARNs, like <code>arn:aws:lambda:*:111122223333:function:orders-*</code>. Make one role per environment, so a staging job can never touch prod.</p>
+<h2 id="step-2-point-everything-at-the-alias"><a class="anchor" href="#step-2-point-everything-at-the-alias" aria-hidden="true" tabindex="-1">#</a>Step 2: point everything at the alias</h2>
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 390" class="diagram" role="img" aria-labelledby="where-things-point-t where-things-point-d">
+  <title id="where-things-point-t">Callers point at the alias</title>
+  <desc id="where-things-point-d">API Gateway, an SQS event source mapping and an EventBridge rule all call the live alias, which sends 90 percent of calls to version 7 and 10 percent to version 8; an unqualified ARN would call $LATEST, which you should never point at.</desc>
+  <defs>
+    <marker id="where-things-point-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker>
+  </defs>
+
+  <!-- Callers -->
+  <rect class="d-box" x="20" y="30" width="190" height="60" rx="10"/>
+  <text class="d-text" x="115" y="56" text-anchor="middle">API Gateway</text>
+  <text class="d-sub" x="115" y="76" text-anchor="middle">HTTP requests</text>
+
+  <rect class="d-box" x="20" y="120" width="190" height="60" rx="10"/>
+  <text class="d-text" x="115" y="146" text-anchor="middle">SQS mapping</text>
+  <text class="d-sub" x="115" y="166" text-anchor="middle">batches</text>
+
+  <rect class="d-box" x="20" y="210" width="190" height="60" rx="10"/>
+  <text class="d-text" x="115" y="236" text-anchor="middle">EventBridge rule</text>
+  <text class="d-sub" x="115" y="256" text-anchor="middle">async events</text>
+
+  <!-- Alias -->
+  <rect class="d-box d-accent" x="300" y="105" width="170" height="90" rx="10"/>
+  <text class="d-text" x="385" y="140" text-anchor="middle">alias: live</text>
+  <text class="d-sub d-mono" x="385" y="164" text-anchor="middle">orders:live</text>
+
+  <line class="d-edge d-edge-accent" x1="210" y1="60" x2="300" y2="128" marker-end="url(#where-things-point-arrow)"/>
+  <line class="d-edge d-edge-accent" x1="210" y1="150" x2="300" y2="150" marker-end="url(#where-things-point-arrow)"/>
+  <line class="d-edge d-edge-accent" x1="210" y1="240" x2="300" y2="172" marker-end="url(#where-things-point-arrow)"/>
+
+  <!-- Versions -->
+  <rect class="d-box" x="590" y="40" width="190" height="64" rx="10"/>
+  <text class="d-text" x="685" y="68" text-anchor="middle">Version 7</text>
+  <text class="d-sub" x="685" y="88" text-anchor="middle">current code</text>
+
+  <rect class="d-box" x="590" y="196" width="190" height="64" rx="10"/>
+  <text class="d-text" x="685" y="224" text-anchor="middle">Version 8</text>
+  <text class="d-sub" x="685" y="244" text-anchor="middle">new code</text>
+
+  <line class="d-edge" x1="470" y1="130" x2="590" y2="76" marker-end="url(#where-things-point-arrow)"/>
+  <text class="d-sub" x="530" y="88" text-anchor="middle">90%</text>
+  <line class="d-edge" x1="470" y1="170" x2="590" y2="224" marker-end="url(#where-things-point-arrow)"/>
+  <text class="d-sub" x="530" y="226" text-anchor="middle">10%</text>
+
+  <!-- Never here -->
+  <rect class="d-box d-warn" x="20" y="306" width="190" height="60" rx="10"/>
+  <text class="d-text" x="115" y="332" text-anchor="middle">Plain function ARN</text>
+  <text class="d-sub d-mono" x="115" y="352" text-anchor="middle">orders</text>
+
+  <rect class="d-box d-warn" x="590" y="306" width="190" height="60" rx="10"/>
+  <text class="d-text" x="685" y="332" text-anchor="middle">$LATEST</text>
+  <text class="d-sub" x="685" y="352" text-anchor="middle">never point here</text>
+
+  <line class="d-edge d-edge-warn d-dashed" x1="210" y1="336" x2="590" y2="336" marker-end="url(#where-things-point-arrow)"/>
+  <text class="d-sub" x="400" y="326" text-anchor="middle">changes on every upload</text>
+</svg><figcaption>Callers only know 'live'. Only the alias knows about versions.</figcaption></figure>
+<p>This is the step people skip, and then their &quot;canary&quot; does nothing. If API Gateway calls the plain function ARN (<code>…:function:orders</code>), it calls <code>$LATEST</code>. The moment CI uploads a new zip, 100% of your users get untested code. No alias trick can help after that.</p>
+<p>So every caller must use the <strong>alias ARN</strong> (<code>…:function:orders:live</code>):</p>
+<ul>
+<li><strong>API Gateway / Function URL:</strong> the integration URI uses the alias, and the <code>lambda:InvokeFunction</code> permission has <code>--qualifier live</code>. A permission on the plain function does not cover the alias.</li>
+<li><strong>Event source mappings</strong> (SQS, Kinesis, DynamoDB streams): set <code>FunctionName</code> to the alias ARN.</li>
+<li><strong>S3, SNS, EventBridge:</strong> the target is the alias ARN, and the resource policy is on the alias.</li>
+</ul>
+<p>In Terraform, let Terraform create the alias and the wiring, and let CI own the version numbers:</p>
+<div class="code"><span class="code__lang">hcl</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FFA657">resource</span><span style="color:#79C0FF"> "aws_lambda_alias"</span><span style="color:#79C0FF"> "live"</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">  name</span><span style="color:#FF7B72">             =</span><span style="color:#A5D6FF"> "live"</span></span>
+<span class="line"><span style="color:#E6EDF3">  function_name</span><span style="color:#FF7B72">    =</span><span style="color:#E6EDF3"> aws_lambda_function</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">orders</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">function_name</span></span>
+<span class="line"><span style="color:#E6EDF3">  function_version</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> aws_lambda_function</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">orders</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">version </span><span style="color:#8B949E"># only used on first create</span></span>
+<span class="line"><span style="color:#FFA657">  lifecycle</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">    ignore_changes</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> [function_version, routing_config] </span><span style="color:#8B949E"># CI moves these</span></span>
+<span class="line"><span style="color:#E6EDF3">  }</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FFA657">resource</span><span style="color:#79C0FF"> "aws_lambda_permission"</span><span style="color:#79C0FF"> "apigw"</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">  statement_id</span><span style="color:#FF7B72">  =</span><span style="color:#A5D6FF"> "apigw-live"</span></span>
+<span class="line"><span style="color:#E6EDF3">  action</span><span style="color:#FF7B72">        =</span><span style="color:#A5D6FF"> "lambda:InvokeFunction"</span></span>
+<span class="line"><span style="color:#E6EDF3">  function_name</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> aws_lambda_function</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">orders</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">function_name</span></span>
+<span class="line"><span style="color:#E6EDF3">  qualifier</span><span style="color:#FF7B72">     =</span><span style="color:#E6EDF3"> aws_lambda_alias</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">live</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">name</span></span>
+<span class="line"><span style="color:#E6EDF3">  principal</span><span style="color:#FF7B72">     =</span><span style="color:#A5D6FF"> "apigateway.amazonaws.com"</span></span>
+<span class="line"><span style="color:#E6EDF3">  source_arn</span><span style="color:#FF7B72">    =</span><span style="color:#A5D6FF"> "</span><span style="color:#FF7B72">${</span><span style="color:#E6EDF3">aws_apigatewayv2_api</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">http</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">execution_arn</span><span style="color:#FF7B72">}</span><span style="color:#A5D6FF">/*/*"</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#8B949E"># In the API Gateway integration:</span></span>
+<span class="line"><span style="color:#8B949E">#   integration_uri = aws_lambda_alias.live.invoke_arn</span></span></code></pre></div>
+<p>Also add <code>filename</code> and <code>source_code_hash</code> to <code>ignore_changes</code> on <code>aws_lambda_function</code>. If you don&#39;t, the next <code>terraform apply</code> puts back whatever zip Terraform last saw, and that zip lands on <code>$LATEST</code>.</p>
+<h2 id="step-3-upload-wait-publish"><a class="anchor" href="#step-3-upload-wait-publish" aria-hidden="true" tabindex="-1">#</a>Step 3: upload, wait, publish</h2>
+<p>Each deploy runs three AWS CLI calls:</p>
+<div class="code"><span class="code__lang">bash</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#E6EDF3">sha</span><span style="color:#FF7B72">=</span><span style="color:#E6EDF3">$(</span><span style="color:#FFA657">aws</span><span style="color:#A5D6FF"> lambda</span><span style="color:#A5D6FF"> update-function-code</span><span style="color:#79C0FF"> --function-name</span><span style="color:#A5D6FF"> orders</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#79C0FF">  --zip-file</span><span style="color:#A5D6FF"> fileb://function.zip</span><span style="color:#79C0FF"> --query</span><span style="color:#A5D6FF"> CodeSha256</span><span style="color:#79C0FF"> --output</span><span style="color:#A5D6FF"> text</span><span style="color:#E6EDF3">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FFA657">aws</span><span style="color:#A5D6FF"> lambda</span><span style="color:#A5D6FF"> wait</span><span style="color:#A5D6FF"> function-updated</span><span style="color:#79C0FF"> --function-name</span><span style="color:#A5D6FF"> orders</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E6EDF3">ver</span><span style="color:#FF7B72">=</span><span style="color:#E6EDF3">$(</span><span style="color:#FFA657">aws</span><span style="color:#A5D6FF"> lambda</span><span style="color:#A5D6FF"> publish-version</span><span style="color:#79C0FF"> --function-name</span><span style="color:#A5D6FF"> orders</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#79C0FF">  --code-sha256</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$sha</span><span style="color:#A5D6FF">"</span><span style="color:#79C0FF"> --description</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$GITHUB_SHA</span><span style="color:#A5D6FF">"</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#79C0FF">  --query</span><span style="color:#A5D6FF"> Version</span><span style="color:#79C0FF"> --output</span><span style="color:#A5D6FF"> text</span><span style="color:#E6EDF3">)</span></span></code></pre></div>
+<p>Here is why each piece is there:</p>
+<ul>
+<li><strong><code>wait function-updated</code></strong>: <code>update-function-code</code> returns before the update is done. If you publish too early, you get a <code>ResourceConflictException</code>, or a version of the old code.</li>
+<li><strong><code>--code-sha256</code></strong>: this makes <code>publish-version</code> fail if someone else changed <code>$LATEST</code> between your upload and your publish. You freeze exactly the zip you tested, or nothing.</li>
+<li><strong><code>--description &quot;$GITHUB_SHA&quot;</code></strong>: later, <code>list-versions-by-function</code> tells you which commit each version came from.</li>
+</ul>
+<p>Watch out for one edge case: if nothing changed since the last version, Lambda doesn&#39;t make a new one. It hands back the existing one. The canary script below checks for this and exits early.</p>
+<h2 id="step-4-move-traffic-slowly"><a class="anchor" href="#step-4-move-traffic-slowly" aria-hidden="true" tabindex="-1">#</a>Step 4: move traffic slowly</h2>
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" class="diagram" role="img" aria-labelledby="alias-weights-t alias-weights-d">
+  <title id="alias-weights-t">Alias traffic weights over time</title>
+  <desc id="alias-weights-d">Three stacked bars for the live alias: before the deploy v7 gets 100 percent, at t0 v7 gets 90 percent and v8 gets 10 percent, and at t plus 5 minutes v8 gets 100 percent.</desc>
+
+  <!-- Legend -->
+  <rect class="d-fill-cyan" x="190" y="22" width="16" height="16" rx="3"/>
+  <text class="d-sub" x="214" y="35">v7 (current)</text>
+  <rect class="d-fill-accent" x="320" y="22" width="16" height="16" rx="3"/>
+  <text class="d-sub" x="344" y="35">v8 (new)</text>
+
+  <!-- Gridlines -->
+  <line class="d-grid" x1="190" y1="60" x2="190" y2="250"/>
+  <line class="d-grid" x1="330" y1="60" x2="330" y2="250"/>
+  <line class="d-grid" x1="470" y1="60" x2="470" y2="250"/>
+  <line class="d-grid" x1="610" y1="60" x2="610" y2="250"/>
+  <line class="d-grid" x1="750" y1="60" x2="750" y2="250"/>
+
+  <!-- Row labels -->
+  <text class="d-text" x="170" y="92" text-anchor="end">Before</text>
+  <text class="d-text" x="170" y="157" text-anchor="end">t0: canary</text>
+  <text class="d-text" x="170" y="222" text-anchor="end">t+5 min: done</text>
+
+  <!-- Bars (560 px = 100%) -->
+  <rect class="d-fill-cyan" x="190" y="68" width="560" height="40"/>
+  <text class="d-text" x="470" y="93" text-anchor="middle">v7 · 100%</text>
+
+  <rect class="d-fill-cyan" x="190" y="133" width="504" height="40"/>
+  <rect class="d-fill-accent" x="694" y="133" width="56" height="40"/>
+  <text class="d-text" x="442" y="158" text-anchor="middle">v7 · 90%</text>
+  <text class="d-text" x="722" y="158" text-anchor="middle">10%</text>
+
+  <rect class="d-fill-accent" x="190" y="198" width="560" height="40"/>
+  <text class="d-text" x="470" y="223" text-anchor="middle">v8 · 100%</text>
+
+  <!-- Axis -->
+  <line class="d-axis" x1="190" y1="250" x2="750" y2="250"/>
+  <text class="d-sub" x="190" y="272" text-anchor="middle">0%</text>
+  <text class="d-sub" x="330" y="272" text-anchor="middle">25%</text>
+  <text class="d-sub" x="470" y="272" text-anchor="middle">50%</text>
+  <text class="d-sub" x="610" y="272" text-anchor="middle">75%</text>
+  <text class="d-sub" x="750" y="272" text-anchor="middle">100%</text>
+  <text class="d-sub" x="470" y="292" text-anchor="middle">share of calls to the live alias</text>
+</svg><figcaption>A 10% canary for five minutes, then all traffic moves to v8.</figcaption></figure>
+<p>A weighted alias holds one main version plus <code>AdditionalVersionWeights</code>, which is a map of one other version to a share between 0 and 1. With <code>{&quot;8&quot;: 0.1}</code>, about 10% of calls go to v8 and the rest go to v7. Both versions must have the same execution role and the same dead-letter queue setup, and neither can be <code>$LATEST</code>.</p>
+<p>You have two ways to drive this.</p>
+<h3 id="option-a-let-codedeploy-do-it"><a class="anchor" href="#option-a-let-codedeploy-do-it" aria-hidden="true" tabindex="-1">#</a>Option A: let CodeDeploy do it</h3>
+<p>CodeDeploy knows how to shift Lambda alias traffic. You make an app and a deployment group once (in Terraform). Then each deploy is one API call. <code>CodeDeployDefault.LambdaCanary10Percent5Minutes</code> sends 10% for five minutes, then the other 90%. If an alarm you attached goes off while it runs, CodeDeploy stops and puts the alias back by itself.</p>
+<div class="code"><span class="code__lang">hcl</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FFA657">resource</span><span style="color:#79C0FF"> "aws_codedeploy_app"</span><span style="color:#79C0FF"> "orders"</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">  name</span><span style="color:#FF7B72">             =</span><span style="color:#A5D6FF"> "orders"</span></span>
+<span class="line"><span style="color:#E6EDF3">  compute_platform</span><span style="color:#FF7B72"> =</span><span style="color:#A5D6FF"> "Lambda"</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FFA657">resource</span><span style="color:#79C0FF"> "aws_codedeploy_deployment_group"</span><span style="color:#79C0FF"> "live"</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">  app_name</span><span style="color:#FF7B72">               =</span><span style="color:#E6EDF3"> aws_codedeploy_app</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">orders</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">name</span></span>
+<span class="line"><span style="color:#E6EDF3">  deployment_group_name</span><span style="color:#FF7B72">  =</span><span style="color:#A5D6FF"> "live"</span></span>
+<span class="line"><span style="color:#E6EDF3">  service_role_arn</span><span style="color:#FF7B72">       =</span><span style="color:#E6EDF3"> aws_iam_role</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">codedeploy</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">arn </span><span style="color:#8B949E"># AWSCodeDeployRoleForLambda</span></span>
+<span class="line"><span style="color:#E6EDF3">  deployment_config_name</span><span style="color:#FF7B72"> =</span><span style="color:#A5D6FF"> "CodeDeployDefault.LambdaCanary10Percent5Minutes"</span></span>
+<span class="line"><span style="color:#FFA657">  deployment_style</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">    deployment_type</span><span style="color:#FF7B72">   =</span><span style="color:#A5D6FF"> "BLUE_GREEN"</span></span>
+<span class="line"><span style="color:#E6EDF3">    deployment_option</span><span style="color:#FF7B72"> =</span><span style="color:#A5D6FF"> "WITH_TRAFFIC_CONTROL"</span></span>
+<span class="line"><span style="color:#E6EDF3">  }</span></span>
+<span class="line"><span style="color:#FFA657">  alarm_configuration</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">    enabled</span><span style="color:#FF7B72"> =</span><span style="color:#79C0FF"> true</span></span>
+<span class="line"><span style="color:#E6EDF3">    alarms</span><span style="color:#FF7B72">  =</span><span style="color:#E6EDF3"> [aws_cloudwatch_metric_alarm</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">orders_live_errors</span><span style="color:#FF7B72">.</span><span style="color:#E6EDF3">alarm_name]</span></span>
+<span class="line"><span style="color:#E6EDF3">  }</span></span>
+<span class="line"><span style="color:#FFA657">  auto_rollback_configuration</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">    enabled</span><span style="color:#FF7B72"> =</span><span style="color:#79C0FF"> true</span></span>
+<span class="line"><span style="color:#E6EDF3">    events</span><span style="color:#FF7B72">  =</span><span style="color:#E6EDF3"> [</span><span style="color:#A5D6FF">"DEPLOYMENT_FAILURE"</span><span style="color:#E6EDF3">, </span><span style="color:#A5D6FF">"DEPLOYMENT_STOP_ON_ALARM"</span><span style="color:#E6EDF3">]</span></span>
+<span class="line"><span style="color:#E6EDF3">  }</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
+<p>From the workflow, after <code>publish-version</code>, you pass an AppSpec (the small file that tells CodeDeploy which alias to move, and from which version to which) right in the call:</p>
+<div class="code"><span class="code__lang">bash</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#E6EDF3">cur</span><span style="color:#FF7B72">=</span><span style="color:#E6EDF3">$(</span><span style="color:#FFA657">aws</span><span style="color:#A5D6FF"> lambda</span><span style="color:#A5D6FF"> get-alias</span><span style="color:#79C0FF"> --function-name</span><span style="color:#A5D6FF"> orders</span><span style="color:#79C0FF"> --name</span><span style="color:#A5D6FF"> live</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#79C0FF">  --query</span><span style="color:#A5D6FF"> FunctionVersion</span><span style="color:#79C0FF"> --output</span><span style="color:#A5D6FF"> text</span><span style="color:#E6EDF3">)</span></span>
+<span class="line"><span style="color:#E6EDF3">appspec</span><span style="color:#FF7B72">=</span><span style="color:#E6EDF3">$(</span><span style="color:#FFA657">cat</span><span style="color:#FF7B72"> &#x3C;&#x3C;</span><span style="color:#E6EDF3">EOF</span></span>
+<span class="line"><span style="color:#A5D6FF">{"version":0.0,"Resources":[{"orders":{"Type":"AWS::Lambda::Function",</span></span>
+<span class="line"><span style="color:#A5D6FF"> "Properties":{"Name":"orders","Alias":"live","CurrentVersion":"</span><span style="color:#E6EDF3">$cur</span><span style="color:#A5D6FF">","TargetVersion":"</span><span style="color:#E6EDF3">$ver</span><span style="color:#A5D6FF">"}}}]}</span></span>
+<span class="line"><span style="color:#E6EDF3">EOF</span></span>
+<span class="line"><span style="color:#E6EDF3">)</span></span>
+<span class="line"><span style="color:#E6EDF3">id</span><span style="color:#FF7B72">=</span><span style="color:#E6EDF3">$(</span><span style="color:#FFA657">aws</span><span style="color:#A5D6FF"> deploy</span><span style="color:#A5D6FF"> create-deployment</span><span style="color:#79C0FF"> --application-name</span><span style="color:#A5D6FF"> orders</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#79C0FF">  --deployment-group-name</span><span style="color:#A5D6FF"> live</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#79C0FF">  --revision</span><span style="color:#A5D6FF"> "$(</span><span style="color:#FFA657">jq</span><span style="color:#79C0FF"> -nc</span><span style="color:#79C0FF"> --arg</span><span style="color:#A5D6FF"> c "</span><span style="color:#E6EDF3">$appspec</span><span style="color:#A5D6FF">" </span><span style="color:#FF7B72">\</span></span>
+<span class="line"><span style="color:#A5D6FF">     '{revisionType:"AppSpecContent",appSpecContent:{content:$c}}')"</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#79C0FF">  --query</span><span style="color:#A5D6FF"> deploymentId</span><span style="color:#79C0FF"> --output</span><span style="color:#A5D6FF"> text</span><span style="color:#E6EDF3">)</span></span>
+<span class="line"><span style="color:#FFA657">aws</span><span style="color:#A5D6FF"> deploy</span><span style="color:#A5D6FF"> wait</span><span style="color:#A5D6FF"> deployment-successful</span><span style="color:#79C0FF"> --deployment-id</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$id</span><span style="color:#A5D6FF">"</span></span></code></pre></div>
+<p>The waiter fails if the deployment fails or rolls back, so your job goes red. The deploy role also needs <code>codedeploy:CreateDeployment</code>, <code>GetDeployment</code>, <code>GetDeploymentConfig</code>, <code>RegisterApplicationRevision</code> and <code>GetApplicationRevision</code>. You can also add <code>BeforeAllowTraffic</code> hooks: a Lambda that runs a smoke test before any real traffic moves.</p>
+<h3 id="option-b-a-small-script-you-can-read"><a class="anchor" href="#option-b-a-small-script-you-can-read" aria-hidden="true" tabindex="-1">#</a>Option B: a small script you can read</h3>
+<p>If you don&#39;t want another service, the same logic fits in a short script. It shifts 10%, checks every minute for five minutes, then promotes or rolls back. It looks at two signals: the alias-level error alarm, and the <code>Errors</code> metric for <strong>only the new version</strong>. The <code>ExecutedVersion</code> dimension in CloudWatch splits alias metrics by the version that really ran.</p>
+<div class="code"><span class="code__lang">bash</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#8B949E">#!/usr/bin/env bash</span></span>
+<span class="line"><span style="color:#8B949E"># scripts/canary.sh &#x3C;function> &#x3C;alias> &#x3C;new-version></span></span>
+<span class="line"><span style="color:#79C0FF">set</span><span style="color:#79C0FF"> -euo</span><span style="color:#A5D6FF"> pipefail</span></span>
+<span class="line"><span style="color:#E6EDF3">fn</span><span style="color:#FF7B72">=</span><span style="color:#FFA657">$1</span><span style="color:#E6EDF3">; alias</span><span style="color:#FF7B72">=</span><span style="color:#FFA657">$2</span><span style="color:#E6EDF3">; new</span><span style="color:#FF7B72">=</span><span style="color:#FFA657">$3</span></span>
+<span class="line"><span style="color:#E6EDF3">weight</span><span style="color:#FF7B72">=</span><span style="color:#E6EDF3">${CANARY_WEIGHT</span><span style="color:#FF7B72">:-</span><span style="color:#E6EDF3">0.1}; minutes</span><span style="color:#FF7B72">=</span><span style="color:#E6EDF3">${BAKE_MINUTES</span><span style="color:#FF7B72">:-</span><span style="color:#E6EDF3">5}; alarm</span><span style="color:#FF7B72">=</span><span style="color:#A5D6FF">"</span><span style="color:#E6EDF3">$fn</span><span style="color:#A5D6FF">-</span><span style="color:#E6EDF3">$alias</span><span style="color:#A5D6FF">-errors"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#E6EDF3">old</span><span style="color:#FF7B72">=</span><span style="color:#E6EDF3">$(</span><span style="color:#FFA657">aws</span><span style="color:#A5D6FF"> lambda</span><span style="color:#A5D6FF"> get-alias</span><span style="color:#79C0FF"> --function-name</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$fn</span><span style="color:#A5D6FF">"</span><span style="color:#79C0FF"> --name</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$alias</span><span style="color:#A5D6FF">"</span><span style="color:#79C0FF"> --query</span><span style="color:#A5D6FF"> FunctionVersion</span><span style="color:#79C0FF"> --output</span><span style="color:#A5D6FF"> text</span><span style="color:#E6EDF3">)</span></span>
+<span class="line"><span style="color:#E6EDF3">[ </span><span style="color:#A5D6FF">"</span><span style="color:#E6EDF3">$old</span><span style="color:#A5D6FF">"</span><span style="color:#FF7B72"> =</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$new</span><span style="color:#A5D6FF">"</span><span style="color:#E6EDF3"> ] &#x26;&#x26; { </span><span style="color:#79C0FF">echo</span><span style="color:#A5D6FF"> "v</span><span style="color:#E6EDF3">$new</span><span style="color:#A5D6FF"> is already live"</span><span style="color:#E6EDF3">; </span><span style="color:#79C0FF">exit</span><span style="color:#79C0FF"> 0</span><span style="color:#E6EDF3">; }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D2A8FF">point</span><span style="color:#E6EDF3">() { </span><span style="color:#FFA657">aws</span><span style="color:#A5D6FF"> lambda</span><span style="color:#A5D6FF"> update-alias</span><span style="color:#79C0FF"> --function-name</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$fn</span><span style="color:#A5D6FF">"</span><span style="color:#79C0FF"> --name</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$alias</span><span style="color:#A5D6FF">"</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#79C0FF">  --function-version</span><span style="color:#A5D6FF"> "</span><span style="color:#79C0FF">$1</span><span style="color:#A5D6FF">"</span><span style="color:#79C0FF"> --routing-config</span><span style="color:#A5D6FF"> 'AdditionalVersionWeights={}'</span><span style="color:#FF7B72"> ></span><span style="color:#A5D6FF"> /dev/null</span><span style="color:#E6EDF3">; }</span></span>
+<span class="line"><span style="color:#D2A8FF">rollback</span><span style="color:#E6EDF3">() { </span><span style="color:#79C0FF">trap</span><span style="color:#A5D6FF"> -</span><span style="color:#A5D6FF"> ERR</span><span style="color:#A5D6FF"> INT</span><span style="color:#A5D6FF"> TERM</span><span style="color:#E6EDF3">; </span><span style="color:#FFA657">point</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$old</span><span style="color:#A5D6FF">"</span><span style="color:#E6EDF3">; </span><span style="color:#79C0FF">echo</span><span style="color:#A5D6FF"> "::error::</span><span style="color:#E6EDF3">$fn</span><span style="color:#A5D6FF"> rolled back to v</span><span style="color:#E6EDF3">$old</span><span style="color:#A5D6FF">"</span><span style="color:#E6EDF3">; </span><span style="color:#79C0FF">exit</span><span style="color:#79C0FF"> 1</span><span style="color:#E6EDF3">; }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FFA657">aws</span><span style="color:#A5D6FF"> lambda</span><span style="color:#A5D6FF"> update-alias</span><span style="color:#79C0FF"> --function-name</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$fn</span><span style="color:#A5D6FF">"</span><span style="color:#79C0FF"> --name</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$alias</span><span style="color:#A5D6FF">"</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#79C0FF">  --routing-config</span><span style="color:#A5D6FF"> "AdditionalVersionWeights={</span><span style="color:#FF7B72">\"</span><span style="color:#E6EDF3">$new</span><span style="color:#FF7B72">\"</span><span style="color:#A5D6FF">=</span><span style="color:#E6EDF3">$weight</span><span style="color:#A5D6FF">}"</span><span style="color:#FF7B72"> ></span><span style="color:#A5D6FF"> /dev/null</span></span>
+<span class="line"><span style="color:#79C0FF">trap</span><span style="color:#A5D6FF"> rollback</span><span style="color:#A5D6FF"> ERR</span><span style="color:#A5D6FF"> INT</span><span style="color:#A5D6FF"> TERM</span><span style="color:#8B949E">   # a cancelled or crashed job must not leave the split in place</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">for</span><span style="color:#E6EDF3"> i </span><span style="color:#FF7B72">in</span><span style="color:#E6EDF3"> $(</span><span style="color:#FFA657">seq</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$minutes</span><span style="color:#A5D6FF">"</span><span style="color:#E6EDF3">); </span><span style="color:#FF7B72">do</span></span>
+<span class="line"><span style="color:#FFA657">  sleep</span><span style="color:#79C0FF"> 60</span></span>
+<span class="line"><span style="color:#E6EDF3">  state</span><span style="color:#FF7B72">=</span><span style="color:#E6EDF3">$(</span><span style="color:#FFA657">aws</span><span style="color:#A5D6FF"> cloudwatch</span><span style="color:#A5D6FF"> describe-alarms</span><span style="color:#79C0FF"> --alarm-names</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$alarm</span><span style="color:#A5D6FF">"</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#79C0FF">    --query</span><span style="color:#A5D6FF"> 'MetricAlarms[0].StateValue'</span><span style="color:#79C0FF"> --output</span><span style="color:#A5D6FF"> text</span><span style="color:#E6EDF3">)</span></span>
+<span class="line"><span style="color:#E6EDF3">  errors</span><span style="color:#FF7B72">=</span><span style="color:#E6EDF3">$(</span><span style="color:#FFA657">aws</span><span style="color:#A5D6FF"> cloudwatch</span><span style="color:#A5D6FF"> get-metric-statistics</span><span style="color:#79C0FF"> --namespace</span><span style="color:#A5D6FF"> AWS/Lambda</span><span style="color:#79C0FF"> --metric-name</span><span style="color:#A5D6FF"> Errors</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#79C0FF">    --dimensions</span><span style="color:#A5D6FF"> Name=FunctionName,Value="</span><span style="color:#E6EDF3">$fn</span><span style="color:#A5D6FF">"</span><span style="color:#A5D6FF"> Name=Resource,Value="</span><span style="color:#E6EDF3">$fn</span><span style="color:#A5D6FF">:</span><span style="color:#E6EDF3">$alias</span><span style="color:#A5D6FF">"</span><span style="color:#A5D6FF"> Name=ExecutedVersion,Value="</span><span style="color:#E6EDF3">$new</span><span style="color:#A5D6FF">"</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#79C0FF">    --start-time</span><span style="color:#A5D6FF"> "$(</span><span style="color:#FFA657">date</span><span style="color:#79C0FF"> -u</span><span style="color:#79C0FF"> -d</span><span style="color:#A5D6FF"> '-3 min' +%FT%TZ)"</span><span style="color:#79C0FF"> --end-time</span><span style="color:#A5D6FF"> "$(</span><span style="color:#FFA657">date</span><span style="color:#79C0FF"> -u</span><span style="color:#A5D6FF"> +%FT%TZ)"</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#79C0FF">    --period</span><span style="color:#79C0FF"> 60</span><span style="color:#79C0FF"> --statistics</span><span style="color:#A5D6FF"> Sum</span><span style="color:#79C0FF"> --query</span><span style="color:#A5D6FF"> 'sum(Datapoints[].Sum)'</span><span style="color:#79C0FF"> --output</span><span style="color:#A5D6FF"> text</span><span style="color:#E6EDF3">)</span></span>
+<span class="line"><span style="color:#79C0FF">  echo</span><span style="color:#A5D6FF"> "minute </span><span style="color:#E6EDF3">$i</span><span style="color:#A5D6FF">: alarm=</span><span style="color:#E6EDF3">$state</span><span style="color:#A5D6FF">, v</span><span style="color:#E6EDF3">$new</span><span style="color:#A5D6FF"> errors=</span><span style="color:#E6EDF3">$errors</span><span style="color:#A5D6FF">"</span></span>
+<span class="line"><span style="color:#FF7B72">  if</span><span style="color:#E6EDF3"> [ </span><span style="color:#A5D6FF">"</span><span style="color:#E6EDF3">$state</span><span style="color:#A5D6FF">"</span><span style="color:#FF7B72"> =</span><span style="color:#A5D6FF"> "ALARM"</span><span style="color:#E6EDF3"> ] </span><span style="color:#FF7B72">||</span><span style="color:#E6EDF3"> [ </span><span style="color:#A5D6FF">"${</span><span style="color:#E6EDF3">errors</span><span style="color:#FF7B72">%</span><span style="color:#A5D6FF">.</span><span style="color:#FF7B72">*</span><span style="color:#A5D6FF">}"</span><span style="color:#FF7B72"> -gt</span><span style="color:#79C0FF"> 0</span><span style="color:#E6EDF3"> ]; </span><span style="color:#FF7B72">then</span><span style="color:#FFA657"> rollback</span><span style="color:#E6EDF3">; </span><span style="color:#FF7B72">fi</span></span>
+<span class="line"><span style="color:#FF7B72">done</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79C0FF">trap</span><span style="color:#A5D6FF"> -</span><span style="color:#A5D6FF"> ERR</span><span style="color:#A5D6FF"> INT</span><span style="color:#A5D6FF"> TERM</span></span>
+<span class="line"><span style="color:#FFA657">point</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$new</span><span style="color:#A5D6FF">"</span></span>
+<span class="line"><span style="color:#79C0FF">echo</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$fn</span><span style="color:#A5D6FF">:</span><span style="color:#E6EDF3">$alias</span><span style="color:#A5D6FF"> -> v</span><span style="color:#E6EDF3">$new</span><span style="color:#A5D6FF"> (100%)"</span></span></code></pre></div>
+<p>&quot;Any error at all&quot; is a strict rule. For a busy function, swap it for an error rate (<code>Errors</code> ÷ <code>Invocations</code> for the new version) and a minimum number of calls, so one unlucky timeout doesn&#39;t block every release.</p>
+<h2 id="the-full-workflow-option-b-monorepo-ready"><a class="anchor" href="#the-full-workflow-option-b-monorepo-ready" aria-hidden="true" tabindex="-1">#</a>The full workflow (option B, monorepo-ready)</h2>
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 320" class="diagram" role="img" aria-labelledby="monorepo-matrix-t monorepo-matrix-d">
+  <title id="monorepo-matrix-t">Deploy only changed functions</title>
+  <desc id="monorepo-matrix-d">A git diff finds that the orders and billing folders changed and users did not, so the changes job outputs a list of two names and the matrix starts one deploy job each for orders and billing, with no job for users.</desc>
+  <defs>
+    <marker id="monorepo-matrix-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker>
+  </defs>
+
+  <!-- Repo -->
+  <rect class="d-zone" x="20" y="30" width="210" height="260" rx="10"/>
+  <text class="d-zone-label" x="36" y="52">functions/</text>
+
+  <rect class="d-box d-accent" x="40" y="70" width="170" height="56" rx="10"/>
+  <text class="d-text d-mono" x="125" y="94" text-anchor="middle">orders/</text>
+  <text class="d-sub" x="125" y="114" text-anchor="middle">changed</text>
+
+  <rect class="d-box d-accent" x="40" y="150" width="170" height="56" rx="10"/>
+  <text class="d-text d-mono" x="125" y="174" text-anchor="middle">billing/</text>
+  <text class="d-sub" x="125" y="194" text-anchor="middle">changed</text>
+
+  <rect class="d-box" x="40" y="230" width="170" height="44" rx="10"/>
+  <text class="d-sub d-mono" x="125" y="257" text-anchor="middle">users/  no change</text>
+
+  <!-- Changes job -->
+  <rect class="d-box" x="310" y="128" width="200" height="76" rx="10"/>
+  <text class="d-text" x="410" y="158" text-anchor="middle">changes job</text>
+  <text class="d-sub d-mono" x="410" y="182" text-anchor="middle">["orders","billing"]</text>
+
+  <line class="d-edge" x1="230" y1="166" x2="310" y2="166" marker-end="url(#monorepo-matrix-arrow)"/>
+  <text class="d-sub" x="270" y="156" text-anchor="middle">git diff</text>
+
+  <!-- Matrix -->
+  <rect class="d-box d-ok" x="590" y="40" width="190" height="64" rx="10"/>
+  <text class="d-text" x="685" y="68" text-anchor="middle">deploy orders</text>
+  <text class="d-sub" x="685" y="88" text-anchor="middle">own canary</text>
+
+  <rect class="d-box d-ok" x="590" y="134" width="190" height="64" rx="10"/>
+  <text class="d-text" x="685" y="162" text-anchor="middle">deploy billing</text>
+  <text class="d-sub" x="685" y="182" text-anchor="middle">own canary</text>
+
+  <rect class="d-box" x="590" y="228" width="190" height="52" rx="10"/>
+  <text class="d-sub" x="685" y="259" text-anchor="middle">users: no job</text>
+
+  <line class="d-edge d-edge-ok" x1="510" y1="150" x2="590" y2="76" marker-end="url(#monorepo-matrix-arrow)"/>
+  <line class="d-edge d-edge-ok" x1="510" y1="166" x2="590" y2="166" marker-end="url(#monorepo-matrix-arrow)"/>
+  <text class="d-sub" x="550" y="200" text-anchor="middle">matrix</text>
+</svg><figcaption>Only folders with changes get a deploy job. Each job runs its own canary.</figcaption></figure>
+<p>This workflow assumes one folder per function under <code>functions/</code>, with the folder name the same as the Lambda function name. The first job finds which folders changed. The second job runs once per changed function.</p>
+<div class="code"><span class="code__lang">yaml</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#7EE787">name</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">deploy-lambdas</span></span>
+<span class="line"><span style="color:#79C0FF">on</span><span style="color:#E6EDF3">:</span></span>
+<span class="line"><span style="color:#7EE787">  push</span><span style="color:#E6EDF3">:</span></span>
+<span class="line"><span style="color:#7EE787">    branches</span><span style="color:#E6EDF3">: [</span><span style="color:#A5D6FF">main</span><span style="color:#E6EDF3">]</span></span>
+<span class="line"><span style="color:#7EE787">    paths</span><span style="color:#E6EDF3">: [</span><span style="color:#A5D6FF">"functions/**"</span><span style="color:#E6EDF3">]</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7EE787">jobs</span><span style="color:#E6EDF3">:</span></span>
+<span class="line"><span style="color:#7EE787">  changes</span><span style="color:#E6EDF3">:</span></span>
+<span class="line"><span style="color:#7EE787">    runs-on</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">ubuntu-latest</span></span>
+<span class="line"><span style="color:#7EE787">    permissions</span><span style="color:#E6EDF3">: { </span><span style="color:#7EE787">contents</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">read</span><span style="color:#E6EDF3"> }</span></span>
+<span class="line"><span style="color:#7EE787">    outputs</span><span style="color:#E6EDF3">:</span></span>
+<span class="line"><span style="color:#7EE787">      functions</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">${{ steps.diff.outputs.functions }}</span></span>
+<span class="line"><span style="color:#7EE787">    steps</span><span style="color:#E6EDF3">:</span></span>
+<span class="line"><span style="color:#E6EDF3">      - </span><span style="color:#7EE787">uses</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">actions/checkout@v7</span></span>
+<span class="line"><span style="color:#7EE787">        with</span><span style="color:#E6EDF3">: { </span><span style="color:#7EE787">fetch-depth</span><span style="color:#E6EDF3">: </span><span style="color:#79C0FF">0</span><span style="color:#E6EDF3"> }</span></span>
+<span class="line"><span style="color:#E6EDF3">      - </span><span style="color:#7EE787">id</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">diff</span></span>
+<span class="line"><span style="color:#7EE787">        run</span><span style="color:#E6EDF3">: </span><span style="color:#FF7B72">|</span></span>
+<span class="line"><span style="color:#A5D6FF">          fns=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" -- functions/ \</span></span>
+<span class="line"><span style="color:#A5D6FF">            | cut -d/ -f2 | sort -u | jq -R . | jq -sc .)</span></span>
+<span class="line"><span style="color:#A5D6FF">          echo "functions=$fns" >> "$GITHUB_OUTPUT"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#7EE787">  deploy</span><span style="color:#E6EDF3">:</span></span>
+<span class="line"><span style="color:#7EE787">    needs</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">changes</span></span>
+<span class="line"><span style="color:#7EE787">    if</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">needs.changes.outputs.functions != '[]'</span></span>
+<span class="line"><span style="color:#7EE787">    runs-on</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">ubuntu-latest</span></span>
+<span class="line"><span style="color:#7EE787">    environment</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">production</span><span style="color:#8B949E">          # required reviewers + the OIDC sub claim</span></span>
+<span class="line"><span style="color:#7EE787">    permissions</span><span style="color:#E6EDF3">:</span></span>
+<span class="line"><span style="color:#7EE787">      id-token</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">write</span><span style="color:#8B949E">                # lets the job ask GitHub for an OIDC token</span></span>
+<span class="line"><span style="color:#7EE787">      contents</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">read</span><span style="color:#8B949E">                 # lets actions/checkout read the repo</span></span>
+<span class="line"><span style="color:#7EE787">    strategy</span><span style="color:#E6EDF3">:</span></span>
+<span class="line"><span style="color:#7EE787">      fail-fast</span><span style="color:#E6EDF3">: </span><span style="color:#79C0FF">false</span></span>
+<span class="line"><span style="color:#7EE787">      matrix</span><span style="color:#E6EDF3">:</span></span>
+<span class="line"><span style="color:#7EE787">        fn</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">${{ fromJSON(needs.changes.outputs.functions) }}</span></span>
+<span class="line"><span style="color:#7EE787">    concurrency</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">deploy-${{ matrix.fn }}</span><span style="color:#8B949E">   # never two canaries on one alias</span></span>
+<span class="line"><span style="color:#7EE787">    defaults</span><span style="color:#E6EDF3">:</span></span>
+<span class="line"><span style="color:#7EE787">      run</span><span style="color:#E6EDF3">: { </span><span style="color:#7EE787">working-directory</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">"functions/${{ matrix.fn }}"</span><span style="color:#E6EDF3"> }</span></span>
+<span class="line"><span style="color:#7EE787">    steps</span><span style="color:#E6EDF3">:</span></span>
+<span class="line"><span style="color:#E6EDF3">      - </span><span style="color:#7EE787">uses</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">actions/checkout@v7</span></span>
+<span class="line"><span style="color:#E6EDF3">      - </span><span style="color:#7EE787">uses</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">actions/setup-node@v7</span></span>
+<span class="line"><span style="color:#7EE787">        with</span><span style="color:#E6EDF3">: { </span><span style="color:#7EE787">node-version</span><span style="color:#E6EDF3">: </span><span style="color:#79C0FF">24</span><span style="color:#E6EDF3"> }</span></span>
+<span class="line"><span style="color:#E6EDF3">      - </span><span style="color:#7EE787">run</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">npm ci &#x26;&#x26; npm test &#x26;&#x26; npm run build</span></span>
+<span class="line"><span style="color:#E6EDF3">      - </span><span style="color:#7EE787">run</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">cd dist &#x26;&#x26; zip -qr ../function.zip .</span></span>
+<span class="line"><span style="color:#E6EDF3">      - </span><span style="color:#7EE787">uses</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">aws-actions/configure-aws-credentials@v6</span></span>
+<span class="line"><span style="color:#7EE787">        with</span><span style="color:#E6EDF3">:</span></span>
+<span class="line"><span style="color:#7EE787">          role-to-assume</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">${{ vars.DEPLOY_ROLE_ARN }}</span></span>
+<span class="line"><span style="color:#7EE787">          aws-region</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">ap-south-1</span></span>
+<span class="line"><span style="color:#E6EDF3">      - </span><span style="color:#7EE787">id</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">publish</span></span>
+<span class="line"><span style="color:#7EE787">        run</span><span style="color:#E6EDF3">: </span><span style="color:#FF7B72">|</span></span>
+<span class="line"><span style="color:#A5D6FF">          sha=$(aws lambda update-function-code --function-name "${{ matrix.fn }}" \</span></span>
+<span class="line"><span style="color:#A5D6FF">            --zip-file fileb://function.zip --query CodeSha256 --output text)</span></span>
+<span class="line"><span style="color:#A5D6FF">          aws lambda wait function-updated --function-name "${{ matrix.fn }}"</span></span>
+<span class="line"><span style="color:#A5D6FF">          ver=$(aws lambda publish-version --function-name "${{ matrix.fn }}" \</span></span>
+<span class="line"><span style="color:#A5D6FF">            --code-sha256 "$sha" --description "${{ github.sha }}" --query Version --output text)</span></span>
+<span class="line"><span style="color:#A5D6FF">          echo "version=$ver" >> "$GITHUB_OUTPUT"</span></span>
+<span class="line"><span style="color:#E6EDF3">      - </span><span style="color:#7EE787">run</span><span style="color:#E6EDF3">: </span><span style="color:#A5D6FF">../../scripts/canary.sh "${{ matrix.fn }}" live "${{ steps.publish.outputs.version }}"</span></span></code></pre></div>
+<p>A few notes on this file:</p>
+<ul>
+<li><strong><code>environment: production</code></strong> does two jobs. In the repo settings you add <strong>required reviewers</strong> to that environment, so the job waits until a person approves it. It also makes the OIDC <code>sub</code> claim <code>repo:my-org/my-repo:environment:production</code>, which is exactly what the trust policy allows. A job without the environment can&#39;t take on the prod role at all.</li>
+<li><strong><code>DEPLOY_ROLE_ARN</code></strong> is an environment variable, not a secret. A role ARN isn&#39;t sensitive, and keeping it per environment means staging and prod use different roles without any <code>if</code> logic.</li>
+<li><strong><code>fail-fast: false</code></strong> means one function rolling back doesn&#39;t cancel the canaries of the others halfway through.</li>
+<li><strong><code>paths</code></strong> on the trigger skips the whole run when nothing under <code>functions/</code> changed. The <code>git diff</code> then narrows it down to the folders that did change.</li>
+<li><code>configure-aws-credentials@v6</code> was the current major version when I checked in November 2026. Pin a full commit SHA if your org requires it.</li>
+</ul>
+<h2 id="triggers-that-behave-differently-under-a-weighted-alias"><a class="anchor" href="#triggers-that-behave-differently-under-a-weighted-alias" aria-hidden="true" tabindex="-1">#</a>Triggers that behave differently under a weighted alias</h2>
+<p>The traffic split happens <strong>per invocation</strong>. That&#39;s simple for HTTP, but less simple for anything that batches or retries.</p>
+<div class="table-wrap" tabindex="0"><table>
+<thead>
+<tr>
+<th>Trigger</th>
+<th>What the split means</th>
+<th>Watch out for</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>API Gateway, Function URL, ALB</td>
+<td>Each request picks v7 or v8 by weight</td>
+<td>Low traffic is noisy: AWS says the split is probabilistic, so with only a few calls the real share can be far from 10%</td>
+</tr>
+<tr>
+<td>S3, SNS, EventBridge (async)</td>
+<td>Each event picks a version when Lambda runs it</td>
+<td>Don&#39;t assume a retry goes to the same version. A bad v8 can fail an event that v7 then retries</td>
+</tr>
+<tr>
+<td>SQS mapping</td>
+<td>The poller calls the alias once per batch, so the whole batch goes to one version</td>
+<td>Failed messages come back after the visibility timeout and may land on either version. Big batches make the 10% lumpy</td>
+</tr>
+<tr>
+<td>Kinesis / DynamoDB streams</td>
+<td>Same, per batch</td>
+<td>By default, a failing batch blocks its shard until it succeeds or expires, so v8 errors slow down v7 too</td>
+</tr>
+<tr>
+<td>Provisioned concurrency</td>
+<td>Set on the alias or a version, never <code>$LATEST</code></td>
+<td>While the split is active, calls can spill over to on-demand (cold) instances. AWS suggests extra provisioned concurrency during the shift</td>
+</tr>
+</tbody></table>
+</div>
+<p>For queue and stream consumers, I keep the canary but care more about the rollback alarm than the bake time. A shard stuck on a poison batch is a worse problem than a few HTTP 500s.</p>
+<h2 id="rollback-and-cleanup"><a class="anchor" href="#rollback-and-cleanup" aria-hidden="true" tabindex="-1">#</a>Rollback and cleanup</h2>
+<p>Rolling back is one call. You don&#39;t rebuild or re-upload anything:</p>
+<div class="code"><span class="code__lang">bash</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FFA657">aws</span><span style="color:#A5D6FF"> lambda</span><span style="color:#A5D6FF"> update-alias</span><span style="color:#79C0FF"> --function-name</span><span style="color:#A5D6FF"> orders</span><span style="color:#79C0FF"> --name</span><span style="color:#A5D6FF"> live</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#79C0FF">  --function-version</span><span style="color:#79C0FF"> 7</span><span style="color:#79C0FF"> --routing-config</span><span style="color:#A5D6FF"> 'AdditionalVersionWeights={}'</span></span></code></pre></div>
+<p>Old versions pile up, and each one counts toward Lambda&#39;s code storage quota. When I checked in November 2026, that was 300 GB per Region, and AWS can&#39;t raise it. I keep the last five versions and never delete one that an alias still uses:</p>
+<div class="code"><span class="code__lang">bash</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#E6EDF3">fn</span><span style="color:#FF7B72">=</span><span style="color:#A5D6FF">orders</span><span style="color:#E6EDF3">; keep</span><span style="color:#FF7B72">=</span><span style="color:#A5D6FF">5</span></span>
+<span class="line"><span style="color:#E6EDF3">in_use</span><span style="color:#FF7B72">=</span><span style="color:#E6EDF3">$(</span><span style="color:#FFA657">aws</span><span style="color:#A5D6FF"> lambda</span><span style="color:#A5D6FF"> list-aliases</span><span style="color:#79C0FF"> --function-name</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$fn</span><span style="color:#A5D6FF">"</span><span style="color:#79C0FF"> --output</span><span style="color:#A5D6FF"> json</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#FF7B72">  |</span><span style="color:#FFA657"> jq</span><span style="color:#79C0FF"> -r</span><span style="color:#A5D6FF"> '.Aliases[] | .FunctionVersion, ((.RoutingConfig.AdditionalVersionWeights // {}) | keys[])'</span><span style="color:#E6EDF3">)</span></span>
+<span class="line"><span style="color:#FFA657">aws</span><span style="color:#A5D6FF"> lambda</span><span style="color:#A5D6FF"> list-versions-by-function</span><span style="color:#79C0FF"> --function-name</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$fn</span><span style="color:#A5D6FF">"</span><span style="color:#79C0FF"> --output</span><span style="color:#A5D6FF"> json</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#FF7B72">  |</span><span style="color:#FFA657"> jq</span><span style="color:#79C0FF"> -r</span><span style="color:#A5D6FF"> '.Versions[].Version | select(. != "$LATEST")'</span><span style="color:#FF7B72"> |</span><span style="color:#FFA657"> sort</span><span style="color:#79C0FF"> -n</span><span style="color:#FF7B72"> |</span><span style="color:#FFA657"> head</span><span style="color:#79C0FF"> -n</span><span style="color:#79C0FF"> -</span><span style="color:#A5D6FF">"</span><span style="color:#E6EDF3">$keep</span><span style="color:#A5D6FF">"</span><span style="color:#FF7B72"> \</span></span>
+<span class="line"><span style="color:#FF7B72">  |</span><span style="color:#FF7B72"> while</span><span style="color:#79C0FF"> read</span><span style="color:#79C0FF"> -r</span><span style="color:#A5D6FF"> v</span><span style="color:#E6EDF3">; </span><span style="color:#FF7B72">do</span></span>
+<span class="line"><span style="color:#FFA657">      grep</span><span style="color:#79C0FF"> -qx</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$v</span><span style="color:#A5D6FF">"</span><span style="color:#FF7B72"> &#x3C;&#x3C;&#x3C;</span><span style="color:#A5D6FF">"</span><span style="color:#E6EDF3">$in_use</span><span style="color:#A5D6FF">"</span><span style="color:#E6EDF3"> &#x26;&#x26; </span><span style="color:#FF7B72">continue</span></span>
+<span class="line"><span style="color:#FFA657">      aws</span><span style="color:#A5D6FF"> lambda</span><span style="color:#A5D6FF"> delete-function</span><span style="color:#79C0FF"> --function-name</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$fn</span><span style="color:#A5D6FF">"</span><span style="color:#79C0FF"> --qualifier</span><span style="color:#A5D6FF"> "</span><span style="color:#E6EDF3">$v</span><span style="color:#A5D6FF">"</span></span>
+<span class="line"><span style="color:#FF7B72">    done</span></span></code></pre></div>
+<p>Run it as a last step after a successful promote, or as a weekly scheduled workflow.</p>
+<h2 id="codedeploy-or-the-script"><a class="anchor" href="#codedeploy-or-the-script" aria-hidden="true" tabindex="-1">#</a>CodeDeploy or the script?</h2>
+<div class="table-wrap" tabindex="0"><table>
+<thead>
+<tr>
+<th></th>
+<th>CodeDeploy (option A)</th>
+<th>Script (option B)</th>
+<th>Flip the alias at once</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Moving parts</td>
+<td>App, deployment group, service role</td>
+<td>One shell file</td>
+<td>One CLI call</td>
+</tr>
+<tr>
+<td>Rollback trigger</td>
+<td>CloudWatch alarms, handled by AWS</td>
+<td>Alarm + per-version metric, handled by your job</td>
+<td>You, by hand</td>
+</tr>
+<tr>
+<td>If the CI runner dies mid-shift</td>
+<td>CodeDeploy keeps going</td>
+<td><code>trap</code> rolls back on cancel; a hard kill leaves the split</td>
+<td>Nothing in flight</td>
+</tr>
+<tr>
+<td>Shift patterns</td>
+<td>Canary, linear, all-at-once, custom</td>
+<td>Whatever you write</td>
+<td>All-at-once</td>
+</tr>
+<tr>
+<td>Pre-traffic smoke tests</td>
+<td>Built in (<code>BeforeAllowTraffic</code> hook)</td>
+<td>A step before the script</td>
+<td>A step before the flip</td>
+</tr>
+<tr>
+<td>Best for</td>
+<td>Many functions, long bake times, strict audit</td>
+<td>Few functions, readable pipelines</td>
+<td>Internal tools, dev stages</td>
+</tr>
+</tbody></table>
+</div>
+<p>My rule of thumb: start with the script, because you can read the whole deploy in one file. Move to CodeDeploy once you bake for longer than a CI job should sit waiting, or when someone asks for an audit trail of every traffic shift.</p>
+<h2 id="gotchas"><a class="anchor" href="#gotchas" aria-hidden="true" tabindex="-1">#</a>Gotchas</h2>
+<ul>
+<li><strong>The first push to a new branch</strong> has <code>github.event.before</code> set to forty zeros, so <code>git diff</code> fails. Use <code>git diff HEAD~1</code> as a fallback, or deploy all functions in that case.</li>
+<li><strong>Terraform and CI fighting.</strong> Without <code>ignore_changes</code>, <code>terraform apply</code> resets the alias to the version Terraform remembers. That&#39;s a silent rollback, or a silent roll-forward.</li>
+<li><strong>Config changes skip the canary.</strong> Environment variables, memory and timeout live on <code>$LATEST</code> too. They&#39;re only safe because <code>publish-version</code> freezes them together with the code. Never change config on a live version (you can&#39;t anyway), and never point callers at <code>$LATEST</code>.</li>
+<li><strong>Metrics arrive late.</strong> A Lambda metric carries the time the call started, and it can show up a few minutes later (longer for slow functions). A one-minute bake can promote before the errors are even reported. That&#39;s why the script looks back three minutes on every check, and why I bake for five.</li>
+<li><strong>No traffic means no signal.</strong> If the function gets two calls in five minutes, the canary proves nothing. Send synthetic traffic, or make the script require a minimum <code>Invocations</code> count before it promotes.</li>
+<li><strong>Database changes aren&#39;t covered.</strong> v7 and v8 run side by side, so any schema change must work with both. Use expand-then-contract migrations.</li>
+</ul>
+<h2 id="when-not-to-use-this"><a class="anchor" href="#when-not-to-use-this" aria-hidden="true" tabindex="-1">#</a>When not to use this</h2>
+<ul>
+<li><strong>You already use SAM or CDK.</strong> <code>AutoPublishAlias</code> plus <code>DeploymentPreference</code> sets up all of option A for you. Don&#39;t rebuild it by hand.</li>
+<li><strong>Low-traffic internal jobs</strong>, like a nightly cron function. A canary needs traffic to mean anything. Publish a version and flip the alias.</li>
+<li><strong>Changes that can&#39;t run side by side</strong>, such as a new message format that v7 can&#39;t read. Use a feature flag or a two-step release instead of a traffic split.</li>
+</ul>
+<h2 id="checklist"><a class="anchor" href="#checklist" aria-hidden="true" tabindex="-1">#</a>Checklist</h2>
+<ul>
+<li><input disabled="" type="checkbox"> OIDC provider with no thumbprint; role trust limited by <code>aud</code> and an exact <code>sub</code></li>
+<li><input disabled="" type="checkbox"> One deploy role per environment, with Lambda actions scoped to your function ARNs</li>
+<li><input disabled="" type="checkbox"> Every trigger and permission uses the <code>live</code> alias ARN, never the plain ARN</li>
+<li><input disabled="" type="checkbox"> <code>update-function-code</code> → <code>wait function-updated</code> → <code>publish-version --code-sha256</code></li>
+<li><input disabled="" type="checkbox"> Error alarm on <code>Resource = &lt;fn&gt;:live</code>; per-version check with <code>ExecutedVersion</code></li>
+<li><input disabled="" type="checkbox"> Rollback on alarm, on job cancel and on script error</li>
+<li><input disabled="" type="checkbox"> <code>ignore_changes</code> on the alias version, the routing config and the function&#39;s zip</li>
+<li><input disabled="" type="checkbox"> Prod environment with required reviewers</li>
+<li><input disabled="" type="checkbox"> Old versions cleaned up, keeping any version an alias uses</li>
+</ul>
+<h2 id="further-reading"><a class="anchor" href="#further-reading" aria-hidden="true" tabindex="-1">#</a>Further reading</h2>
+<ul>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/configuring-alias-routing.html" target="_blank" rel="noopener">Lambda: implement canary deployments using a weighted alias</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/using-aliases.html" target="_blank" rel="noopener">Lambda: using aliases in event sources and permissions policies</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics-view.html" target="_blank" rel="noopener">Lambda: viewing metrics (the <code>ExecutedVersion</code> dimension)</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html" target="_blank" rel="noopener">Lambda: configuring provisioned concurrency</a></li>
+<li><a href="https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html" target="_blank" rel="noopener">Lambda quotas</a></li>
+<li><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html#idp_oidc_Create_GitHub" target="_blank" rel="noopener">IAM: configuring a role for the GitHub OIDC identity provider</a></li>
+<li><a href="https://docs.github.com/en/actions/reference/security/oidc" target="_blank" rel="noopener">GitHub: OpenID Connect reference (subject claim formats)</a></li>
+<li><a href="https://github.blog/changelog/2023-07-13-github-actions-oidc-integration-with-aws-no-longer-requires-pinning-of-intermediate-tls-certificates/" target="_blank" rel="noopener">GitHub changelog: AWS OIDC no longer needs pinned certificates (July 2023)</a></li>
+<li><a href="https://github.com/aws-actions/configure-aws-credentials" target="_blank" rel="noopener">aws-actions/configure-aws-credentials</a></li>
+<li><a href="https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-configurations.html" target="_blank" rel="noopener">CodeDeploy: deployment configurations</a></li>
+<li><a href="https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-example.html#appspec-file-example-lambda" target="_blank" rel="noopener">CodeDeploy: AppSpec example for a Lambda deployment</a></li>
+<li><a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_openid_connect_provider" target="_blank" rel="noopener">Terraform: aws_iam_openid_connect_provider</a></li>
+</ul>
+
+        </div>
+      </div>
+      <footer class="post__foot container">
+        <div class="author">
+          <span class="brand__mark" aria-hidden="true">DP</span>
+          <div>
+            <p class="author__name">Divya Patel</p>
+            <p class="author__bio">Backend &amp; Cloud Engineer in Ahmedabad, India. I design AWS infrastructure with Terraform and build the serverless services that run on it. Open to remote roles and contract work.</p>
+          </div>
+          <a class="btn btn--accent btn--sm" href="/contact">Work with me</a>
+        </div>
+        <h2 class="more__title">More writing</h2><ul class="post-list post-list--compact"><li class="post-card"><a href="/blog/redis-cache-stampede-aurora">
+    <span class="post-card__meta"><time datetime="2026-11-13">13 November 2026</time> · 12 min read</span>
+    <span class="post-card__title">Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL</span>
+    <span class="post-card__desc">Redis caching patterns for Postgres in plain words: cache-aside vs write-through, cache stampede prevention, TTL jitter and safe invalidation.</span>
+    <span class="post-card__tags">Redis · PostgreSQL · AWS</span>
+  </a></li><li class="post-card"><a href="/blog/self-host-llm-vllm-cost-vs-api">
+    <span class="post-card__meta"><time datetime="2026-11-13">13 November 2026</time> · 12 min read</span>
+    <span class="post-card__title">Self-hosting an LLM with vLLM: the real cost math vs an API</span>
+    <span class="post-card__desc">A neutral break-even model for self-hosting an LLM with vLLM vs paying an API per token, with a worked example, real prices and a small production setup.</span>
+    <span class="post-card__tags">LLM · vLLM · Cost</span>
+  </a></li><li class="post-card"><a href="/blog/terraform-aws-startup-layout">
+    <span class="post-card__meta"><time datetime="2026-11-13">13 November 2026</time> · 12 min read</span>
+    <span class="post-card__title">Terraform for a one-AWS-account startup: layout, state, and the day you split</span>
+    <span class="post-card__desc">How to structure Terraform for a small AWS startup: one state, then split state per stack and environment, then multi-account. With real HCL.</span>
+    <span class="post-card__tags">Terraform · AWS · Infrastructure as Code</span>
+  </a></li></ul>
+      </footer>
+    </article>
+  </main>
+
+  <footer class="footer blog-footer">
+    <div class="container">
+      <div class="footer__links">
+        <a href="/">Portfolio</a>
+        <a href="/blog">Writing</a>
+        <a href="/blog/feed.xml">RSS</a>
+        <a href="/contact">Contact</a>
+        <a href="/backend-developer-ahmedabad">Backend developer in Ahmedabad</a>
+        <a href="https://www.linkedin.com/in/divyapatel5113" target="_blank" rel="me noopener">LinkedIn</a>
+        <a href="#main" class="footer__top">Back to top ↑</a>
+      </div>
+    </div>
+    <p class="container footer__fine">© 2026 Divya Patel. Writing on backend, cloud infrastructure and system design.</p>
+  </footer>
+</body>
+</html>

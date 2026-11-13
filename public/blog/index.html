@@ -1,0 +1,184 @@
+<!doctype html>
+<!-- Built by scripts/blog.mjs from content/blog. Edit the Markdown, not this file. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.googletagmanager.com 'sha256-/LbKt0MibuWw3TF4uF0TA4kkd2452qY8QG2QS7CZnw8=' 'sha256-iLDnONK3Z3/vV4tWZdatHdq72Zjn7Q8OR2HSRTqTurU='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; font-src 'self'; connect-src 'self' https://formsubmit.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; manifest-src 'self'; frame-src https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action https://formsubmit.co">
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-M75XC5GH');</script>
+  <!-- End Google Tag Manager -->
+  <title>Writing – Divya Patel, Backend &amp; Cloud Engineer</title>
+  <meta name="description" content="Writing by Divya Patel, Backend &amp; Cloud Engineer: practical guides on system design, AWS, Terraform, caching with Redis, CI/CD and self-hosted LLM infrastructure, with diagrams.">
+  <meta name="author" content="Divya Patel">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="theme-color" content="#08090b">
+  <meta name="color-scheme" content="dark">
+  <link rel="canonical" href="https://divypatel.in/blog">
+  <link rel="alternate" type="application/rss+xml" title="Divya Patel – Writing" href="https://divypatel.in/blog/feed.xml">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://divypatel.in/blog">
+  <meta property="og:site_name" content="Divya Patel">
+  <meta property="og:locale" content="en_IN">
+  <meta property="og:title" content="Writing – Divya Patel, Backend &amp; Cloud Engineer">
+  <meta property="og:description" content="Writing by Divya Patel, Backend &amp; Cloud Engineer: practical guides on system design, AWS, Terraform, caching with Redis, CI/CD and self-hosted LLM infrastructure, with diagrams.">
+  <meta property="og:image" content="https://divypatel.in/assets/img/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="/assets/fonts/Archivo-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Blog",
+        "@id": "https://divypatel.in/blog#blog",
+        "name": "Divya Patel – Writing",
+        "url": "https://divypatel.in/blog",
+        "description": "Writing by Divya Patel, Backend & Cloud Engineer: practical guides on system design, AWS, Terraform, caching with Redis, CI/CD and self-hosted LLM infrastructure, with diagrams.",
+        "inLanguage": "en",
+        "author": {
+          "@id": "https://divypatel.in/#person"
+        },
+        "publisher": {
+          "@id": "https://divypatel.in/#person"
+        },
+        "blogPost": [
+          {
+            "@id": "https://divypatel.in/blog/lambda-zero-downtime-deploys-github-actions#article"
+          },
+          {
+            "@id": "https://divypatel.in/blog/redis-cache-stampede-aurora#article"
+          },
+          {
+            "@id": "https://divypatel.in/blog/self-host-llm-vllm-cost-vs-api#article"
+          },
+          {
+            "@id": "https://divypatel.in/blog/terraform-aws-startup-layout#article"
+          }
+        ]
+      },
+      {
+        "@type": "Person",
+        "@id": "https://divypatel.in/#person",
+        "name": "Divya Patel",
+        "url": "https://divypatel.in/",
+        "jobTitle": "Backend & Cloud Engineer",
+        "sameAs": [
+          "https://www.linkedin.com/in/divyapatel5113"
+        ]
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Divya Patel",
+            "item": "https://divypatel.in/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Writing",
+            "item": "https://divypatel.in/blog"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+  <script type="module" src="/assets/js/blog.js"></script>
+</head>
+<body class="blog-page">
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M75XC5GH" height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a href="/" class="brand" aria-label="Divya Patel, home"><span class="brand__mark">DP</span><span class="brand__name">Divya Patel</span></a>
+      <nav aria-label="Sections" class="nav">
+        <a href="/about">About</a>
+        <a href="/how-i-build">How I build</a>
+        <a href="/journey">Journey</a>
+        <a href="/projects">Projects</a>
+        <a href="/skills">Skills</a>
+        <a aria-current="page" href="/blog">Writing</a>
+      </nav>
+      <a href="/contact" class="btn btn--accent btn--sm magnetic header-cta">Let’s talk <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span></span><span></span></button>
+    </div>
+    <div class="progress" aria-hidden="true"><i></i></div>
+  </header>
+
+  <div class="menu" id="menu" hidden>
+    <nav aria-label="Sections (mobile)">
+      <a href="/about"><small>01</small>About</a>
+      <a href="/how-i-build"><small>02</small>How I build</a>
+      <a href="/journey"><small>03</small>Journey</a>
+      <a href="/projects"><small>04</small>Projects</a>
+      <a href="/skills"><small>05</small>Skills</a>
+      <a aria-current="page" href="/blog"><small>06</small>Writing</a>
+      <a href="/contact"><small>07</small>Contact</a>
+    </nav>
+    <p class="menu__foot">iamdivypatel@gmail.com<br>Ahmedabad, India (UTC+5:30)</p>
+  </div>
+
+  <main id="main">
+    <section class="blog-index container">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Divya Patel</a><span aria-hidden="true">/</span><span>Writing</span></nav>
+      <h1 class="post__title">Writing on backend, cloud and <span class="serif">system design.</span></h1>
+      <p class="post__dek">Practical guides for developers and the people who hire them: how to design, deploy and pay for production systems on AWS, drawn as diagrams first and code second.</p>
+      <ul class="post-list"><li class="post-card"><a href="/blog/lambda-zero-downtime-deploys-github-actions">
+    <span class="post-card__meta"><time datetime="2026-11-13">13 November 2026</time> · 12 min read</span>
+    <span class="post-card__title">Zero-downtime Lambda deploys from GitHub Actions: OIDC, versions, aliases and canary rollback</span>
+    <span class="post-card__desc">Deploy AWS Lambda from GitHub Actions with no stored AWS keys: OIDC login, versions, a weighted alias canary and automatic rollback.</span>
+    <span class="post-card__tags">AWS Lambda · GitHub Actions · CI/CD</span>
+  </a></li><li class="post-card"><a href="/blog/redis-cache-stampede-aurora">
+    <span class="post-card__meta"><time datetime="2026-11-13">13 November 2026</time> · 12 min read</span>
+    <span class="post-card__title">Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL</span>
+    <span class="post-card__desc">Redis caching patterns for Postgres in plain words: cache-aside vs write-through, cache stampede prevention, TTL jitter and safe invalidation.</span>
+    <span class="post-card__tags">Redis · PostgreSQL · AWS</span>
+  </a></li><li class="post-card"><a href="/blog/self-host-llm-vllm-cost-vs-api">
+    <span class="post-card__meta"><time datetime="2026-11-13">13 November 2026</time> · 12 min read</span>
+    <span class="post-card__title">Self-hosting an LLM with vLLM: the real cost math vs an API</span>
+    <span class="post-card__desc">A neutral break-even model for self-hosting an LLM with vLLM vs paying an API per token, with a worked example, real prices and a small production setup.</span>
+    <span class="post-card__tags">LLM · vLLM · Cost</span>
+  </a></li><li class="post-card"><a href="/blog/terraform-aws-startup-layout">
+    <span class="post-card__meta"><time datetime="2026-11-13">13 November 2026</time> · 12 min read</span>
+    <span class="post-card__title">Terraform for a one-AWS-account startup: layout, state, and the day you split</span>
+    <span class="post-card__desc">How to structure Terraform for a small AWS startup: one state, then split state per stack and environment, then multi-account. With real HCL.</span>
+    <span class="post-card__tags">Terraform · AWS · Infrastructure as Code</span>
+  </a></li></ul>
+      <p class="blog-index__rss">Follow along with the <a href="/blog/feed.xml">RSS feed</a>.</p>
+    </section>
+  </main>
+
+  <footer class="footer blog-footer">
+    <div class="container">
+      <div class="footer__links">
+        <a href="/">Portfolio</a>
+        <a href="/blog">Writing</a>
+        <a href="/blog/feed.xml">RSS</a>
+        <a href="/contact">Contact</a>
+        <a href="/backend-developer-ahmedabad">Backend developer in Ahmedabad</a>
+        <a href="https://www.linkedin.com/in/divyapatel5113" target="_blank" rel="me noopener">LinkedIn</a>
+        <a href="#main" class="footer__top">Back to top ↑</a>
+      </div>
+    </div>
+    <p class="container footer__fine">© 2026 Divya Patel. Writing on backend, cloud infrastructure and system design.</p>
+  </footer>
+</body>
+</html>

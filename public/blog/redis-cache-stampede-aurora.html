@@ -1,0 +1,805 @@
+<!doctype html>
+<!-- Built by scripts/blog.mjs from content/blog. Edit the Markdown, not this file. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.googletagmanager.com 'sha256-/LbKt0MibuWw3TF4uF0TA4kkd2452qY8QG2QS7CZnw8=' 'sha256-iLDnONK3Z3/vV4tWZdatHdq72Zjn7Q8OR2HSRTqTurU='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; font-src 'self'; connect-src 'self' https://formsubmit.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; manifest-src 'self'; frame-src https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action https://formsubmit.co">
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-M75XC5GH');</script>
+  <!-- End Google Tag Manager -->
+  <title>Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL – Divya Patel</title>
+  <meta name="description" content="Redis caching patterns for Postgres in plain words: cache-aside vs write-through, cache stampede prevention, TTL jitter and safe invalidation.">
+  <meta name="author" content="Divya Patel">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="theme-color" content="#08090b">
+  <meta name="color-scheme" content="dark">
+  <link rel="canonical" href="https://divypatel.in/blog/redis-cache-stampede-aurora">
+  <link rel="alternate" type="application/rss+xml" title="Divya Patel – Writing" href="https://divypatel.in/blog/feed.xml">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://divypatel.in/blog/redis-cache-stampede-aurora">
+  <meta property="og:site_name" content="Divya Patel">
+  <meta property="og:locale" content="en_IN">
+  <meta property="og:title" content="Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL – Divya Patel">
+  <meta property="og:description" content="Redis caching patterns for Postgres in plain words: cache-aside vs write-through, cache stampede prevention, TTL jitter and safe invalidation.">
+  <meta property="og:image" content="https://divypatel.in/assets/img/og/redis-cache-stampede-aurora.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="article:published_time" content="2026-11-13">
+  <meta property="article:modified_time" content="2026-11-13">
+  <meta property="article:author" content="https://divypatel.in/">
+  <meta property="article:tag" content="Redis">
+  <meta property="article:tag" content="PostgreSQL">
+  <meta property="article:tag" content="AWS">
+  <meta property="article:tag" content="System design">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="/assets/fonts/Archivo-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BlogPosting",
+        "@id": "https://divypatel.in/blog/redis-cache-stampede-aurora#article",
+        "headline": "Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL",
+        "description": "Redis caching patterns for Postgres in plain words: cache-aside vs write-through, cache stampede prevention, TTL jitter and safe invalidation.",
+        "datePublished": "2026-11-13",
+        "dateModified": "2026-11-13",
+        "url": "https://divypatel.in/blog/redis-cache-stampede-aurora",
+        "mainEntityOfPage": "https://divypatel.in/blog/redis-cache-stampede-aurora",
+        "image": "https://divypatel.in/assets/img/og/redis-cache-stampede-aurora.png",
+        "keywords": "Redis, PostgreSQL, AWS, System design",
+        "wordCount": 2789,
+        "inLanguage": "en",
+        "author": {
+          "@id": "https://divypatel.in/#person",
+          "@type": "Person",
+          "name": "Divya Patel",
+          "url": "https://divypatel.in/"
+        },
+        "publisher": {
+          "@id": "https://divypatel.in/#person",
+          "@type": "Person",
+          "name": "Divya Patel"
+        },
+        "isPartOf": {
+          "@id": "https://divypatel.in/blog#blog"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Divya Patel",
+            "item": "https://divypatel.in/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Writing",
+            "item": "https://divypatel.in/blog"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL",
+            "item": "https://divypatel.in/blog/redis-cache-stampede-aurora"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+  <script type="module" src="/assets/js/blog.js"></script>
+</head>
+<body class="blog-page">
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M75XC5GH" height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a href="/" class="brand" aria-label="Divya Patel, home"><span class="brand__mark">DP</span><span class="brand__name">Divya Patel</span></a>
+      <nav aria-label="Sections" class="nav">
+        <a href="/about">About</a>
+        <a href="/how-i-build">How I build</a>
+        <a href="/journey">Journey</a>
+        <a href="/projects">Projects</a>
+        <a href="/skills">Skills</a>
+        <a aria-current="page" href="/blog">Writing</a>
+      </nav>
+      <a href="/contact" class="btn btn--accent btn--sm magnetic header-cta">Let’s talk <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span></span><span></span></button>
+    </div>
+    <div class="progress" aria-hidden="true"><i></i></div>
+  </header>
+
+  <div class="menu" id="menu" hidden>
+    <nav aria-label="Sections (mobile)">
+      <a href="/about"><small>01</small>About</a>
+      <a href="/how-i-build"><small>02</small>How I build</a>
+      <a href="/journey"><small>03</small>Journey</a>
+      <a href="/projects"><small>04</small>Projects</a>
+      <a href="/skills"><small>05</small>Skills</a>
+      <a aria-current="page" href="/blog"><small>06</small>Writing</a>
+      <a href="/contact"><small>07</small>Contact</a>
+    </nav>
+    <p class="menu__foot">iamdivypatel@gmail.com<br>Ahmedabad, India (UTC+5:30)</p>
+  </div>
+
+  <main id="main">
+    <article class="post" itemscope>
+      <header class="post__head container">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Divya Patel</a><span aria-hidden="true">/</span><a href="/blog">Writing</a></nav>
+        <ul class="tags" aria-label="Topics"><li>Redis</li><li>PostgreSQL</li><li>AWS</li><li>System design</li></ul>
+        <h1 class="post__title">Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL</h1>
+        <p class="post__dek">Redis caching patterns for Postgres in plain words: cache-aside vs write-through, cache stampede prevention, TTL jitter and safe invalidation.</p>
+        <p class="post__meta"><span>By <a href="/about" rel="author">Divya Patel</a></span><span><time datetime="2026-11-13">13 November 2026</time></span><span>12 min read</span></p>
+      </header>
+      <div class="post__layout container">
+        <aside class="toc" aria-label="On this page">
+          <details open><summary>On this page</summary><ol><li><a href="#tldr">TL;DR</a></li><li><a href="#the-setup">The setup</a></li><li><a href="#four-ways-to-keep-a-cache-filled">Four ways to keep a cache filled</a></li><li><a href="#the-cache-stampede">The cache stampede</a></li><li><a href="#ttl-jitter">TTL jitter</a></li><li><a href="#invalidation-and-the-stale-write-back-race">Invalidation and the stale write-back race</a></li><li><a href="#hot-keys">Hot keys</a></li><li><a href="#negative-caching">Negative caching</a></li><li><a href="#when-redis-is-down">When Redis is down</a></li><li><a href="#picking-a-pattern">Picking a pattern</a></li><li><a href="#gotchas">Gotchas</a></li><li><a href="#when-not-to-use-this">When not to use this</a></li><li><a href="#checklist">Checklist</a></li><li><a href="#further-reading">Further reading</a></li></ol></details>
+        </aside>
+        <div class="prose">
+<p>Putting Redis in front of Aurora PostgreSQL is easy. Keeping it correct when traffic spikes, keys expire and Redis goes down is the hard part, so this post is about that part, with Node.js and TypeScript code you can copy.</p>
+<h2 id="tldr"><a class="anchor" href="#tldr" aria-hidden="true" tabindex="-1">#</a>TL;DR</h2>
+<ul>
+<li><strong>Start with cache-aside.</strong> Read from Redis, and on a miss read from Aurora and save the result with a TTL. It is simple, and Aurora is still the source of truth.</li>
+<li><strong>Protect busy keys from stampedes.</strong> Let one request rebuild an expired key while the others wait or get the old value. A <code>SET key token NX PX</code> lock, early refresh (XFetch) or stale-while-revalidate all do this.</li>
+<li><strong>Add jitter to every TTL</strong> so that keys written together don&#39;t all expire together.</li>
+<li><strong>Delete from the cache only after the database commit</strong>, and keep TTLs short. For data where staleness really hurts, store a version number and refuse older writes.</li>
+<li><strong>Plan for Redis being down.</strong> Fall back to Aurora, but limit how many requests do that at the same time, or the outage moves to your database.</li>
+</ul>
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" class="diagram" role="img" aria-labelledby="cache-aside-path-t cache-aside-path-d">
+  <title id="cache-aside-path-t">Cache-aside read path</title>
+  <desc id="cache-aside-path-d">The app asks Redis first; on a hit it returns, on a miss it queries Aurora PostgreSQL and writes the row back to Redis with a TTL.</desc>
+  <defs>
+    <marker id="cache-aside-path-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker>
+  </defs>
+
+  <rect class="d-zone" x="200" y="24" width="584" height="356" rx="10"/>
+  <text class="d-zone-label" x="216" y="46">VPC</text>
+
+  <rect class="d-box" x="24" y="80" width="140" height="70" rx="10"/>
+  <text class="d-text" x="94" y="112" text-anchor="middle">Client</text>
+  <text class="d-sub" x="94" y="132" text-anchor="middle">HTTP request</text>
+
+  <rect class="d-box d-accent" x="260" y="80" width="200" height="70" rx="10"/>
+  <text class="d-text" x="360" y="112" text-anchor="middle">App (Node.js)</text>
+  <text class="d-sub d-mono" x="360" y="132" text-anchor="middle">ioredis + pg</text>
+
+  <rect class="d-box d-cyan" x="576" y="80" width="184" height="70" rx="10"/>
+  <text class="d-text" x="668" y="112" text-anchor="middle">ElastiCache</text>
+  <text class="d-sub" x="668" y="132" text-anchor="middle">Valkey / Redis OSS</text>
+
+  <rect class="d-box" x="260" y="290" width="200" height="70" rx="10"/>
+  <text class="d-text" x="360" y="322" text-anchor="middle">Aurora PostgreSQL</text>
+  <text class="d-sub" x="360" y="342" text-anchor="middle">source of truth</text>
+
+  <!-- client <-> app -->
+  <path class="d-edge" d="M164 103H258" marker-end="url(#cache-aside-path-arrow)"/>
+  <path class="d-edge d-dashed" d="M260 128H166" marker-end="url(#cache-aside-path-arrow)"/>
+
+  <!-- 1 GET -->
+  <path class="d-edge d-edge-ok" d="M460 100H574" marker-end="url(#cache-aside-path-arrow)"/>
+  <circle class="d-num" cx="482" cy="86" r="9"/><text class="d-num-text" x="482" y="86">1</text>
+  <text class="d-sub d-mono" x="497" y="90">GET key</text>
+
+  <!-- 2 hit / nil -->
+  <path class="d-edge d-edge-ok d-dashed" d="M576 130H462" marker-end="url(#cache-aside-path-arrow)"/>
+  <circle class="d-num" cx="482" cy="146" r="9"/><text class="d-num-text" x="482" y="146">2</text>
+  <text class="d-sub" x="497" y="150">hit or nil</text>
+
+  <!-- 3 SELECT -->
+  <path class="d-edge d-edge-accent" d="M300 150V288" marker-end="url(#cache-aside-path-arrow)"/>
+  <circle class="d-num" cx="232" cy="219" r="9"/><text class="d-num-text" x="232" y="219">3</text>
+  <text class="d-sub d-mono" x="290" y="223" text-anchor="end">SELECT</text>
+
+  <!-- 4 rows -->
+  <path class="d-edge d-edge-accent d-dashed" d="M360 290V152" marker-end="url(#cache-aside-path-arrow)"/>
+  <circle class="d-num" cx="378" cy="219" r="9"/><text class="d-num-text" x="378" y="219">4</text>
+  <text class="d-sub" x="393" y="223">row</text>
+
+  <!-- 5 SET -->
+  <path class="d-edge d-edge-accent" d="M440 150V240H668V152" marker-end="url(#cache-aside-path-arrow)"/>
+  <circle class="d-num" cx="500" cy="224" r="9"/><text class="d-num-text" x="500" y="224">5</text>
+  <text class="d-sub d-mono" x="515" y="228">SET key EX ttl</text>
+
+  <text class="d-sub" x="560" y="300">miss path: steps 3 to 5</text>
+  <text class="d-sub" x="560" y="320">hit path: steps 1 and 2</text>
+</svg><figcaption>Cache-aside: steps 1–2 on a hit, steps 1–5 on a miss</figcaption></figure>
+<h2 id="the-setup"><a class="anchor" href="#the-setup" aria-hidden="true" tabindex="-1">#</a>The setup</h2>
+<p>A quick word on names first. On AWS, the managed service is <strong>Amazon ElastiCache</strong>. Since October 2024 it supports <strong>Valkey</strong>, the open-source fork of Redis run by the Linux Foundation, next to Redis OSS and Memcached. Valkey speaks the same protocol and commands as Redis, so everything in this post works on both. I&#39;ll say &quot;Redis&quot; for the cache and &quot;Aurora&quot; for Aurora PostgreSQL.</p>
+<p>I use <a href="https://github.com/redis/ioredis" target="_blank" rel="noopener">ioredis</a> for the cache and <a href="https://node-postgres.com/" target="_blank" rel="noopener">node-postgres</a> (<code>pg</code>) for the database. Here is the base that every later snippet builds on. A <strong>TTL</strong> (time to live) is how many seconds a key stays before Redis removes it on its own.</p>
+<div class="code"><span class="code__lang">ts</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FF7B72">import</span><span style="color:#E6EDF3"> Redis </span><span style="color:#FF7B72">from</span><span style="color:#A5D6FF"> "ioredis"</span><span style="color:#E6EDF3">;</span></span>
+<span class="line"><span style="color:#FF7B72">import</span><span style="color:#E6EDF3"> pg </span><span style="color:#FF7B72">from</span><span style="color:#A5D6FF"> "pg"</span><span style="color:#E6EDF3">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">export</span><span style="color:#FF7B72"> const</span><span style="color:#79C0FF"> redis</span><span style="color:#FF7B72"> =</span><span style="color:#FF7B72"> new</span><span style="color:#D2A8FF"> Redis</span><span style="color:#E6EDF3">(process.env.</span><span style="color:#79C0FF">REDIS_URL</span><span style="color:#FF7B72">!</span><span style="color:#E6EDF3">, {</span></span>
+<span class="line"><span style="color:#E6EDF3">  commandTimeout: </span><span style="color:#79C0FF">100</span><span style="color:#E6EDF3">,        </span><span style="color:#8B949E">// a slow cache is a broken cache</span></span>
+<span class="line"><span style="color:#E6EDF3">  maxRetriesPerRequest: </span><span style="color:#79C0FF">1</span><span style="color:#E6EDF3">,    </span><span style="color:#8B949E">// fail fast instead of piling up retries</span></span>
+<span class="line"><span style="color:#E6EDF3">  enableOfflineQueue: </span><span style="color:#79C0FF">false</span><span style="color:#E6EDF3">,  </span><span style="color:#8B949E">// don't queue commands while disconnected</span></span>
+<span class="line"><span style="color:#E6EDF3">});</span></span>
+<span class="line"><span style="color:#FF7B72">export</span><span style="color:#FF7B72"> const</span><span style="color:#79C0FF"> db</span><span style="color:#FF7B72"> =</span><span style="color:#FF7B72"> new</span><span style="color:#E6EDF3"> pg.</span><span style="color:#D2A8FF">Pool</span><span style="color:#E6EDF3">({ connectionString: process.env.</span><span style="color:#79C0FF">DATABASE_URL</span><span style="color:#E6EDF3">, max: </span><span style="color:#79C0FF">20</span><span style="color:#E6EDF3"> });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">export</span><span style="color:#FF7B72"> type</span><span style="color:#FFA657"> Product</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> { </span><span style="color:#FFA657">id</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> string</span><span style="color:#E6EDF3">; </span><span style="color:#FFA657">name</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> string</span><span style="color:#E6EDF3">; </span><span style="color:#FFA657">price_cents</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> number</span><span style="color:#E6EDF3">; </span><span style="color:#FFA657">version</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> number</span><span style="color:#E6EDF3"> };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">export</span><span style="color:#FF7B72"> async</span><span style="color:#FF7B72"> function</span><span style="color:#D2A8FF"> loadProduct</span><span style="color:#E6EDF3">(</span><span style="color:#FFA657">id</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> string</span><span style="color:#E6EDF3">)</span><span style="color:#FF7B72">:</span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">Product</span><span style="color:#FF7B72"> |</span><span style="color:#79C0FF"> null</span><span style="color:#E6EDF3">> {</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#E6EDF3"> { </span><span style="color:#79C0FF">rows</span><span style="color:#E6EDF3"> } </span><span style="color:#FF7B72">=</span><span style="color:#FF7B72"> await</span><span style="color:#E6EDF3"> db.</span><span style="color:#D2A8FF">query</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">Product</span><span style="color:#E6EDF3">>(</span></span>
+<span class="line"><span style="color:#A5D6FF">    "SELECT id, name, price_cents, version FROM products WHERE id = $1"</span><span style="color:#E6EDF3">,</span></span>
+<span class="line"><span style="color:#E6EDF3">    [id],</span></span>
+<span class="line"><span style="color:#E6EDF3">  );</span></span>
+<span class="line"><span style="color:#FF7B72">  return</span><span style="color:#E6EDF3"> rows[</span><span style="color:#79C0FF">0</span><span style="color:#E6EDF3">] </span><span style="color:#FF7B72">??</span><span style="color:#79C0FF"> null</span><span style="color:#E6EDF3">;</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
+<p>For ElastiCache with encryption in transit, use a <code>rediss://</code> URL (two s&#39;s) so ioredis connects over TLS.</p>
+<p>The three ioredis options matter. By default, ioredis queues commands while it reconnects, so if Redis hangs, every request hangs with it. With these settings, a Redis problem becomes a fast error your code can handle.</p>
+<h2 id="four-ways-to-keep-a-cache-filled"><a class="anchor" href="#four-ways-to-keep-a-cache-filled" aria-hidden="true" tabindex="-1">#</a>Four ways to keep a cache filled</h2>
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" class="diagram" role="img" aria-labelledby="cache-patterns-t cache-patterns-d">
+  <title id="cache-patterns-t">Cache-aside, write-through and write-behind</title>
+  <desc id="cache-patterns-d">Three small flows side by side: cache-aside reads Redis and falls back to Aurora, write-through writes Aurora then Redis, write-behind writes Redis and flushes to Aurora later.</desc>
+  <defs>
+    <marker id="cache-patterns-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker>
+  </defs>
+
+  <rect class="d-zone" x="16" y="16" width="240" height="328" rx="10"/>
+  <text class="d-text" x="136" y="48" text-anchor="middle">Cache-aside</text>
+  <rect class="d-box d-accent" x="76" y="76" width="120" height="50" rx="10"/>
+  <text class="d-text" x="136" y="106" text-anchor="middle">App</text>
+  <rect class="d-box d-cyan" x="32" y="216" width="92" height="50" rx="10"/>
+  <text class="d-text" x="78" y="246" text-anchor="middle">Redis</text>
+  <rect class="d-box" x="148" y="216" width="92" height="50" rx="10"/>
+  <text class="d-text" x="194" y="246" text-anchor="middle">Aurora</text>
+  <path class="d-edge d-edge-ok" d="M106 126L80 214" marker-end="url(#cache-patterns-arrow)"/>
+  <text class="d-sub" x="86" y="174" text-anchor="end">1  read</text>
+  <path class="d-edge d-edge-accent" d="M166 126L192 214" marker-end="url(#cache-patterns-arrow)"/>
+  <text class="d-sub" x="186" y="174">2  on miss</text>
+  <text class="d-sub" x="136" y="296" text-anchor="middle">miss: SELECT, then SET</text>
+  <text class="d-sub" x="136" y="320" text-anchor="middle">write: DB, then DEL</text>
+
+  <rect class="d-zone" x="280" y="16" width="240" height="328" rx="10"/>
+  <text class="d-text" x="400" y="48" text-anchor="middle">Write-through</text>
+  <rect class="d-box d-accent" x="340" y="76" width="120" height="50" rx="10"/>
+  <text class="d-text" x="400" y="106" text-anchor="middle">App</text>
+  <rect class="d-box d-cyan" x="296" y="216" width="92" height="50" rx="10"/>
+  <text class="d-text" x="342" y="246" text-anchor="middle">Redis</text>
+  <rect class="d-box" x="412" y="216" width="92" height="50" rx="10"/>
+  <text class="d-text" x="458" y="246" text-anchor="middle">Aurora</text>
+  <path class="d-edge d-edge-accent" d="M370 126L344 214" marker-end="url(#cache-patterns-arrow)"/>
+  <text class="d-sub" x="350" y="174" text-anchor="end">2  SET</text>
+  <path class="d-edge d-edge-accent" d="M430 126L456 214" marker-end="url(#cache-patterns-arrow)"/>
+  <text class="d-sub" x="450" y="174">1  write</text>
+  <text class="d-sub" x="400" y="296" text-anchor="middle">write DB, then cache</text>
+  <text class="d-sub" x="400" y="320" text-anchor="middle">cache stays warm</text>
+
+  <rect class="d-zone" x="544" y="16" width="240" height="328" rx="10"/>
+  <text class="d-text" x="664" y="48" text-anchor="middle">Write-behind</text>
+  <rect class="d-box d-accent" x="604" y="76" width="120" height="50" rx="10"/>
+  <text class="d-text" x="664" y="106" text-anchor="middle">App</text>
+  <rect class="d-box d-cyan" x="560" y="216" width="92" height="50" rx="10"/>
+  <text class="d-text" x="606" y="246" text-anchor="middle">Redis</text>
+  <rect class="d-box" x="676" y="216" width="92" height="50" rx="10"/>
+  <text class="d-text" x="722" y="246" text-anchor="middle">Aurora</text>
+  <path class="d-edge d-edge-accent" d="M634 126L608 214" marker-end="url(#cache-patterns-arrow)"/>
+  <text class="d-sub" x="614" y="174" text-anchor="end">1  write</text>
+  <path class="d-edge d-dashed" d="M652 241H674" marker-end="url(#cache-patterns-arrow)"/>
+  <text class="d-sub" x="664" y="296" text-anchor="middle">2  async flush</text>
+  <text class="d-sub" x="664" y="320" text-anchor="middle">fast, can lose writes</text>
+</svg><figcaption>Who writes to the cache, and when</figcaption></figure>
+<ul>
+<li><strong>Cache-aside</strong> (also called <em>lazy loading</em>): the app reads Redis. On a miss, the app reads Aurora and writes the result to Redis. On a write, the app updates Aurora and deletes the cache key.</li>
+<li><strong>Read-through</strong>: the same idea, but a cache library does the loading for you. Your code only talks to the cache. In Node apps this is usually just a helper like <code>getOrLoad</code> below.</li>
+<li><strong>Write-through</strong>: every write goes to Aurora and then to Redis, in the same request. The cache stays warm, but you also cache data that nobody may ever read.</li>
+<li><strong>Write-behind</strong> (or <em>write-back</em>): the app writes to Redis only, and a background worker copies changes to Aurora later. Writes are very fast, but if Redis loses data before the flush, those writes are gone.</li>
+</ul>
+<p>For most apps I start with cache-aside plus a TTL. It fails safely: if the cache is empty or wrong, the next read fixes it. The <a href="https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html" target="_blank" rel="noopener">ElastiCache caching strategies guide</a> suggests the same mix: lazy loading for reads, write-through where you need fresh data, and a TTL on everything.</p>
+<h3 id="cache-aside-in-10-lines"><a class="anchor" href="#cache-aside-in-10-lines" aria-hidden="true" tabindex="-1">#</a>Cache-aside in 10 lines</h3>
+<div class="code"><span class="code__lang">ts</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FF7B72">export</span><span style="color:#FF7B72"> async</span><span style="color:#FF7B72"> function</span><span style="color:#D2A8FF"> getProduct</span><span style="color:#E6EDF3">(</span><span style="color:#FFA657">id</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> string</span><span style="color:#E6EDF3">)</span><span style="color:#FF7B72">:</span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">Product</span><span style="color:#FF7B72"> |</span><span style="color:#79C0FF"> null</span><span style="color:#E6EDF3">> {</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> key</span><span style="color:#FF7B72"> =</span><span style="color:#A5D6FF"> `product:v1:${</span><span style="color:#E6EDF3">id</span><span style="color:#A5D6FF">}`</span><span style="color:#E6EDF3">;</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> cached</span><span style="color:#FF7B72"> =</span><span style="color:#FF7B72"> await</span><span style="color:#E6EDF3"> redis.</span><span style="color:#D2A8FF">get</span><span style="color:#E6EDF3">(key);</span></span>
+<span class="line"><span style="color:#FF7B72">  if</span><span style="color:#E6EDF3"> (cached </span><span style="color:#FF7B72">!==</span><span style="color:#79C0FF"> null</span><span style="color:#E6EDF3">) </span><span style="color:#FF7B72">return</span><span style="color:#79C0FF"> JSON</span><span style="color:#E6EDF3">.</span><span style="color:#D2A8FF">parse</span><span style="color:#E6EDF3">(cached) </span><span style="color:#FF7B72">as</span><span style="color:#FFA657"> Product</span><span style="color:#FF7B72"> |</span><span style="color:#79C0FF"> null</span><span style="color:#E6EDF3">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> product</span><span style="color:#FF7B72"> =</span><span style="color:#FF7B72"> await</span><span style="color:#D2A8FF"> loadProduct</span><span style="color:#E6EDF3">(id);</span></span>
+<span class="line"><span style="color:#FF7B72">  await</span><span style="color:#E6EDF3"> redis.</span><span style="color:#D2A8FF">set</span><span style="color:#E6EDF3">(key, </span><span style="color:#79C0FF">JSON</span><span style="color:#E6EDF3">.</span><span style="color:#D2A8FF">stringify</span><span style="color:#E6EDF3">(product), </span><span style="color:#A5D6FF">"EX"</span><span style="color:#E6EDF3">, </span><span style="color:#D2A8FF">ttlWithJitter</span><span style="color:#E6EDF3">(product </span><span style="color:#FF7B72">?</span><span style="color:#79C0FF"> 300</span><span style="color:#FF7B72"> :</span><span style="color:#79C0FF"> 30</span><span style="color:#E6EDF3">));</span></span>
+<span class="line"><span style="color:#FF7B72">  return</span><span style="color:#E6EDF3"> product;</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
+<p>Note <code>ttlWithJitter</code> and the 30-second <code>null</code>. I&#39;ll come back to both.</p>
+<h2 id="the-cache-stampede"><a class="anchor" href="#the-cache-stampede" aria-hidden="true" tabindex="-1">#</a>The cache stampede</h2>
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" class="diagram" role="img" aria-labelledby="stampede-timeline-t stampede-timeline-d">
+  <title id="stampede-timeline-t">Cache stampede with and without a lock</title>
+  <desc id="stampede-timeline-d">Two bar charts of Aurora queries over time: without a lock, many queries hit Aurora right after a hot key expires; with a lock, only one query does.</desc>
+  <defs>
+    <marker id="stampede-timeline-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker>
+  </defs>
+  <text class="d-text" x="772" y="38" text-anchor="end">Without a lock</text>
+  <path class="d-grid" d="M100 137H772"/>
+  <path class="d-grid" d="M100 94H772"/>
+  <path class="d-axis" d="M100 50V180H772"/>
+  <text class="d-sub" x="90" y="111" text-anchor="end">Aurora</text>
+  <text class="d-sub" x="90" y="127" text-anchor="end">queries</text>
+  <rect class="d-fill-warn" x="317" y="70" width="28" height="110" rx="3"/>
+  <rect class="d-fill-warn" x="359" y="76" width="28" height="104" rx="3"/>
+  <rect class="d-fill-warn" x="401" y="84" width="28" height="96" rx="3"/>
+  <rect class="d-fill-warn" x="443" y="128" width="28" height="52" rx="3"/>
+  <path class="d-edge d-dashed" d="M310 50V180"/>
+  <text class="d-sub" x="310" y="38" text-anchor="middle">key expires</text>
+  <text class="d-sub" x="500" y="111">every request that misses</text>
+  <text class="d-sub" x="500" y="129">runs the same SELECT</text>
+  <text class="d-text" x="772" y="250" text-anchor="end">With a lock (single flight)</text>
+  <path class="d-grid" d="M100 349H772"/>
+  <path class="d-grid" d="M100 306H772"/>
+  <path class="d-axis" d="M100 262V392H772"/>
+  <text class="d-sub" x="90" y="323" text-anchor="end">Aurora</text>
+  <text class="d-sub" x="90" y="339" text-anchor="end">queries</text>
+  <rect class="d-fill-ok" x="317" y="380" width="28" height="12" rx="3"/>
+  <path class="d-edge d-dashed" d="M310 262V392"/>
+  <text class="d-sub" x="310" y="250" text-anchor="middle">key expires</text>
+  <text class="d-sub" x="500" y="323">one request rebuilds the key</text>
+  <text class="d-sub" x="500" y="341">the rest wait or get stale data</text>
+  <path class="d-edge" d="M100 424H300" marker-end="url(#stampede-timeline-arrow)"/>
+  <text class="d-sub" x="312" y="428">time (illustrative, not measured)</text>
+</svg><figcaption>The same burst of traffic, with and without a lock</figcaption></figure>
+<p>A <strong>cache stampede</strong> (also called a <em>thundering herd</em>) happens when a popular key expires and many requests miss at the same moment. Each one runs the same query against Aurora. Say your home page key gets 2,000 requests a second and the query takes 200 ms. In that 200 ms, around 400 requests all miss and all run the query. Aurora slows down, so the query takes longer, so even more requests miss. That loop is how a cache expiry turns into an outage.</p>
+<p>There are three common fixes. You can use them together.</p>
+<h3 id="fix-1-a-single-flight-lock"><a class="anchor" href="#fix-1-a-single-flight-lock" aria-hidden="true" tabindex="-1">#</a>Fix 1: a single-flight lock</h3>
+<p>&quot;Single flight&quot; means only one request rebuilds the key, and everyone else waits for its result. In Redis you build that with one command: <code>SET lock:key token NX PX 5000</code>. <code>NX</code> means &quot;only set it if it doesn&#39;t exist&quot;, so only one client gets the lock. <code>PX 5000</code> means the lock removes itself after 5 seconds, so a crashed process can&#39;t hold it forever.</p>
+<p>The tricky part is releasing the lock. A plain <code>DEL</code> is a bug. If your rebuild took longer than 5 seconds, the lock already expired, another request took it, and your <code>DEL</code> now deletes <em>their</em> lock. The fix, which the <a href="https://valkey.io/commands/set/" target="_blank" rel="noopener">Valkey <code>SET</code> docs</a> also describe, is a random token and a small Lua script that deletes the lock only if it still holds your token. Redis runs a Lua script as one step, so nothing can happen between the check and the delete.</p>
+<div class="code"><span class="code__lang">ts</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FF7B72">import</span><span style="color:#E6EDF3"> { randomUUID } </span><span style="color:#FF7B72">from</span><span style="color:#A5D6FF"> "node:crypto"</span><span style="color:#E6EDF3">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">const</span><span style="color:#79C0FF"> RELEASE</span><span style="color:#FF7B72"> =</span><span style="color:#A5D6FF"> `</span></span>
+<span class="line"><span style="color:#A5D6FF">if redis.call("GET", KEYS[1]) == ARGV[1] then</span></span>
+<span class="line"><span style="color:#A5D6FF">  return redis.call("DEL", KEYS[1])</span></span>
+<span class="line"><span style="color:#A5D6FF">end</span></span>
+<span class="line"><span style="color:#A5D6FF">return 0`</span><span style="color:#E6EDF3">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">export</span><span style="color:#FF7B72"> async</span><span style="color:#FF7B72"> function</span><span style="color:#D2A8FF"> withLock</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">>(</span></span>
+<span class="line"><span style="color:#FFA657">  key</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> string</span><span style="color:#E6EDF3">, </span><span style="color:#FFA657">ttlMs</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> number</span><span style="color:#E6EDF3">, </span><span style="color:#D2A8FF">fn</span><span style="color:#FF7B72">:</span><span style="color:#E6EDF3"> () </span><span style="color:#FF7B72">=></span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">>,</span></span>
+<span class="line"><span style="color:#E6EDF3">)</span><span style="color:#FF7B72">:</span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;{ </span><span style="color:#FFA657">ok</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> true</span><span style="color:#E6EDF3">; </span><span style="color:#FFA657">value</span><span style="color:#FF7B72">:</span><span style="color:#FFA657"> T</span><span style="color:#E6EDF3"> } </span><span style="color:#FF7B72">|</span><span style="color:#E6EDF3"> { </span><span style="color:#FFA657">ok</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> false</span><span style="color:#E6EDF3"> }> {</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> lockKey</span><span style="color:#FF7B72"> =</span><span style="color:#A5D6FF"> `lock:${</span><span style="color:#E6EDF3">key</span><span style="color:#A5D6FF">}`</span><span style="color:#E6EDF3">;</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> token</span><span style="color:#FF7B72"> =</span><span style="color:#D2A8FF"> randomUUID</span><span style="color:#E6EDF3">();</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> acquired</span><span style="color:#FF7B72"> =</span><span style="color:#FF7B72"> await</span><span style="color:#E6EDF3"> redis.</span><span style="color:#D2A8FF">set</span><span style="color:#E6EDF3">(lockKey, token, </span><span style="color:#A5D6FF">"PX"</span><span style="color:#E6EDF3">, ttlMs, </span><span style="color:#A5D6FF">"NX"</span><span style="color:#E6EDF3">);</span></span>
+<span class="line"><span style="color:#FF7B72">  if</span><span style="color:#E6EDF3"> (acquired </span><span style="color:#FF7B72">!==</span><span style="color:#A5D6FF"> "OK"</span><span style="color:#E6EDF3">) </span><span style="color:#FF7B72">return</span><span style="color:#E6EDF3"> { ok: </span><span style="color:#79C0FF">false</span><span style="color:#E6EDF3"> };   </span><span style="color:#8B949E">// someone else holds it</span></span>
+<span class="line"><span style="color:#FF7B72">  try</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#FF7B72">    return</span><span style="color:#E6EDF3"> { ok: </span><span style="color:#79C0FF">true</span><span style="color:#E6EDF3">, value: </span><span style="color:#FF7B72">await</span><span style="color:#D2A8FF"> fn</span><span style="color:#E6EDF3">() };</span></span>
+<span class="line"><span style="color:#E6EDF3">  } </span><span style="color:#FF7B72">finally</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#FF7B72">    await</span><span style="color:#E6EDF3"> redis.</span><span style="color:#D2A8FF">eval</span><span style="color:#E6EDF3">(</span><span style="color:#79C0FF">RELEASE</span><span style="color:#E6EDF3">, </span><span style="color:#79C0FF">1</span><span style="color:#E6EDF3">, lockKey, token); </span><span style="color:#8B949E">// only delete our own lock</span></span>
+<span class="line"><span style="color:#E6EDF3">  }</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
+<aside class="callout callout--tip"><p><strong>Tip:</strong> On Valkey 9.0 or later you can replace the Lua script with the built-in <a href="https://valkey.io/commands/delifeq/" target="_blank" rel="noopener"><code>DELIFEQ key value</code></a> command. Check which engine version your cluster runs before you depend on it.</p>
+</aside>
+<p>Now the read path. The request that gets the lock checks the cache one more time (another request may have filled it already), loads from Aurora and saves the value. The others sleep a little and check again.</p>
+<div class="code"><span class="code__lang">ts</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FF7B72">import</span><span style="color:#E6EDF3"> { setTimeout </span><span style="color:#FF7B72">as</span><span style="color:#E6EDF3"> sleep } </span><span style="color:#FF7B72">from</span><span style="color:#A5D6FF"> "node:timers/promises"</span><span style="color:#E6EDF3">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">export</span><span style="color:#FF7B72"> async</span><span style="color:#FF7B72"> function</span><span style="color:#D2A8FF"> getOrLoad</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">>(</span><span style="color:#FFA657">key</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> string</span><span style="color:#E6EDF3">, </span><span style="color:#FFA657">ttlSec</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> number</span><span style="color:#E6EDF3">, </span><span style="color:#D2A8FF">load</span><span style="color:#FF7B72">:</span><span style="color:#E6EDF3"> () </span><span style="color:#FF7B72">=></span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">>)</span><span style="color:#FF7B72">:</span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">> {</span></span>
+<span class="line"><span style="color:#FF7B72">  for</span><span style="color:#E6EDF3"> (</span><span style="color:#FF7B72">let</span><span style="color:#E6EDF3"> attempt </span><span style="color:#FF7B72">=</span><span style="color:#79C0FF"> 0</span><span style="color:#E6EDF3">; attempt </span><span style="color:#FF7B72">&#x3C;</span><span style="color:#79C0FF"> 20</span><span style="color:#E6EDF3">; attempt</span><span style="color:#FF7B72">++</span><span style="color:#E6EDF3">) {</span></span>
+<span class="line"><span style="color:#FF7B72">    const</span><span style="color:#79C0FF"> hit</span><span style="color:#FF7B72"> =</span><span style="color:#FF7B72"> await</span><span style="color:#E6EDF3"> redis.</span><span style="color:#D2A8FF">get</span><span style="color:#E6EDF3">(key);</span></span>
+<span class="line"><span style="color:#FF7B72">    if</span><span style="color:#E6EDF3"> (hit </span><span style="color:#FF7B72">!==</span><span style="color:#79C0FF"> null</span><span style="color:#E6EDF3">) </span><span style="color:#FF7B72">return</span><span style="color:#79C0FF"> JSON</span><span style="color:#E6EDF3">.</span><span style="color:#D2A8FF">parse</span><span style="color:#E6EDF3">(hit) </span><span style="color:#FF7B72">as</span><span style="color:#FFA657"> T</span><span style="color:#E6EDF3">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">    const</span><span style="color:#79C0FF"> res</span><span style="color:#FF7B72"> =</span><span style="color:#FF7B72"> await</span><span style="color:#D2A8FF"> withLock</span><span style="color:#E6EDF3">(key, </span><span style="color:#79C0FF">5_000</span><span style="color:#E6EDF3">, </span><span style="color:#FF7B72">async</span><span style="color:#E6EDF3"> () </span><span style="color:#FF7B72">=></span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#FF7B72">      const</span><span style="color:#79C0FF"> again</span><span style="color:#FF7B72"> =</span><span style="color:#FF7B72"> await</span><span style="color:#E6EDF3"> redis.</span><span style="color:#D2A8FF">get</span><span style="color:#E6EDF3">(key);         </span><span style="color:#8B949E">// filled while we waited?</span></span>
+<span class="line"><span style="color:#FF7B72">      if</span><span style="color:#E6EDF3"> (again </span><span style="color:#FF7B72">!==</span><span style="color:#79C0FF"> null</span><span style="color:#E6EDF3">) </span><span style="color:#FF7B72">return</span><span style="color:#79C0FF"> JSON</span><span style="color:#E6EDF3">.</span><span style="color:#D2A8FF">parse</span><span style="color:#E6EDF3">(again) </span><span style="color:#FF7B72">as</span><span style="color:#FFA657"> T</span><span style="color:#E6EDF3">;</span></span>
+<span class="line"><span style="color:#FF7B72">      const</span><span style="color:#79C0FF"> value</span><span style="color:#FF7B72"> =</span><span style="color:#FF7B72"> await</span><span style="color:#D2A8FF"> load</span><span style="color:#E6EDF3">();</span></span>
+<span class="line"><span style="color:#FF7B72">      await</span><span style="color:#E6EDF3"> redis.</span><span style="color:#D2A8FF">set</span><span style="color:#E6EDF3">(key, </span><span style="color:#79C0FF">JSON</span><span style="color:#E6EDF3">.</span><span style="color:#D2A8FF">stringify</span><span style="color:#E6EDF3">(value), </span><span style="color:#A5D6FF">"EX"</span><span style="color:#E6EDF3">, </span><span style="color:#D2A8FF">ttlWithJitter</span><span style="color:#E6EDF3">(ttlSec));</span></span>
+<span class="line"><span style="color:#FF7B72">      return</span><span style="color:#E6EDF3"> value;</span></span>
+<span class="line"><span style="color:#E6EDF3">    });</span></span>
+<span class="line"><span style="color:#FF7B72">    if</span><span style="color:#E6EDF3"> (res.ok) </span><span style="color:#FF7B72">return</span><span style="color:#E6EDF3"> res.value;</span></span>
+<span class="line"><span style="color:#FF7B72">    await</span><span style="color:#D2A8FF"> sleep</span><span style="color:#E6EDF3">(</span><span style="color:#79C0FF">50</span><span style="color:#FF7B72"> +</span><span style="color:#E6EDF3"> Math.</span><span style="color:#D2A8FF">random</span><span style="color:#E6EDF3">() </span><span style="color:#FF7B72">*</span><span style="color:#79C0FF"> 50</span><span style="color:#E6EDF3">);          </span><span style="color:#8B949E">// lock is busy: wait, then re-check</span></span>
+<span class="line"><span style="color:#E6EDF3">  }</span></span>
+<span class="line"><span style="color:#FF7B72">  return</span><span style="color:#D2A8FF"> load</span><span style="color:#E6EDF3">(); </span><span style="color:#8B949E">// waited ~1.5 s: stop waiting and go to the DB</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
+<p>This is not a lock you&#39;d trust for money or stock counts. If Redis fails over, a lock can be lost. Here that&#39;s fine. The worst case is that two requests rebuild the same key, which is what would have happened anyway without the lock.</p>
+<h3 id="fix-2-refresh-early-at-random-xfetch"><a class="anchor" href="#fix-2-refresh-early-at-random-xfetch" aria-hidden="true" tabindex="-1">#</a>Fix 2: refresh early, at random (XFetch)</h3>
+<p>The lock makes the others wait. A nicer trick is to rebuild the key <em>a bit before</em> it expires, so it never really expires under load. If every request did that at the same fixed moment, you&#39;d get a stampede again. So each request rolls a dice instead, and the chance of refreshing grows as expiry gets closer.</p>
+<p>This is the <strong>XFetch</strong> algorithm from the paper <em>Optimal Probabilistic Cache Stampede Prevention</em> (Vattani, Chierichetti and Lowenstein, VLDB 2015). You store two extra things with the value: <code>delta</code>, how long the last rebuild took, and the expiry time. Slow queries start refreshing earlier, which is what you want.</p>
+<div class="code"><span class="code__lang">ts</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FF7B72">type</span><span style="color:#FFA657"> Entry</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">> </span><span style="color:#FF7B72">=</span><span style="color:#E6EDF3"> { </span><span style="color:#FFA657">value</span><span style="color:#FF7B72">:</span><span style="color:#FFA657"> T</span><span style="color:#E6EDF3">; </span><span style="color:#FFA657">delta</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> number</span><span style="color:#E6EDF3">; </span><span style="color:#FFA657">expiresAt</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> number</span><span style="color:#E6EDF3"> };</span></span>
+<span class="line"><span style="color:#FF7B72">const</span><span style="color:#79C0FF"> BETA</span><span style="color:#FF7B72"> =</span><span style="color:#79C0FF"> 1</span><span style="color:#E6EDF3">; </span><span style="color:#8B949E">// > 1 refreshes earlier, &#x3C; 1 later</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">export</span><span style="color:#FF7B72"> async</span><span style="color:#FF7B72"> function</span><span style="color:#D2A8FF"> xfetch</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">>(</span><span style="color:#FFA657">key</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> string</span><span style="color:#E6EDF3">, </span><span style="color:#FFA657">ttlSec</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> number</span><span style="color:#E6EDF3">, </span><span style="color:#D2A8FF">load</span><span style="color:#FF7B72">:</span><span style="color:#E6EDF3"> () </span><span style="color:#FF7B72">=></span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">>)</span><span style="color:#FF7B72">:</span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">> {</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> raw</span><span style="color:#FF7B72"> =</span><span style="color:#FF7B72"> await</span><span style="color:#E6EDF3"> redis.</span><span style="color:#D2A8FF">get</span><span style="color:#E6EDF3">(key);</span></span>
+<span class="line"><span style="color:#FF7B72">  if</span><span style="color:#E6EDF3"> (raw </span><span style="color:#FF7B72">!==</span><span style="color:#79C0FF"> null</span><span style="color:#E6EDF3">) {</span></span>
+<span class="line"><span style="color:#FF7B72">    const</span><span style="color:#79C0FF"> e</span><span style="color:#FF7B72"> =</span><span style="color:#79C0FF"> JSON</span><span style="color:#E6EDF3">.</span><span style="color:#D2A8FF">parse</span><span style="color:#E6EDF3">(raw) </span><span style="color:#FF7B72">as</span><span style="color:#FFA657"> Entry</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">>;</span></span>
+<span class="line"><span style="color:#8B949E">    // Math.log(Math.random()) is &#x3C;= 0, so this adds a random head start</span></span>
+<span class="line"><span style="color:#FF7B72">    const</span><span style="color:#79C0FF"> refreshEarly</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> Date.</span><span style="color:#D2A8FF">now</span><span style="color:#E6EDF3">() </span><span style="color:#FF7B72">-</span><span style="color:#E6EDF3"> e.delta </span><span style="color:#FF7B72">*</span><span style="color:#79C0FF"> BETA</span><span style="color:#FF7B72"> *</span><span style="color:#E6EDF3"> Math.</span><span style="color:#D2A8FF">log</span><span style="color:#E6EDF3">(Math.</span><span style="color:#D2A8FF">random</span><span style="color:#E6EDF3">()) </span><span style="color:#FF7B72">>=</span><span style="color:#E6EDF3"> e.expiresAt;</span></span>
+<span class="line"><span style="color:#FF7B72">    if</span><span style="color:#E6EDF3"> (</span><span style="color:#FF7B72">!</span><span style="color:#E6EDF3">refreshEarly) </span><span style="color:#FF7B72">return</span><span style="color:#E6EDF3"> e.value;</span></span>
+<span class="line"><span style="color:#E6EDF3">  }</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> start</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> Date.</span><span style="color:#D2A8FF">now</span><span style="color:#E6EDF3">();</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> value</span><span style="color:#FF7B72"> =</span><span style="color:#FF7B72"> await</span><span style="color:#D2A8FF"> load</span><span style="color:#E6EDF3">();</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> delta</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> Date.</span><span style="color:#D2A8FF">now</span><span style="color:#E6EDF3">() </span><span style="color:#FF7B72">-</span><span style="color:#E6EDF3"> start;               </span><span style="color:#8B949E">// how long a rebuild takes</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> entry</span><span style="color:#FF7B72">:</span><span style="color:#FFA657"> Entry</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">> </span><span style="color:#FF7B72">=</span><span style="color:#E6EDF3"> { value, delta, expiresAt: Date.</span><span style="color:#D2A8FF">now</span><span style="color:#E6EDF3">() </span><span style="color:#FF7B72">+</span><span style="color:#E6EDF3"> ttlSec </span><span style="color:#FF7B72">*</span><span style="color:#79C0FF"> 1000</span><span style="color:#E6EDF3"> };</span></span>
+<span class="line"><span style="color:#FF7B72">  await</span><span style="color:#E6EDF3"> redis.</span><span style="color:#D2A8FF">set</span><span style="color:#E6EDF3">(key, </span><span style="color:#79C0FF">JSON</span><span style="color:#E6EDF3">.</span><span style="color:#D2A8FF">stringify</span><span style="color:#E6EDF3">(entry), </span><span style="color:#A5D6FF">"PX"</span><span style="color:#E6EDF3">, ttlSec </span><span style="color:#FF7B72">*</span><span style="color:#79C0FF"> 1000</span><span style="color:#E6EDF3">);</span></span>
+<span class="line"><span style="color:#FF7B72">  return</span><span style="color:#E6EDF3"> value;</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
+<p>No lock and no waiting. Under heavy traffic, one or two requests refresh a little early and the rest keep reading the cached value. The guarantee is about probability, not a promise, so a few requests may refresh at once. That&#39;s usually fine. The check uses each server&#39;s clock, so keep clocks in sync with NTP.</p>
+<h3 id="fix-3-stale-while-revalidate"><a class="anchor" href="#fix-3-stale-while-revalidate" aria-hidden="true" tabindex="-1">#</a>Fix 3: stale-while-revalidate</h3>
+<p><strong>Stale-while-revalidate</strong> means &quot;give the user the old value right now, and rebuild it in the background.&quot; The name comes from an HTTP cache header (<a href="https://www.rfc-editor.org/rfc/rfc5861" target="_blank" rel="noopener">RFC 5861</a>). You keep two times: a <em>fresh</em> time, and a longer <em>hard</em> TTL in Redis. Between the two, the value is stale but still usable.</p>
+<div class="code"><span class="code__lang">ts</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FF7B72">type</span><span style="color:#FFA657"> Swr</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">> </span><span style="color:#FF7B72">=</span><span style="color:#E6EDF3"> { </span><span style="color:#FFA657">value</span><span style="color:#FF7B72">:</span><span style="color:#FFA657"> T</span><span style="color:#E6EDF3">; </span><span style="color:#FFA657">freshUntil</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> number</span><span style="color:#E6EDF3"> };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">async</span><span style="color:#FF7B72"> function</span><span style="color:#D2A8FF"> refresh</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">>(</span><span style="color:#FFA657">key</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> string</span><span style="color:#E6EDF3">, </span><span style="color:#FFA657">freshSec</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> number</span><span style="color:#E6EDF3">, </span><span style="color:#FFA657">staleSec</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> number</span><span style="color:#E6EDF3">, </span><span style="color:#D2A8FF">load</span><span style="color:#FF7B72">:</span><span style="color:#E6EDF3"> () </span><span style="color:#FF7B72">=></span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">>)</span><span style="color:#FF7B72">:</span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">> {</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> value</span><span style="color:#FF7B72"> =</span><span style="color:#FF7B72"> await</span><span style="color:#D2A8FF"> load</span><span style="color:#E6EDF3">();</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> entry</span><span style="color:#FF7B72">:</span><span style="color:#FFA657"> Swr</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">> </span><span style="color:#FF7B72">=</span><span style="color:#E6EDF3"> { value, freshUntil: Date.</span><span style="color:#D2A8FF">now</span><span style="color:#E6EDF3">() </span><span style="color:#FF7B72">+</span><span style="color:#E6EDF3"> freshSec </span><span style="color:#FF7B72">*</span><span style="color:#79C0FF"> 1000</span><span style="color:#E6EDF3"> };</span></span>
+<span class="line"><span style="color:#FF7B72">  await</span><span style="color:#E6EDF3"> redis.</span><span style="color:#D2A8FF">set</span><span style="color:#E6EDF3">(key, </span><span style="color:#79C0FF">JSON</span><span style="color:#E6EDF3">.</span><span style="color:#D2A8FF">stringify</span><span style="color:#E6EDF3">(entry), </span><span style="color:#A5D6FF">"EX"</span><span style="color:#E6EDF3">, freshSec </span><span style="color:#FF7B72">+</span><span style="color:#E6EDF3"> staleSec);</span></span>
+<span class="line"><span style="color:#FF7B72">  return</span><span style="color:#E6EDF3"> value;</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">export</span><span style="color:#FF7B72"> async</span><span style="color:#FF7B72"> function</span><span style="color:#D2A8FF"> getSwr</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">>(</span></span>
+<span class="line"><span style="color:#FFA657">  key</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> string</span><span style="color:#E6EDF3">, </span><span style="color:#FFA657">freshSec</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> number</span><span style="color:#E6EDF3">, </span><span style="color:#FFA657">staleSec</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> number</span><span style="color:#E6EDF3">, </span><span style="color:#D2A8FF">load</span><span style="color:#FF7B72">:</span><span style="color:#E6EDF3"> () </span><span style="color:#FF7B72">=></span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">>,</span></span>
+<span class="line"><span style="color:#E6EDF3">)</span><span style="color:#FF7B72">:</span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">> {</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> raw</span><span style="color:#FF7B72"> =</span><span style="color:#FF7B72"> await</span><span style="color:#E6EDF3"> redis.</span><span style="color:#D2A8FF">get</span><span style="color:#E6EDF3">(key);</span></span>
+<span class="line"><span style="color:#FF7B72">  if</span><span style="color:#E6EDF3"> (raw </span><span style="color:#FF7B72">===</span><span style="color:#79C0FF"> null</span><span style="color:#E6EDF3">) </span><span style="color:#FF7B72">return</span><span style="color:#D2A8FF"> refresh</span><span style="color:#E6EDF3">(key, freshSec, staleSec, load); </span><span style="color:#8B949E">// true miss</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> entry</span><span style="color:#FF7B72"> =</span><span style="color:#79C0FF"> JSON</span><span style="color:#E6EDF3">.</span><span style="color:#D2A8FF">parse</span><span style="color:#E6EDF3">(raw) </span><span style="color:#FF7B72">as</span><span style="color:#FFA657"> Swr</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">>;</span></span>
+<span class="line"><span style="color:#FF7B72">  if</span><span style="color:#E6EDF3"> (Date.</span><span style="color:#D2A8FF">now</span><span style="color:#E6EDF3">() </span><span style="color:#FF7B72">></span><span style="color:#E6EDF3"> entry.freshUntil) {</span></span>
+<span class="line"><span style="color:#8B949E">    // stale: answer now, rebuild in the background, one worker only</span></span>
+<span class="line"><span style="color:#FF7B72">    void</span><span style="color:#D2A8FF"> withLock</span><span style="color:#E6EDF3">(key, </span><span style="color:#79C0FF">5_000</span><span style="color:#E6EDF3">, () </span><span style="color:#FF7B72">=></span><span style="color:#D2A8FF"> refresh</span><span style="color:#E6EDF3">(key, freshSec, staleSec, load))</span></span>
+<span class="line"><span style="color:#E6EDF3">      .</span><span style="color:#D2A8FF">catch</span><span style="color:#E6EDF3">((</span><span style="color:#FFA657">err</span><span style="color:#E6EDF3">) </span><span style="color:#FF7B72">=></span><span style="color:#E6EDF3"> console.</span><span style="color:#D2A8FF">warn</span><span style="color:#E6EDF3">(</span><span style="color:#A5D6FF">"swr refresh failed"</span><span style="color:#E6EDF3">, key, err));</span></span>
+<span class="line"><span style="color:#E6EDF3">  }</span></span>
+<span class="line"><span style="color:#FF7B72">  return</span><span style="color:#E6EDF3"> entry.value;</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
+<p>Nobody waits for Aurora once the key exists. It&#39;s my default for product lists, settings and feature flags, where a few seconds of old data are fine. A true miss (the first load, or after the hard TTL) still goes straight to the database. On a very hot key, wrap that path with <code>getOrLoad</code> too.</p>
+<h2 id="ttl-jitter"><a class="anchor" href="#ttl-jitter" aria-hidden="true" tabindex="-1">#</a>TTL jitter</h2>
+<p>If you warm a cache by loading 50,000 keys in one job, all with <code>EX 300</code>, they all expire in the same second five minutes later. You&#39;ve built a stampede on a timer. <strong>Jitter</strong> means adding a small random amount to each TTL so expiries spread out.</p>
+<div class="code"><span class="code__lang">ts</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FF7B72">export</span><span style="color:#FF7B72"> function</span><span style="color:#D2A8FF"> ttlWithJitter</span><span style="color:#E6EDF3">(</span><span style="color:#FFA657">baseSeconds</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> number</span><span style="color:#E6EDF3">, </span><span style="color:#FFA657">spread</span><span style="color:#FF7B72"> =</span><span style="color:#79C0FF"> 0.1</span><span style="color:#E6EDF3">)</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> number</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> delta</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> baseSeconds </span><span style="color:#FF7B72">*</span><span style="color:#E6EDF3"> spread;</span></span>
+<span class="line"><span style="color:#FF7B72">  return</span><span style="color:#E6EDF3"> Math.</span><span style="color:#D2A8FF">max</span><span style="color:#E6EDF3">(</span><span style="color:#79C0FF">1</span><span style="color:#E6EDF3">, Math.</span><span style="color:#D2A8FF">round</span><span style="color:#E6EDF3">(baseSeconds </span><span style="color:#FF7B72">-</span><span style="color:#E6EDF3"> delta </span><span style="color:#FF7B72">+</span><span style="color:#E6EDF3"> Math.</span><span style="color:#D2A8FF">random</span><span style="color:#E6EDF3">() </span><span style="color:#FF7B72">*</span><span style="color:#79C0FF"> 2</span><span style="color:#FF7B72"> *</span><span style="color:#E6EDF3"> delta));</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span>
+<span class="line"><span style="color:#8B949E">// ttlWithJitter(300) → somewhere between 270 and 330 seconds</span></span></code></pre></div>
+<p>Plus or minus 10% is enough for most cases. It costs nothing, so I add it everywhere.</p>
+<h2 id="invalidation-and-the-stale-write-back-race"><a class="anchor" href="#invalidation-and-the-stale-write-back-race" aria-hidden="true" tabindex="-1">#</a>Invalidation and the stale write-back race</h2>
+<p>&quot;Invalidation&quot; means removing or updating a cache entry when the real data changes. The usual cache-aside rule is: write to Aurora, then <code>DEL</code> the key. The next read will load the new row. Mostly, that works. But there is a race.</p>
+<figure class="figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" class="diagram" role="img" aria-labelledby="invalidation-race-t invalidation-race-d">
+  <title id="invalidation-race-t">The stale write-back race</title>
+  <desc id="invalidation-race-d">A sequence diagram where a reader loads an old value from Aurora, a writer updates the row and deletes the cache key, and then the reader writes the old value back into Redis.</desc>
+  <defs>
+    <marker id="invalidation-race-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker>
+  </defs>
+
+  <!-- race window band -->
+  <rect class="d-box d-warn" x="24" y="186" width="752" height="186" rx="10"/>
+  <text class="d-sub" x="620" y="356" text-anchor="middle">race window</text>
+
+  <!-- actors -->
+  <rect class="d-box d-accent" x="60" y="24" width="120" height="50" rx="10"/>
+  <text class="d-text" x="120" y="54" text-anchor="middle">Reader</text>
+  <rect class="d-box d-cyan" x="260" y="24" width="120" height="50" rx="10"/>
+  <text class="d-text" x="320" y="54" text-anchor="middle">Redis</text>
+  <rect class="d-box" x="460" y="24" width="120" height="50" rx="10"/>
+  <text class="d-text" x="520" y="54" text-anchor="middle">Aurora</text>
+  <rect class="d-box d-accent" x="660" y="24" width="120" height="50" rx="10"/>
+  <text class="d-text" x="720" y="54" text-anchor="middle">Writer</text>
+
+  <!-- lifelines -->
+  <path class="d-edge d-dashed" d="M120 74V396"/>
+  <path class="d-edge d-dashed" d="M320 74V396"/>
+  <path class="d-edge d-dashed" d="M520 74V396"/>
+  <path class="d-edge d-dashed" d="M720 74V396"/>
+
+  <!-- 1 GET miss -->
+  <path class="d-edge" d="M120 122H318" marker-end="url(#invalidation-race-arrow)"/>
+  <circle class="d-num" cx="160" cy="109" r="9"/><text class="d-num-text" x="160" y="109">1</text>
+  <text class="d-sub" x="175" y="113">GET: miss</text>
+
+  <!-- 2 SELECT v1 -->
+  <path class="d-edge" d="M120 166H518" marker-end="url(#invalidation-race-arrow)"/>
+  <circle class="d-num" cx="160" cy="153" r="9"/><text class="d-num-text" x="160" y="153">2</text>
+  <text class="d-sub" x="175" y="157">SELECT: gets v1</text>
+
+  <!-- 3 UPDATE v2 -->
+  <path class="d-edge d-edge-accent" d="M720 236H522" marker-end="url(#invalidation-race-arrow)"/>
+  <circle class="d-num" cx="562" cy="223" r="9"/><text class="d-num-text" x="562" y="223">3</text>
+  <text class="d-sub" x="577" y="227">UPDATE to v2</text>
+
+  <!-- 4 DEL -->
+  <path class="d-edge d-edge-accent" d="M720 290H322" marker-end="url(#invalidation-race-arrow)"/>
+  <circle class="d-num" cx="562" cy="277" r="9"/><text class="d-num-text" x="562" y="277">4</text>
+  <text class="d-sub" x="577" y="281">DEL key</text>
+
+  <!-- 5 SET stale -->
+  <path class="d-edge d-edge-warn" d="M120 346H318" marker-end="url(#invalidation-race-arrow)"/>
+  <circle class="d-num" cx="160" cy="333" r="9"/><text class="d-num-text" x="160" y="333">5</text>
+  <text class="d-sub" x="175" y="337">SET key = v1</text>
+
+  <!-- outcome -->
+  <rect class="d-box d-warn" x="220" y="420" width="360" height="60" rx="10"/>
+  <text class="d-text" x="400" y="446" text-anchor="middle">Redis has v1, Aurora has v2</text>
+  <text class="d-sub" x="400" y="466" text-anchor="middle">stale until the TTL runs out</text>
+</svg><figcaption>The bad order of events: the old value lands after the DEL</figcaption></figure>
+<p>Follow the numbers:</p>
+<ol>
+<li>A reader misses in Redis.</li>
+<li>It reads the row from Aurora and gets version 1.</li>
+<li>Before it saves that, a writer updates the row to version 2 and commits.</li>
+<li>The writer deletes the cache key, which is already empty.</li>
+<li>Now the reader finally saves version 1 into Redis.</li>
+</ol>
+<p>Redis now holds old data until the TTL runs out. It&#39;s rare, but on a busy key, rare things happen every day.</p>
+<p>There are three fixes, from simplest to strongest.</p>
+<h3 id="delete-after-commit"><a class="anchor" href="#delete-after-commit" aria-hidden="true" tabindex="-1">#</a>Delete after commit</h3>
+<p>Never delete the key <em>before</em> or <em>during</em> the transaction, or a reader can refill it with the old row before your commit lands. Delete after <code>COMMIT</code>, and treat a failed <code>DEL</code> as &quot;the TTL will clean it up.&quot;</p>
+<div class="code"><span class="code__lang">ts</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FF7B72">export</span><span style="color:#FF7B72"> async</span><span style="color:#FF7B72"> function</span><span style="color:#D2A8FF"> updatePrice</span><span style="color:#E6EDF3">(</span><span style="color:#FFA657">id</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> string</span><span style="color:#E6EDF3">, </span><span style="color:#FFA657">priceCents</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> number</span><span style="color:#E6EDF3">)</span><span style="color:#FF7B72">:</span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#79C0FF">void</span><span style="color:#E6EDF3">> {</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> client</span><span style="color:#FF7B72"> =</span><span style="color:#FF7B72"> await</span><span style="color:#E6EDF3"> db.</span><span style="color:#D2A8FF">connect</span><span style="color:#E6EDF3">();</span></span>
+<span class="line"><span style="color:#FF7B72">  try</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#FF7B72">    await</span><span style="color:#E6EDF3"> client.</span><span style="color:#D2A8FF">query</span><span style="color:#E6EDF3">(</span><span style="color:#A5D6FF">"BEGIN"</span><span style="color:#E6EDF3">);</span></span>
+<span class="line"><span style="color:#FF7B72">    await</span><span style="color:#E6EDF3"> client.</span><span style="color:#D2A8FF">query</span><span style="color:#E6EDF3">(</span></span>
+<span class="line"><span style="color:#A5D6FF">      "UPDATE products SET price_cents = $2, version = version + 1 WHERE id = $1"</span><span style="color:#E6EDF3">,</span></span>
+<span class="line"><span style="color:#E6EDF3">      [id, priceCents],</span></span>
+<span class="line"><span style="color:#E6EDF3">    );</span></span>
+<span class="line"><span style="color:#FF7B72">    await</span><span style="color:#E6EDF3"> client.</span><span style="color:#D2A8FF">query</span><span style="color:#E6EDF3">(</span><span style="color:#A5D6FF">"COMMIT"</span><span style="color:#E6EDF3">);</span></span>
+<span class="line"><span style="color:#E6EDF3">  } </span><span style="color:#FF7B72">catch</span><span style="color:#E6EDF3"> (err) {</span></span>
+<span class="line"><span style="color:#FF7B72">    await</span><span style="color:#E6EDF3"> client.</span><span style="color:#D2A8FF">query</span><span style="color:#E6EDF3">(</span><span style="color:#A5D6FF">"ROLLBACK"</span><span style="color:#E6EDF3">);</span></span>
+<span class="line"><span style="color:#FF7B72">    throw</span><span style="color:#E6EDF3"> err;</span></span>
+<span class="line"><span style="color:#E6EDF3">  } </span><span style="color:#FF7B72">finally</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">    client.</span><span style="color:#D2A8FF">release</span><span style="color:#E6EDF3">();</span></span>
+<span class="line"><span style="color:#E6EDF3">  }</span></span>
+<span class="line"><span style="color:#8B949E">  // only after COMMIT: readers that start now will see the new row</span></span>
+<span class="line"><span style="color:#FF7B72">  await</span><span style="color:#E6EDF3"> redis.</span><span style="color:#D2A8FF">del</span><span style="color:#E6EDF3">(</span><span style="color:#A5D6FF">`product:v1:${</span><span style="color:#E6EDF3">id</span><span style="color:#A5D6FF">}`</span><span style="color:#E6EDF3">).</span><span style="color:#D2A8FF">catch</span><span style="color:#E6EDF3">((</span><span style="color:#FFA657">err</span><span style="color:#E6EDF3">) </span><span style="color:#FF7B72">=></span><span style="color:#E6EDF3"> console.</span><span style="color:#D2A8FF">warn</span><span style="color:#E6EDF3">(</span><span style="color:#A5D6FF">"DEL failed"</span><span style="color:#E6EDF3">, err));</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
+<h3 id="keep-ttls-short"><a class="anchor" href="#keep-ttls-short" aria-hidden="true" tabindex="-1">#</a>Keep TTLs short</h3>
+<p>A short TTL doesn&#39;t stop the race, but it limits how long the damage lasts. It&#39;s your safety net for every bug in this section.</p>
+<h3 id="use-versions-so-old-data-cant-win"><a class="anchor" href="#use-versions-so-old-data-cant-win" aria-hidden="true" tabindex="-1">#</a>Use versions so old data can&#39;t win</h3>
+<p>When old data really hurts (prices, permissions, account status), give each row a <code>version</code> column that goes up by one on every update. Store the version next to the cached value, and only let a write in if it&#39;s newer. On update, the writer saves the new row straight into the cache instead of deleting it. That&#39;s write-through with a version check. The slow reader from the diagram then tries to save version 1 over version 2, and the script says no.</p>
+<div class="code"><span class="code__lang">ts</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FF7B72">const</span><span style="color:#79C0FF"> SET_IF_NEWER</span><span style="color:#FF7B72"> =</span><span style="color:#A5D6FF"> `</span></span>
+<span class="line"><span style="color:#A5D6FF">local cur = redis.call("HGET", KEYS[1], "ver")</span></span>
+<span class="line"><span style="color:#A5D6FF">if cur and tonumber(cur) >= tonumber(ARGV[1]) then return 0 end</span></span>
+<span class="line"><span style="color:#A5D6FF">redis.call("HSET", KEYS[1], "ver", ARGV[1], "data", ARGV[2])</span></span>
+<span class="line"><span style="color:#A5D6FF">redis.call("EXPIRE", KEYS[1], ARGV[3])</span></span>
+<span class="line"><span style="color:#A5D6FF">return 1`</span><span style="color:#E6EDF3">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">export</span><span style="color:#FF7B72"> async</span><span style="color:#FF7B72"> function</span><span style="color:#D2A8FF"> cacheProduct</span><span style="color:#E6EDF3">(</span><span style="color:#FFA657">p</span><span style="color:#FF7B72">:</span><span style="color:#FFA657"> Product</span><span style="color:#E6EDF3">, </span><span style="color:#FFA657">ttlSec</span><span style="color:#FF7B72"> =</span><span style="color:#79C0FF"> 300</span><span style="color:#E6EDF3">)</span><span style="color:#FF7B72">:</span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#79C0FF">boolean</span><span style="color:#E6EDF3">> {</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> n</span><span style="color:#FF7B72"> =</span><span style="color:#FF7B72"> await</span><span style="color:#E6EDF3"> redis.</span><span style="color:#D2A8FF">eval</span><span style="color:#E6EDF3">(</span><span style="color:#79C0FF">SET_IF_NEWER</span><span style="color:#E6EDF3">, </span><span style="color:#79C0FF">1</span><span style="color:#E6EDF3">, </span><span style="color:#A5D6FF">`product:v2:${</span><span style="color:#E6EDF3">p</span><span style="color:#A5D6FF">.</span><span style="color:#E6EDF3">id</span><span style="color:#A5D6FF">}`</span><span style="color:#E6EDF3">,</span></span>
+<span class="line"><span style="color:#E6EDF3">    p.version, </span><span style="color:#79C0FF">JSON</span><span style="color:#E6EDF3">.</span><span style="color:#D2A8FF">stringify</span><span style="color:#E6EDF3">(p), </span><span style="color:#D2A8FF">ttlWithJitter</span><span style="color:#E6EDF3">(ttlSec));</span></span>
+<span class="line"><span style="color:#FF7B72">  return</span><span style="color:#E6EDF3"> n </span><span style="color:#FF7B72">===</span><span style="color:#79C0FF"> 1</span><span style="color:#E6EDF3">;</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">export</span><span style="color:#FF7B72"> async</span><span style="color:#FF7B72"> function</span><span style="color:#D2A8FF"> savePrice</span><span style="color:#E6EDF3">(</span><span style="color:#FFA657">id</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> string</span><span style="color:#E6EDF3">, </span><span style="color:#FFA657">priceCents</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> number</span><span style="color:#E6EDF3">)</span><span style="color:#FF7B72">:</span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#79C0FF">void</span><span style="color:#E6EDF3">> {</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#E6EDF3"> { </span><span style="color:#79C0FF">rows</span><span style="color:#E6EDF3"> } </span><span style="color:#FF7B72">=</span><span style="color:#FF7B72"> await</span><span style="color:#E6EDF3"> db.</span><span style="color:#D2A8FF">query</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">Product</span><span style="color:#E6EDF3">>(</span></span>
+<span class="line"><span style="color:#A5D6FF">    `UPDATE products SET price_cents = $2, version = version + 1</span></span>
+<span class="line"><span style="color:#A5D6FF">     WHERE id = $1 RETURNING id, name, price_cents, version`</span><span style="color:#E6EDF3">,</span></span>
+<span class="line"><span style="color:#E6EDF3">    [id, priceCents],</span></span>
+<span class="line"><span style="color:#E6EDF3">  );</span></span>
+<span class="line"><span style="color:#FF7B72">  if</span><span style="color:#E6EDF3"> (rows[</span><span style="color:#79C0FF">0</span><span style="color:#E6EDF3">]) </span><span style="color:#FF7B72">await</span><span style="color:#D2A8FF"> cacheProduct</span><span style="color:#E6EDF3">(rows[</span><span style="color:#79C0FF">0</span><span style="color:#E6EDF3">]); </span><span style="color:#8B949E">// newer version wins, old ones bounce off</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
+<p>On the read path, call <code>cacheProduct(row)</code> instead of a plain <code>SET</code>. Notice the <code>v1</code>/<code>v2</code> in the key names: that&#39;s the other meaning of &quot;versioned keys.&quot; If you change the shape of what you cache, change the key prefix, and the old entries simply age out instead of breaking your new code.</p>
+<h2 id="hot-keys"><a class="anchor" href="#hot-keys" aria-hidden="true" tabindex="-1">#</a>Hot keys</h2>
+<p>A <strong>hot key</strong> is one key that gets a big share of all traffic, like a home page config or a flash-sale product. In a Redis cluster, each key lives on one shard. So a single hot key can max out one node while the rest sit idle, and adding shards doesn&#39;t help.</p>
+<p>Two cheap fixes in the app go a long way. First, merge identical requests inside one Node process, so 200 concurrent requests for the same key turn into one Redis call. Second, keep a tiny copy in memory for about a second.</p>
+<div class="code"><span class="code__lang">ts</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FF7B72">const</span><span style="color:#79C0FF"> inflight</span><span style="color:#FF7B72"> =</span><span style="color:#FF7B72"> new</span><span style="color:#D2A8FF"> Map</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#79C0FF">string</span><span style="color:#E6EDF3">, </span><span style="color:#FFA657">Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#79C0FF">unknown</span><span style="color:#E6EDF3">>>();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">export</span><span style="color:#FF7B72"> function</span><span style="color:#D2A8FF"> singleFlight</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">>(</span><span style="color:#FFA657">key</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> string</span><span style="color:#E6EDF3">, </span><span style="color:#D2A8FF">fn</span><span style="color:#FF7B72">:</span><span style="color:#E6EDF3"> () </span><span style="color:#FF7B72">=></span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">>)</span><span style="color:#FF7B72">:</span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">> {</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> running</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> inflight.</span><span style="color:#D2A8FF">get</span><span style="color:#E6EDF3">(key);</span></span>
+<span class="line"><span style="color:#FF7B72">  if</span><span style="color:#E6EDF3"> (running) </span><span style="color:#FF7B72">return</span><span style="color:#E6EDF3"> running </span><span style="color:#FF7B72">as</span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">>;</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> p</span><span style="color:#FF7B72"> =</span><span style="color:#D2A8FF"> fn</span><span style="color:#E6EDF3">().</span><span style="color:#D2A8FF">finally</span><span style="color:#E6EDF3">(() </span><span style="color:#FF7B72">=></span><span style="color:#E6EDF3"> inflight.</span><span style="color:#D2A8FF">delete</span><span style="color:#E6EDF3">(key));</span></span>
+<span class="line"><span style="color:#E6EDF3">  inflight.</span><span style="color:#D2A8FF">set</span><span style="color:#E6EDF3">(key, p);</span></span>
+<span class="line"><span style="color:#FF7B72">  return</span><span style="color:#E6EDF3"> p;</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">const</span><span style="color:#79C0FF"> local</span><span style="color:#FF7B72"> =</span><span style="color:#FF7B72"> new</span><span style="color:#D2A8FF"> Map</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#79C0FF">string</span><span style="color:#E6EDF3">, { </span><span style="color:#FFA657">value</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> unknown</span><span style="color:#E6EDF3">; </span><span style="color:#FFA657">until</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> number</span><span style="color:#E6EDF3"> }>();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">export</span><span style="color:#FF7B72"> async</span><span style="color:#FF7B72"> function</span><span style="color:#D2A8FF"> getHot</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">>(</span><span style="color:#FFA657">key</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> string</span><span style="color:#E6EDF3">, </span><span style="color:#D2A8FF">load</span><span style="color:#FF7B72">:</span><span style="color:#E6EDF3"> () </span><span style="color:#FF7B72">=></span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">>)</span><span style="color:#FF7B72">:</span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">T</span><span style="color:#E6EDF3">> {</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> l</span><span style="color:#FF7B72"> =</span><span style="color:#E6EDF3"> local.</span><span style="color:#D2A8FF">get</span><span style="color:#E6EDF3">(key);</span></span>
+<span class="line"><span style="color:#FF7B72">  if</span><span style="color:#E6EDF3"> (l </span><span style="color:#FF7B72">&#x26;&#x26;</span><span style="color:#E6EDF3"> l.until </span><span style="color:#FF7B72">></span><span style="color:#E6EDF3"> Date.</span><span style="color:#D2A8FF">now</span><span style="color:#E6EDF3">()) </span><span style="color:#FF7B72">return</span><span style="color:#E6EDF3"> l.value </span><span style="color:#FF7B72">as</span><span style="color:#FFA657"> T</span><span style="color:#E6EDF3">;</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> value</span><span style="color:#FF7B72"> =</span><span style="color:#FF7B72"> await</span><span style="color:#D2A8FF"> singleFlight</span><span style="color:#E6EDF3">(key, () </span><span style="color:#FF7B72">=></span><span style="color:#D2A8FF"> getOrLoad</span><span style="color:#E6EDF3">(key, </span><span style="color:#79C0FF">300</span><span style="color:#E6EDF3">, load));</span></span>
+<span class="line"><span style="color:#E6EDF3">  local.</span><span style="color:#D2A8FF">set</span><span style="color:#E6EDF3">(key, { value, until: Date.</span><span style="color:#D2A8FF">now</span><span style="color:#E6EDF3">() </span><span style="color:#FF7B72">+</span><span style="color:#79C0FF"> 1_000</span><span style="color:#E6EDF3"> }); </span><span style="color:#8B949E">// 1 s in-process copy</span></span>
+<span class="line"><span style="color:#FF7B72">  return</span><span style="color:#E6EDF3"> value;</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
+<p>In real code, use a bounded LRU (such as the <code>lru-cache</code> package) instead of a plain <code>Map</code>. If that isn&#39;t enough, read from ElastiCache replicas, or store a few copies of the key (<code>config:home:0</code> to <code>config:home:7</code>) and pick one at random.</p>
+<h2 id="negative-caching"><a class="anchor" href="#negative-caching" aria-hidden="true" tabindex="-1">#</a>Negative caching</h2>
+<p><strong>Negative caching</strong> means remembering that something <em>doesn&#39;t</em> exist. Without it, a request for a product ID that isn&#39;t in the database misses Redis every single time and always hits Aurora. A bot scanning random IDs can hurt you badly this way.</p>
+<p>You already saw the fix in <code>getProduct</code>: when the row is <code>null</code>, cache <code>null</code> with a short TTL (30 seconds there). Keep it short, because when that ID is created you want it to show up quickly. If you create rows with known IDs, delete the key on insert, the same as on update.</p>
+<h2 id="when-redis-is-down"><a class="anchor" href="#when-redis-is-down" aria-hidden="true" tabindex="-1">#</a>When Redis is down</h2>
+<p>Sooner or later, Redis will be slow or unreachable. The usual answer is to <strong>fail open</strong>: if the cache doesn&#39;t work, read from the database. That&#39;s correct, but think about the numbers. If your cache serves 95% of reads, failing open sends 20 times more traffic to Aurora in one second. Aurora also has a hard connection limit. So fail open, but only up to a limit, and reject the rest quickly.</p>
+<div class="code"><span class="code__lang">ts</span><pre class="shiki github-dark-default"><code><span class="line"><span style="color:#FF7B72">let</span><span style="color:#E6EDF3"> fallbacks </span><span style="color:#FF7B72">=</span><span style="color:#79C0FF"> 0</span><span style="color:#E6EDF3">;</span></span>
+<span class="line"><span style="color:#FF7B72">const</span><span style="color:#79C0FF"> MAX_FALLBACKS</span><span style="color:#FF7B72"> =</span><span style="color:#79C0FF"> 10</span><span style="color:#E6EDF3">; </span><span style="color:#8B949E">// per process; size it against Aurora's connection budget</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">export</span><span style="color:#FF7B72"> class</span><span style="color:#FFA657"> CacheUnavailable</span><span style="color:#FF7B72"> extends</span><span style="color:#79C0FF"> Error</span><span style="color:#E6EDF3"> {}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#FF7B72">export</span><span style="color:#FF7B72"> async</span><span style="color:#FF7B72"> function</span><span style="color:#D2A8FF"> getProductSafe</span><span style="color:#E6EDF3">(</span><span style="color:#FFA657">id</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> string</span><span style="color:#E6EDF3">)</span><span style="color:#FF7B72">:</span><span style="color:#FFA657"> Promise</span><span style="color:#E6EDF3">&#x3C;</span><span style="color:#FFA657">Product</span><span style="color:#FF7B72"> |</span><span style="color:#79C0FF"> null</span><span style="color:#E6EDF3">> {</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> key</span><span style="color:#FF7B72"> =</span><span style="color:#A5D6FF"> `product:v1:${</span><span style="color:#E6EDF3">id</span><span style="color:#A5D6FF">}`</span><span style="color:#E6EDF3">;</span></span>
+<span class="line"><span style="color:#FF7B72">  let</span><span style="color:#E6EDF3"> cached</span><span style="color:#FF7B72">:</span><span style="color:#79C0FF"> string</span><span style="color:#FF7B72"> |</span><span style="color:#79C0FF"> null</span><span style="color:#E6EDF3">;</span></span>
+<span class="line"><span style="color:#FF7B72">  try</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#E6EDF3">    cached </span><span style="color:#FF7B72">=</span><span style="color:#FF7B72"> await</span><span style="color:#E6EDF3"> redis.</span><span style="color:#D2A8FF">get</span><span style="color:#E6EDF3">(key);</span></span>
+<span class="line"><span style="color:#E6EDF3">  } </span><span style="color:#FF7B72">catch</span><span style="color:#E6EDF3"> {</span></span>
+<span class="line"><span style="color:#8B949E">    // Redis is down or slow: go to Aurora, but only a few requests at a time</span></span>
+<span class="line"><span style="color:#FF7B72">    if</span><span style="color:#E6EDF3"> (fallbacks </span><span style="color:#FF7B72">>=</span><span style="color:#79C0FF"> MAX_FALLBACKS</span><span style="color:#E6EDF3">) </span><span style="color:#FF7B72">throw</span><span style="color:#FF7B72"> new</span><span style="color:#D2A8FF"> CacheUnavailable</span><span style="color:#E6EDF3">(</span><span style="color:#A5D6FF">"shedding load"</span><span style="color:#E6EDF3">);</span></span>
+<span class="line"><span style="color:#E6EDF3">    fallbacks</span><span style="color:#FF7B72">++</span><span style="color:#E6EDF3">;</span></span>
+<span class="line"><span style="color:#FF7B72">    try</span><span style="color:#E6EDF3"> { </span><span style="color:#FF7B72">return</span><span style="color:#FF7B72"> await</span><span style="color:#D2A8FF"> loadProduct</span><span style="color:#E6EDF3">(id); } </span><span style="color:#FF7B72">finally</span><span style="color:#E6EDF3"> { fallbacks</span><span style="color:#FF7B72">--</span><span style="color:#E6EDF3">; }</span></span>
+<span class="line"><span style="color:#E6EDF3">  }</span></span>
+<span class="line"><span style="color:#FF7B72">  if</span><span style="color:#E6EDF3"> (cached </span><span style="color:#FF7B72">!==</span><span style="color:#79C0FF"> null</span><span style="color:#E6EDF3">) </span><span style="color:#FF7B72">return</span><span style="color:#79C0FF"> JSON</span><span style="color:#E6EDF3">.</span><span style="color:#D2A8FF">parse</span><span style="color:#E6EDF3">(cached) </span><span style="color:#FF7B72">as</span><span style="color:#FFA657"> Product</span><span style="color:#FF7B72"> |</span><span style="color:#79C0FF"> null</span><span style="color:#E6EDF3">;</span></span>
+<span class="line"><span style="color:#FF7B72">  const</span><span style="color:#79C0FF"> product</span><span style="color:#FF7B72"> =</span><span style="color:#FF7B72"> await</span><span style="color:#D2A8FF"> loadProduct</span><span style="color:#E6EDF3">(id);</span></span>
+<span class="line"><span style="color:#E6EDF3">  redis.</span><span style="color:#D2A8FF">set</span><span style="color:#E6EDF3">(key, </span><span style="color:#79C0FF">JSON</span><span style="color:#E6EDF3">.</span><span style="color:#D2A8FF">stringify</span><span style="color:#E6EDF3">(product), </span><span style="color:#A5D6FF">"EX"</span><span style="color:#E6EDF3">, </span><span style="color:#D2A8FF">ttlWithJitter</span><span style="color:#E6EDF3">(product </span><span style="color:#FF7B72">?</span><span style="color:#79C0FF"> 300</span><span style="color:#FF7B72"> :</span><span style="color:#79C0FF"> 30</span><span style="color:#E6EDF3">))</span></span>
+<span class="line"><span style="color:#E6EDF3">    .</span><span style="color:#D2A8FF">catch</span><span style="color:#E6EDF3">(() </span><span style="color:#FF7B72">=></span><span style="color:#E6EDF3"> {}); </span><span style="color:#8B949E">// best effort; a failed SET is just a future miss</span></span>
+<span class="line"><span style="color:#FF7B72">  return</span><span style="color:#E6EDF3"> product;</span></span>
+<span class="line"><span style="color:#E6EDF3">}</span></span></code></pre></div>
+<p>Map <code>CacheUnavailable</code> to an HTTP 503 with a <code>Retry-After</code> header. To size <code>MAX_FALLBACKS</code>, take the database connections you can spare and divide by the number of app processes. If you run many small processes, such as Lambda functions, put RDS Proxy in front of Aurora so a spike of new connections doesn&#39;t overwhelm it.</p>
+<aside class="callout callout--warning"><p><strong>Warning:</strong> Only the Redis call sits inside the <code>try</code>. If you wrap the whole function, a database error also looks like &quot;Redis is down&quot;, and your fallback retries the same failing query.</p>
+</aside>
+<h2 id="picking-a-pattern"><a class="anchor" href="#picking-a-pattern" aria-hidden="true" tabindex="-1">#</a>Picking a pattern</h2>
+<div class="table-wrap" tabindex="0"><table>
+<thead>
+<tr>
+<th>Pattern</th>
+<th>Read latency</th>
+<th>Freshness</th>
+<th>Complexity</th>
+<th>Failure mode</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Cache-aside + TTL</td>
+<td>Miss costs one DB query</td>
+<td>Stale up to TTL</td>
+<td>Low</td>
+<td>Stampedes on hot keys</td>
+</tr>
+<tr>
+<td>Write-through</td>
+<td>Mostly hits</td>
+<td>Fresh after each write</td>
+<td>Medium</td>
+<td>Caches data nobody reads</td>
+</tr>
+<tr>
+<td>Write-behind</td>
+<td>Fast writes</td>
+<td>Cache is the truth for a while</td>
+<td>High</td>
+<td>Lost writes if Redis loses data</td>
+</tr>
+<tr>
+<td>Lock (single flight)</td>
+<td>Waiters pay a small delay</td>
+<td>Same as TTL</td>
+<td>Medium</td>
+<td>Waiters slow down if rebuild is slow</td>
+</tr>
+<tr>
+<td>XFetch</td>
+<td>Almost always a hit</td>
+<td>Refreshes a bit early</td>
+<td>Low</td>
+<td>A few duplicate rebuilds</td>
+</tr>
+<tr>
+<td>Stale-while-revalidate</td>
+<td>Always fast after first load</td>
+<td>Stale up to the extra window</td>
+<td>Medium</td>
+<td>Old data shown during the window</td>
+</tr>
+<tr>
+<td>Versioned writes</td>
+<td>Same as cache-aside</td>
+<td>No stale write-backs</td>
+<td>Medium</td>
+<td>Needs a <code>version</code> column</td>
+</tr>
+</tbody></table>
+</div>
+<p>And a rough guide for TTLs. These are starting points, not measured numbers:</p>
+<div class="table-wrap" tabindex="0"><table>
+<thead>
+<tr>
+<th>Data</th>
+<th>Example TTL</th>
+<th>Pattern</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Config and feature flags</td>
+<td>30–60 s</td>
+<td>Stale-while-revalidate + local copy</td>
+</tr>
+<tr>
+<td>Product or profile pages</td>
+<td>5–15 min</td>
+<td>Cache-aside + lock or XFetch</td>
+</tr>
+<tr>
+<td>Prices, permissions</td>
+<td>1–5 min</td>
+<td>Versioned write-through</td>
+</tr>
+<tr>
+<td>&quot;Not found&quot; results</td>
+<td>10–60 s</td>
+<td>Negative caching</td>
+</tr>
+<tr>
+<td>Session data</td>
+<td>Match the session length</td>
+<td>Redis as the store, not a cache</td>
+</tr>
+</tbody></table>
+</div>
+<h2 id="gotchas"><a class="anchor" href="#gotchas" aria-hidden="true" tabindex="-1">#</a>Gotchas</h2>
+<ul>
+<li><strong>Lua scripts and cluster mode.</strong> In a Redis cluster (and ElastiCache Serverless), all keys used by one script must live in the same hash slot. Every script here touches just one key, so they work. If you add a second key, use a hash tag like <code>{product:42}</code> in both key names.</li>
+<li><strong>JSON of <code>undefined</code>.</strong> <code>JSON.stringify(undefined)</code> returns <code>undefined</code>, ioredis stores it as an empty string, and the next <code>JSON.parse(&quot;&quot;)</code> throws. Return <code>null</code> from loaders, never <code>undefined</code>.</li>
+<li><strong>Eviction.</strong> When Redis runs out of memory, it removes keys based on the <code>maxmemory-policy</code> setting. A cache should use an LRU or LFU policy. Lock keys can be evicted too, which is one more reason the lock is only an optimisation.</li>
+<li><strong>Missing metrics.</strong> Track hit rate, lock waits, fallbacks and Redis latency. A falling hit rate is the first sign of a stampede or a bad key design.</li>
+</ul>
+<h2 id="when-not-to-use-this"><a class="anchor" href="#when-not-to-use-this" aria-hidden="true" tabindex="-1">#</a>When not to use this</h2>
+<ul>
+<li><strong>When Aurora is already fast enough.</strong> A good index and a read replica may be all you need.</li>
+<li><strong>For data that must be exactly right</strong>, like account balances or stock counts at checkout. Read those from the writer instance inside the transaction.</li>
+<li><strong>When each request asks for different data.</strong> If every query is unique, your hit rate will be near zero and you pay for Redis for nothing.</li>
+<li><strong>Write-behind for anything you can&#39;t afford to lose.</strong> If you need queued writes, use a real queue like SQS, not the cache.</li>
+</ul>
+<h2 id="checklist"><a class="anchor" href="#checklist" aria-hidden="true" tabindex="-1">#</a>Checklist</h2>
+<ul>
+<li><input disabled="" type="checkbox"> Every key has a TTL, with jitter.</li>
+<li><input disabled="" type="checkbox"> ioredis has a <code>commandTimeout</code>, low retries and no offline queue.</li>
+<li><input disabled="" type="checkbox"> Hot keys use a lock, XFetch or stale-while-revalidate.</li>
+<li><input disabled="" type="checkbox"> Locks use a random token and a compare-and-delete release.</li>
+<li><input disabled="" type="checkbox"> Cache deletes happen after <code>COMMIT</code>, never before.</li>
+<li><input disabled="" type="checkbox"> Data where staleness hurts uses a version check.</li>
+<li><input disabled="" type="checkbox"> &quot;Not found&quot; is cached with a short TTL.</li>
+<li><input disabled="" type="checkbox"> Fallback to Aurora has a concurrency limit.</li>
+<li><input disabled="" type="checkbox"> Dashboards show hit rate, fallbacks and Redis latency.</li>
+</ul>
+<h2 id="further-reading"><a class="anchor" href="#further-reading" aria-hidden="true" tabindex="-1">#</a>Further reading</h2>
+<ul>
+<li><a href="https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html" target="_blank" rel="noopener">Caching strategies</a>, Amazon ElastiCache docs</li>
+<li><a href="https://aws.amazon.com/about-aws/whats-new/2024/10/amazon-elasticache-valkey" target="_blank" rel="noopener">Announcing Amazon ElastiCache for Valkey</a>, AWS, October 2024</li>
+<li><a href="https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/engine-versions.html" target="_blank" rel="noopener">Engine versions and upgrading in ElastiCache</a>, Amazon ElastiCache docs</li>
+<li><a href="https://valkey.io/commands/set/" target="_blank" rel="noopener"><code>SET</code> command</a> and <a href="https://valkey.io/commands/delifeq/" target="_blank" rel="noopener"><code>DELIFEQ</code> command</a>, Valkey docs</li>
+<li><a href="https://www.vldb.org/pvldb/vol8/p886-vattani.pdf" target="_blank" rel="noopener">Optimal Probabilistic Cache Stampede Prevention</a>, Vattani, Chierichetti and Lowenstein, PVLDB vol. 8, 2015</li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc5861" target="_blank" rel="noopener">RFC 5861: HTTP Cache-Control Extensions for Stale Content</a></li>
+<li><a href="https://github.com/redis/ioredis" target="_blank" rel="noopener">ioredis</a> and <a href="https://node-postgres.com/features/transactions" target="_blank" rel="noopener">node-postgres transactions</a></li>
+</ul>
+
+        </div>
+      </div>
+      <footer class="post__foot container">
+        <div class="author">
+          <span class="brand__mark" aria-hidden="true">DP</span>
+          <div>
+            <p class="author__name">Divya Patel</p>
+            <p class="author__bio">Backend &amp; Cloud Engineer in Ahmedabad, India. I design AWS infrastructure with Terraform and build the serverless services that run on it. Open to remote roles and contract work.</p>
+          </div>
+          <a class="btn btn--accent btn--sm" href="/contact">Work with me</a>
+        </div>
+        <h2 class="more__title">More writing</h2><ul class="post-list post-list--compact"><li class="post-card"><a href="/blog/lambda-zero-downtime-deploys-github-actions">
+    <span class="post-card__meta"><time datetime="2026-11-13">13 November 2026</time> · 12 min read</span>
+    <span class="post-card__title">Zero-downtime Lambda deploys from GitHub Actions: OIDC, versions, aliases and canary rollback</span>
+    <span class="post-card__desc">Deploy AWS Lambda from GitHub Actions with no stored AWS keys: OIDC login, versions, a weighted alias canary and automatic rollback.</span>
+    <span class="post-card__tags">AWS Lambda · GitHub Actions · CI/CD</span>
+  </a></li><li class="post-card"><a href="/blog/self-host-llm-vllm-cost-vs-api">
+    <span class="post-card__meta"><time datetime="2026-11-13">13 November 2026</time> · 12 min read</span>
+    <span class="post-card__title">Self-hosting an LLM with vLLM: the real cost math vs an API</span>
+    <span class="post-card__desc">A neutral break-even model for self-hosting an LLM with vLLM vs paying an API per token, with a worked example, real prices and a small production setup.</span>
+    <span class="post-card__tags">LLM · vLLM · Cost</span>
+  </a></li><li class="post-card"><a href="/blog/terraform-aws-startup-layout">
+    <span class="post-card__meta"><time datetime="2026-11-13">13 November 2026</time> · 12 min read</span>
+    <span class="post-card__title">Terraform for a one-AWS-account startup: layout, state, and the day you split</span>
+    <span class="post-card__desc">How to structure Terraform for a small AWS startup: one state, then split state per stack and environment, then multi-account. With real HCL.</span>
+    <span class="post-card__tags">Terraform · AWS · Infrastructure as Code</span>
+  </a></li></ul>
+      </footer>
+    </article>
+  </main>
+
+  <footer class="footer blog-footer">
+    <div class="container">
+      <div class="footer__links">
+        <a href="/">Portfolio</a>
+        <a href="/blog">Writing</a>
+        <a href="/blog/feed.xml">RSS</a>
+        <a href="/contact">Contact</a>
+        <a href="/backend-developer-ahmedabad">Backend developer in Ahmedabad</a>
+        <a href="https://www.linkedin.com/in/divyapatel5113" target="_blank" rel="me noopener">LinkedIn</a>
+        <a href="#main" class="footer__top">Back to top ↑</a>
+      </div>
+    </div>
+    <p class="container footer__fine">© 2026 Divya Patel. Writing on backend, cloud infrastructure and system design.</p>
+  </footer>
+</body>
+</html>

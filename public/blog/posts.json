@@ -1,0 +1,32 @@
+[
+  {
+    "path": "/backend-developer-ahmedabad",
+    "title": "Backend and cloud developer in Ahmedabad, India",
+    "lastmod": "2026-11-13"
+  },
+  {
+    "path": "/blog",
+    "title": "Writing",
+    "lastmod": "2026-11-13"
+  },
+  {
+    "path": "/blog/lambda-zero-downtime-deploys-github-actions",
+    "title": "Zero-downtime Lambda deploys from GitHub Actions: OIDC, versions, aliases and canary rollback",
+    "lastmod": "2026-11-13"
+  },
+  {
+    "path": "/blog/redis-cache-stampede-aurora",
+    "title": "Cache-aside, write-through and stampede protection: Redis in front of Aurora PostgreSQL",
+    "lastmod": "2026-11-13"
+  },
+  {
+    "path": "/blog/self-host-llm-vllm-cost-vs-api",
+    "title": "Self-hosting an LLM with vLLM: the real cost math vs an API",
+    "lastmod": "2026-11-13"
+  },
+  {
+    "path": "/blog/terraform-aws-startup-layout",
+    "title": "Terraform for a one-AWS-account startup: layout, state, and the day you split",
+    "lastmod": "2026-11-13"
+  }
+]

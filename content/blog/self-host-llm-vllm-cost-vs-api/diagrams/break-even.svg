@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 440" class="diagram" role="img" aria-labelledby="break-even-t break-even-d">
+<title id="break-even-t">Self-hosted vLLM vs API: monthly cost by token volume</title>
+<desc id="break-even-d">Line chart of dollars per month against tokens per month. The API line rises steadily, the self-host line stays flat with a step when a second GPU is added, and they cross near 3.9 billion tokens a month in the example.</desc>
+<text x="90" y="30" class="d-sub">Example: 8B model, one L40S, 50% target use, 10:1 input to output</text>
+<rect x="90" y="50" width="131.0" height="310" class="d-fill-cyan" opacity="0.4"/>
+<rect x="221.0" y="50" width="539.0" height="310" class="d-fill-accent" opacity="0.3"/>
+<text x="80" y="364.0" class="d-sub" text-anchor="end">$0</text>
+<line x1="90" y1="298.0" x2="760" y2="298.0" class="d-grid"/>
+<text x="80" y="302.0" class="d-sub" text-anchor="end">$2k</text>
+<line x1="90" y1="236.0" x2="760" y2="236.0" class="d-grid"/>
+<text x="80" y="240.0" class="d-sub" text-anchor="end">$4k</text>
+<line x1="90" y1="174.0" x2="760" y2="174.0" class="d-grid"/>
+<text x="80" y="178.0" class="d-sub" text-anchor="end">$6k</text>
+<line x1="90" y1="112.0" x2="760" y2="112.0" class="d-grid"/>
+<text x="80" y="116.0" class="d-sub" text-anchor="end">$8k</text>
+<line x1="90" y1="50.0" x2="760" y2="50.0" class="d-grid"/>
+<text x="80" y="54.0" class="d-sub" text-anchor="end">$10k</text>
+<text x="90.0" y="380" class="d-sub" text-anchor="middle">0</text>
+<line x1="224.0" y1="50" x2="224.0" y2="360" class="d-grid"/>
+<text x="224.0" y="380" class="d-sub" text-anchor="middle">4B</text>
+<line x1="358.0" y1="50" x2="358.0" y2="360" class="d-grid"/>
+<text x="358.0" y="380" class="d-sub" text-anchor="middle">8B</text>
+<line x1="492.0" y1="50" x2="492.0" y2="360" class="d-grid"/>
+<text x="492.0" y="380" class="d-sub" text-anchor="middle">12B</text>
+<line x1="626.0" y1="50" x2="626.0" y2="360" class="d-grid"/>
+<text x="626.0" y="380" class="d-sub" text-anchor="middle">16B</text>
+<line x1="760.0" y1="50" x2="760.0" y2="360" class="d-grid"/>
+<text x="760.0" y="380" class="d-sub" text-anchor="middle">20B</text>
+<path d="M90 50V360H760" class="d-axis"/>
+<text x="425" y="412" class="d-text" text-anchor="middle">Tokens per month (input + output)</text>
+<text x="26" y="205" class="d-text" text-anchor="middle" transform="rotate(-90 26 205)">$ per month</text>
+<text x="155.5" y="72" class="d-text" text-anchor="middle">API cheaper</text>
+<text x="490.5" y="72" class="d-text" text-anchor="middle">Self-host cheaper</text>
+<path d="M90.0 360.0L760.0 106.4" class="d-line d-cyan-stroke"/>
+<path d="M90.0 310.4H574.1V285.6H760.0" class="d-line d-accent-stroke"/>
+<text x="600" y="132" class="d-text" text-anchor="end">API (gpt-5-mini)</text>
+<text x="400" y="298.4" class="d-text" text-anchor="middle">Self-host, 1 GPU</text>
+<text x="584.1" y="273.6" class="d-sub">2nd GPU added</text>
+<circle cx="221.0" cy="310.4" r="6" class="d-num"/>
+<line x1="221.0" y1="302.4" x2="261.0" y2="215" class="d-edge"/>
+<text x="265.0" y="212" class="d-text">Break-even ≈ 3.9B</text>
+<text x="265.0" y="230" class="d-sub">≈ $1,600 / month</text>
+</svg>

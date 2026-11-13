@@ -1,7 +1,7 @@
 # Security headers for hosts that read a _headers file (Netlify, Cloudflare Pages/Workers).
 # GitHub Pages ignores this file; the same Content-Security-Policy is also set in a <meta> tag in index.html.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://*.googletagmanager.com 'sha256-/LbKt0MibuWw3TF4uF0TA4kkd2452qY8QG2QS7CZnw8=' 'sha256-1jniyohxMOTsjYjsNfEX2sC7hYdgCkxXiiUW0i2delw='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; font-src 'self'; connect-src 'self' https://formsubmit.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; manifest-src 'self'; frame-src https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action https://formsubmit.co; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://*.googletagmanager.com 'sha256-/LbKt0MibuWw3TF4uF0TA4kkd2452qY8QG2QS7CZnw8=' 'sha256-iLDnONK3Z3/vV4tWZdatHdq72Zjn7Q8OR2HSRTqTurU='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; font-src 'self'; connect-src 'self' https://formsubmit.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; manifest-src 'self'; frame-src https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action https://formsubmit.co; frame-ancestors 'none'
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()

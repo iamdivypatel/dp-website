@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.googletagmanager.com 'sha256-/LbKt0MibuWw3TF4uF0TA4kkd2452qY8QG2QS7CZnw8=' 'sha256-1jniyohxMOTsjYjsNfEX2sC7hYdgCkxXiiUW0i2delw='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; font-src 'self'; connect-src 'self' https://formsubmit.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; manifest-src 'self'; frame-src https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action https://formsubmit.co">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.googletagmanager.com 'sha256-/LbKt0MibuWw3TF4uF0TA4kkd2452qY8QG2QS7CZnw8=' 'sha256-iLDnONK3Z3/vV4tWZdatHdq72Zjn7Q8OR2HSRTqTurU='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; font-src 'self'; connect-src 'self' https://formsubmit.co https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; manifest-src 'self'; frame-src https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action https://formsubmit.co">
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
   new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -19,7 +19,7 @@
   <meta name="theme-color" content="#08090b">
   <meta name="color-scheme" content="dark">
   <!-- Absolute URLs (canonical, og:url, og:image, JSON-LD, robots.txt, sitemap.xml) are set with: npm run set-domain -- https://your-domain -->
-  <link rel="canonical" href="https://divypatel.in/about">
+  <link rel="canonical" href="https://divypatel.in/">
   <meta property="og:type" content="profile">
   <meta property="og:url" content="https://divypatel.in/about">
   <meta property="og:site_name" content="Divya Patel">
@@ -46,7 +46,7 @@
       d.classList.remove('no-js');
       d.classList.add('js');
       try { seen = sessionStorage.getItem('dp-intro') === '1'; sessionStorage.setItem('dp-intro', '1'); } catch (e) {}
-      if (seen) d.classList.add('intro-seen');
+      if (seen || location.pathname !== '/') d.classList.add('intro-seen');
     })();
   </script>
   <link rel="stylesheet" href="/assets/css/styles.css">
@@ -54,24 +54,28 @@
   {
     "@context": "https://schema.org",
     "@graph": [
-      { "@type": "BreadcrumbList", "itemListElement": [{ "@type": "ListItem", "position": 1, "name": "Divya Patel", "item": "https://divypatel.in/" }, { "@type": "ListItem", "position": 2, "name": "About", "item": "https://divypatel.in/about" }] },
-      { "@type": "WebSite", "name": "Divya Patel", "url": "https://divypatel.in/" },
+      { "@type": "WebSite", "@id": "https://divypatel.in/#website", "name": "Divya Patel", "url": "https://divypatel.in/", "publisher": { "@id": "https://divypatel.in/#person" } },
       {
         "@type": "ProfilePage",
         "url": "https://divypatel.in/",
         "dateModified": "2026-11-13",
         "mainEntity": {
           "@type": "Person",
+          "@id": "https://divypatel.in/#person",
           "name": "Divya Patel",
+          "alternateName": "Divy Patel",
+          "url": "https://divypatel.in/",
+          "description": "Backend & Cloud Engineer in Ahmedabad, India. Designs AWS infrastructure with Terraform and builds serverless backends, with Redis caching, CI/CD and observability.",
           "jobTitle": "Backend & Cloud Engineer",
+          "hasOccupation": { "@type": "Occupation", "name": "Backend & Cloud Engineer", "occupationLocation": { "@type": "City", "name": "Ahmedabad" } },
           "image": "https://divypatel.in/assets/img/portrait-coder.webp",
           "email": "mailto:iamdivypatel@gmail.com",
           "telephone": "+91-73592-38533",
-          "address": { "@type": "PostalAddress", "addressLocality": "Ahmedabad", "addressCountry": "IN" },
+          "address": { "@type": "PostalAddress", "addressLocality": "Ahmedabad", "addressRegion": "Gujarat", "addressCountry": "IN" },
           "worksFor": { "@type": "Organization", "name": "Refy9" },
           "alumniOf": { "@type": "CollegeOrUniversity", "name": "Ganpat University" },
           "sameAs": ["https://www.linkedin.com/in/divyapatel5113"],
-          "knowsAbout": ["AWS", "Terraform", "Infrastructure as Code", "System design", "Serverless", "Redis", "CI/CD", "Observability", "Node.js", "TypeScript", "PostgreSQL", "MongoDB", "LLM serving"]
+          "knowsAbout": ["AWS", "AWS Lambda", "Amazon Aurora", "Terraform", "Infrastructure as Code", "DevOps", "System design", "Serverless", "Redis", "CI/CD", "GitHub Actions", "Observability", "Grafana", "Node.js", "TypeScript", "PostgreSQL", "MongoDB", "LLM serving", "vLLM"]
         }
       }
     ]
@@ -111,6 +115,7 @@
         <a href="/journey">Journey</a>
         <a href="/projects">Projects</a>
         <a href="/skills">Skills</a>
+        <a href="/blog">Writing</a>
       </nav>
       <a href="/contact" class="btn btn--accent btn--sm magnetic header-cta">Let’s talk <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><span></span><span></span></button>
@@ -125,7 +130,8 @@
       <a href="/journey"><small>03</small>Journey</a>
       <a href="/projects"><small>04</small>Projects</a>
       <a href="/skills"><small>05</small>Skills</a>
-      <a href="/contact"><small>06</small>Contact</a>
+      <a href="/blog"><small>06</small>Writing</a>
+      <a href="/contact"><small>07</small>Contact</a>
     </nav>
     <p class="menu__foot">iamdivypatel@gmail.com<br>Ahmedabad, India (UTC+5:30)</p>
   </div>
@@ -135,7 +141,7 @@
     <section id="top" class="hero" aria-labelledby="hero-name">
       <div class="hero__meta">
         <p class="label">Backend &amp; Cloud Engineer</p>
-        <p class="status"><span class="status__dot" aria-hidden="true"></span>Open to remote roles</p>
+        <p class="status"><span class="status__dot" aria-hidden="true"></span>Open to remote roles &amp; contract work</p>
       </div>
 
       <div class="hero__copy">
@@ -162,14 +168,15 @@
         </div>
       </div>
 
-      <h1 id="hero-name" class="hero__name" aria-label="Divya Patel">
+      <h1 id="hero-name" class="hero__name">
         <span class="hero__word" aria-hidden="true">Divya</span>
         <span class="hero__word" aria-hidden="true">Patel</span>
+        <span class="sr-only">Divya Patel, Backend &amp; Cloud Engineer in Ahmedabad, India</span>
       </h1>
 
       <div class="hero__foot" data-hero-fade>
         <p class="label">Ahmedabad, India <span class="dim">·</span> <span data-local-time>UTC+5:30</span></p>
-        <a href="/about" class="scroll-hint label">Scroll <i aria-hidden="true"></i></a>
+        <a href="/about" class="scroll-hint label">Scroll <span class="sr-only">to About Divya Patel</span><i aria-hidden="true"></i></a>
       </div>
     </section>
 
@@ -178,13 +185,13 @@
       <div class="container about__grid">
         <div class="about__text">
           <p class="eyebrow"><span>01</span> About</p>
-          <h2 id="about-title" class="sr-only">About Divya</h2>
+          <h2 id="about-title" class="sr-only">About Divya Patel, backend developer and cloud engineer</h2>
           <p class="reveal-words" data-reveal-words>Backend &amp; cloud engineer with 3+ years of production systems on AWS. At Refy9 I’m the main contributor to the Terraform for the whole AWS account and lead developer of OKKAI’s core API: serverless and event-driven services, caching with Redis, CI/CD, observability, security hardening and self-hosted LLM inference, with the services built in Node.js and TypeScript.</p>
-          <p class="about__note">Based in Ahmedabad, India (UTC+5:30). Open to remote roles.</p>
+          <p class="about__note">Based in Ahmedabad, Gujarat, India (UTC+5:30). Open to remote roles and contract work, in India and abroad.</p>
         </div>
         <figure class="portrait">
           <div class="portrait__frame">
-            <img class="portrait__img" src="/assets/img/portrait-coder.webp" width="960" height="1200" alt="Illustrated portrait of Divya Patel in a black hoodie, with headphones around his neck" loading="lazy" decoding="async">
+            <img class="portrait__img" src="/assets/img/portrait-coder.webp" width="960" height="1200" alt="Illustrated portrait of Divya Patel, Backend &amp; Cloud Engineer in Ahmedabad, India, in a black hoodie with headphones around his neck" loading="lazy" decoding="async">
           </div>
           <figcaption><span>Divya Patel (he/him)</span><span>Backend &amp; Cloud Engineer</span></figcaption>
         </figure>
@@ -217,7 +224,7 @@
       <div class="stack__pin">
         <div class="container stack__head">
           <p class="eyebrow"><span>02</span> How I build <span class="dim">— Refy9, OKKAI</span></p>
-          <h2 id="stack-title" class="title" data-split>The system I run <span class="serif">in production.</span></h2>
+          <h2 id="stack-title" class="title" data-split>The AWS system I run <span class="serif">in production.</span></h2>
           <p class="stack__note">A simplified view of the platform I work on. Scroll to take it apart, layer by layer.</p>
         </div>
         <ol class="stack__steps">
@@ -546,7 +553,7 @@
     <section id="skills" class="section skills" aria-labelledby="skills-title">
       <div class="container">
         <p class="eyebrow"><span>06</span> Skills</p>
-        <h2 id="skills-title" class="title" data-split>The toolbox <span class="serif">I reach for.</span></h2>
+        <h2 id="skills-title" class="title" data-split>Backend, cloud &amp; DevOps: the toolbox <span class="serif">I reach for.</span></h2>
         <dl class="skills__grid">
           <div class="skill-card skill-card--feature"><dt>System design</dt><dd>Serverless, event-driven microservices on AWS, caching with Redis, connection pooling with PgBouncer, SQS FIFO queues, WebSocket APIs, cold starts under 2 s</dd></div>
           <div class="skill-card"><dt>Cloud (AWS)</dt><dd>Lambda, API Gateway, EC2, VPC, S3, Aurora PostgreSQL, SQS, EventBridge, CloudFront, WAF, Route 53, IAM, Secrets Manager, SES</dd></div>
@@ -566,7 +573,7 @@
     <section id="education" class="section education" aria-labelledby="education-title">
       <div class="container">
         <p class="eyebrow"><span>07</span> Education</p>
-        <h2 id="education-title" class="sr-only">Education</h2>
+        <h2 id="education-title" class="sr-only">Education: Information Technology, Ganpat University</h2>
         <div class="edu">
           <article class="edu__item">
             <p class="edu__when">Aug 2024 – May 2026</p>
@@ -589,6 +596,11 @@
           <p class="eyebrow eyebrow--dark"><span>08</span> Contact</p>
           <h2 id="contact-title" class="contact__title" data-split>Let’s build something <span class="serif">reliable.</span></h2>
           <p class="contact__lead">Hiring for a cloud or backend role, or need someone to design and run your AWS infrastructure and the services on it? Send a note; I reply by email.</p>
+          <ul class="contact__services" aria-label="What I can help with">
+            <li><strong>AWS infrastructure with Terraform</strong> for a whole account: network, databases, edge and security.</li>
+            <li><strong>Serverless and event-driven backends</strong> on Lambda, API Gateway, SQS and EventBridge, with Redis caching.</li>
+            <li><strong>CI/CD and observability</strong> with GitHub Actions, Grafana, Prometheus and Loki.</li>
+          </ul>
           <div class="signature">
             <img class="avatar avatar--lg" src="/assets/img/avatar.webp" width="320" height="320" alt="" loading="lazy" decoding="async">
             <p><strong>Divya Patel</strong><span>Backend &amp; Cloud Engineer, Ahmedabad</span></p>
@@ -596,7 +608,7 @@
           <dl class="contact__list">
             <div><dt>Email</dt><dd><a href="mailto:iamdivypatel@gmail.com">iamdivypatel@gmail.com</a> <button type="button" class="copy" data-copy="iamdivypatel@gmail.com">Copy</button></dd></div>
             <div><dt>Phone</dt><dd><a href="tel:+917359238533">+91 73592 38533</a></dd></div>
-            <div><dt>LinkedIn</dt><dd><a href="https://www.linkedin.com/in/divyapatel5113" target="_blank" rel="noopener">linkedin.com/in/divyapatel5113</a></dd></div>
+            <div><dt>LinkedIn</dt><dd><a href="https://www.linkedin.com/in/divyapatel5113" target="_blank" rel="me noopener">linkedin.com/in/divyapatel5113</a></dd></div>
             <div><dt>Based in</dt><dd>Ahmedabad, India (UTC+5:30) <span class="contact__time" data-local-time-long></span></dd></div>
             <div><dt>CV</dt><dd><a href="/assets/cv/Divya-Patel-CV-India.pdf" download="Divya-Patel-CV.pdf">Download CV (PDF)</a></dd></div>
           </dl>
@@ -634,15 +646,18 @@
   <footer class="footer">
     <div class="container">
       <dl class="manifest">
-        <div><dt>Status</dt><dd><span class="status__dot" aria-hidden="true"></span>Open to remote roles</dd></div>
+        <div><dt>Status</dt><dd><span class="status__dot" aria-hidden="true"></span>Open to remote &amp; contract work</dd></div>
         <div><dt>Region</dt><dd>Ahmedabad, India · UTC+5:30</dd></div>
         <div><dt>Stack</dt><dd>HTML, Tailwind CSS, GSAP, Three.js</dd></div>
         <div><dt>Last deploy</dt><dd>November 2026</dd></div>
       </dl>
       <div class="footer__links">
         <a href="mailto:iamdivypatel@gmail.com">Email</a>
-        <a href="https://www.linkedin.com/in/divyapatel5113" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.linkedin.com/in/divyapatel5113" target="_blank" rel="me noopener">LinkedIn</a>
         <a href="/assets/cv/Divya-Patel-CV-India.pdf" download="Divya-Patel-CV.pdf">CV</a>
+        <a href="/blog">Writing</a>
+        <a href="/blog/feed.xml">RSS</a>
+        <a href="/backend-developer-ahmedabad">Backend developer in Ahmedabad</a>
         <a href="/" class="footer__top">Back to top ↑</a>
       </div>
     </div>

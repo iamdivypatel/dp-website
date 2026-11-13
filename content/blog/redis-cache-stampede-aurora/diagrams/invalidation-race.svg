@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" class="diagram" role="img" aria-labelledby="invalidation-race-t invalidation-race-d">
+  <title id="invalidation-race-t">The stale write-back race</title>
+  <desc id="invalidation-race-d">A sequence diagram where a reader loads an old value from Aurora, a writer updates the row and deletes the cache key, and then the reader writes the old value back into Redis.</desc>
+  <defs>
+    <marker id="invalidation-race-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker>
+  </defs>
+
+  <!-- race window band -->
+  <rect class="d-box d-warn" x="24" y="186" width="752" height="186" rx="10"/>
+  <text class="d-sub" x="620" y="356" text-anchor="middle">race window</text>
+
+  <!-- actors -->
+  <rect class="d-box d-accent" x="60" y="24" width="120" height="50" rx="10"/>
+  <text class="d-text" x="120" y="54" text-anchor="middle">Reader</text>
+  <rect class="d-box d-cyan" x="260" y="24" width="120" height="50" rx="10"/>
+  <text class="d-text" x="320" y="54" text-anchor="middle">Redis</text>
+  <rect class="d-box" x="460" y="24" width="120" height="50" rx="10"/>
+  <text class="d-text" x="520" y="54" text-anchor="middle">Aurora</text>
+  <rect class="d-box d-accent" x="660" y="24" width="120" height="50" rx="10"/>
+  <text class="d-text" x="720" y="54" text-anchor="middle">Writer</text>
+
+  <!-- lifelines -->
+  <path class="d-edge d-dashed" d="M120 74V396"/>
+  <path class="d-edge d-dashed" d="M320 74V396"/>
+  <path class="d-edge d-dashed" d="M520 74V396"/>
+  <path class="d-edge d-dashed" d="M720 74V396"/>
+
+  <!-- 1 GET miss -->
+  <path class="d-edge" d="M120 122H318" marker-end="url(#invalidation-race-arrow)"/>
+  <circle class="d-num" cx="160" cy="109" r="9"/><text class="d-num-text" x="160" y="109">1</text>
+  <text class="d-sub" x="175" y="113">GET: miss</text>
+
+  <!-- 2 SELECT v1 -->
+  <path class="d-edge" d="M120 166H518" marker-end="url(#invalidation-race-arrow)"/>
+  <circle class="d-num" cx="160" cy="153" r="9"/><text class="d-num-text" x="160" y="153">2</text>
+  <text class="d-sub" x="175" y="157">SELECT: gets v1</text>
+
+  <!-- 3 UPDATE v2 -->
+  <path class="d-edge d-edge-accent" d="M720 236H522" marker-end="url(#invalidation-race-arrow)"/>
+  <circle class="d-num" cx="562" cy="223" r="9"/><text class="d-num-text" x="562" y="223">3</text>
+  <text class="d-sub" x="577" y="227">UPDATE to v2</text>
+
+  <!-- 4 DEL -->
+  <path class="d-edge d-edge-accent" d="M720 290H322" marker-end="url(#invalidation-race-arrow)"/>
+  <circle class="d-num" cx="562" cy="277" r="9"/><text class="d-num-text" x="562" y="277">4</text>
+  <text class="d-sub" x="577" y="281">DEL key</text>
+
+  <!-- 5 SET stale -->
+  <path class="d-edge d-edge-warn" d="M120 346H318" marker-end="url(#invalidation-race-arrow)"/>
+  <circle class="d-num" cx="160" cy="333" r="9"/><text class="d-num-text" x="160" y="333">5</text>
+  <text class="d-sub" x="175" y="337">SET key = v1</text>
+
+  <!-- outcome -->
+  <rect class="d-box d-warn" x="220" y="420" width="360" height="60" rx="10"/>
+  <text class="d-text" x="400" y="446" text-anchor="middle">Redis has v1, Aurora has v2</text>
+  <text class="d-sub" x="400" y="466" text-anchor="middle">stale until the TTL runs out</text>
+</svg>

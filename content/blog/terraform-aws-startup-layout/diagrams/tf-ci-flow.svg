@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 334" class="diagram" role="img" aria-labelledby="tf-ci-flow-t tf-ci-flow-d">
+  <title id="tf-ci-flow-t">Plan on pull request, apply on merge</title>
+  <desc id="tf-ci-flow-d">A pull request triggers a read-only plan that is posted as a comment and reviewed; merging to main applies staging automatically and applies prod only after an environment approval.</desc>
+  <defs>
+    <marker id="tf-ci-flow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker>
+  </defs>
+
+  <!-- Pull request lane -->
+  <rect x="24" y="24" width="752" height="126" rx="10" class="d-zone"/>
+  <text x="40" y="44" class="d-zone-label d-mono">on: pull_request</text>
+  <rect x="40" y="62" width="156" height="66" rx="10" class="d-box"/>
+  <text x="118" y="90" class="d-text" text-anchor="middle">Pull request</text>
+  <text x="118" y="110" class="d-sub" text-anchor="middle">touches a stack</text>
+  <rect x="228" y="62" width="156" height="66" rx="10" class="d-box d-accent"/>
+  <text x="306" y="90" class="d-text" text-anchor="middle">Plan</text>
+  <text x="306" y="110" class="d-sub" text-anchor="middle">OIDC, read-only</text>
+  <rect x="416" y="62" width="156" height="66" rx="10" class="d-box"/>
+  <text x="494" y="90" class="d-text" text-anchor="middle">Plan comment</text>
+  <text x="494" y="110" class="d-sub" text-anchor="middle">per stack and env</text>
+  <rect x="604" y="62" width="156" height="66" rx="10" class="d-box"/>
+  <text x="682" y="90" class="d-text" text-anchor="middle">Review</text>
+  <text x="682" y="110" class="d-sub" text-anchor="middle">read the diff</text>
+  <line x1="196" y1="95" x2="228" y2="95" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
+  <line x1="384" y1="95" x2="416" y2="95" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
+  <line x1="572" y1="95" x2="604" y2="95" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
+
+  <!-- Hand-off -->
+  <path d="M682 128V175H118V232" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
+
+  <!-- Main lane -->
+  <rect x="24" y="200" width="752" height="110" rx="10" class="d-zone"/>
+  <text x="760" y="220" class="d-zone-label d-mono" text-anchor="end">on: push to main</text>
+  <rect x="40" y="232" width="156" height="66" rx="10" class="d-box"/>
+  <text x="118" y="260" class="d-text" text-anchor="middle">Merge</text>
+  <text x="118" y="280" class="d-sub" text-anchor="middle">into main</text>
+  <rect x="228" y="232" width="156" height="66" rx="10" class="d-box"/>
+  <text x="306" y="260" class="d-text" text-anchor="middle">Apply staging</text>
+  <text x="306" y="280" class="d-sub" text-anchor="middle">automatic</text>
+  <rect x="416" y="232" width="156" height="66" rx="10" class="d-box d-warn"/>
+  <text x="494" y="260" class="d-text" text-anchor="middle">Approval</text>
+  <text x="494" y="280" class="d-sub" text-anchor="middle">prod environment</text>
+  <rect x="604" y="232" width="156" height="66" rx="10" class="d-box d-ok"/>
+  <text x="682" y="260" class="d-text" text-anchor="middle">Apply prod</text>
+  <text x="682" y="280" class="d-sub" text-anchor="middle">OIDC, apply role</text>
+  <line x1="196" y1="265" x2="228" y2="265" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
+  <line x1="384" y1="265" x2="416" y2="265" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
+  <line x1="572" y1="265" x2="604" y2="265" class="d-edge" marker-end="url(#tf-ci-flow-arrow)"/>
+</svg>

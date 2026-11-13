@@ -7,7 +7,7 @@ export const routes = [
   {
     path: '/',
     id: 'top',
-    title: 'Divya Patel – Backend & Cloud Engineer', // must match the <title> in index.html
+    title: 'Divya Patel – Backend & Cloud Engineer in Ahmedabad, India', // must match the <title> in index.html
   },
   {
     path: '/about',
@@ -55,6 +55,6 @@ export const routes = [
     path: '/contact',
     id: 'contact',
     title: 'Contact – Divya Patel, Backend & Cloud Engineer',
-    description: 'Contact Divya Patel, Backend & Cloud Engineer in Ahmedabad, India: email, phone, LinkedIn, a message form and the CV to download.',
+    description: 'Hire or contact Divya Patel, Backend & Cloud Engineer in Ahmedabad, Gujarat, India, for remote, full-time or contract work on AWS, Terraform and backend systems.',
   },
 ];

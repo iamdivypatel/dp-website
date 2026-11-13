@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" class="diagram" role="img" aria-labelledby="oidc-trust-t oidc-trust-d">
+  <title id="oidc-trust-t">GitHub OIDC to AWS trust flow</title>
+  <desc id="oidc-trust-d">The GitHub Actions job gets a signed JWT from GitHub's OIDC service, sends it to AWS STS, which checks the IAM role's trust policy conditions on aud and sub and returns short-lived credentials that the job uses to call the Lambda API.</desc>
+  <defs>
+    <marker id="oidc-trust-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="d-head"/></marker>
+  </defs>
+
+  <!-- Zones -->
+  <rect class="d-zone" x="20" y="20" width="240" height="380" rx="10"/>
+  <text class="d-zone-label" x="36" y="40">GITHUB</text>
+  <rect class="d-zone" x="340" y="20" width="440" height="380" rx="10"/>
+  <text class="d-zone-label" x="356" y="40">AWS ACCOUNT</text>
+
+  <!-- GitHub side -->
+  <rect class="d-box d-accent" x="40" y="60" width="200" height="80" rx="10"/>
+  <text class="d-text" x="140" y="92" text-anchor="middle">Actions job</text>
+  <text class="d-sub" x="140" y="114" text-anchor="middle">id-token: write</text>
+
+  <rect class="d-box" x="40" y="250" width="200" height="70" rx="10"/>
+  <text class="d-text" x="140" y="280" text-anchor="middle">GitHub OIDC</text>
+  <text class="d-sub" x="140" y="300" text-anchor="middle">signs a JWT</text>
+
+  <line class="d-edge" x1="100" y1="140" x2="100" y2="250" marker-end="url(#oidc-trust-arrow)"/>
+  <line class="d-edge d-dashed" x1="180" y1="250" x2="180" y2="140" marker-end="url(#oidc-trust-arrow)"/>
+  <circle class="d-num" cx="82" cy="195" r="10"/><text class="d-num-text" x="82" y="195">1</text>
+  <circle class="d-num" cx="198" cy="195" r="10"/><text class="d-num-text" x="198" y="195">2</text>
+  <text class="d-sub" x="140" y="236" text-anchor="middle">JWT</text>
+
+  <!-- AWS side -->
+  <rect class="d-box" x="360" y="60" width="190" height="80" rx="10"/>
+  <text class="d-text" x="455" y="92" text-anchor="middle">AWS STS</text>
+  <text class="d-sub" x="455" y="114" text-anchor="middle">checks the JWT</text>
+
+  <rect class="d-box" x="590" y="60" width="170" height="80" rx="10"/>
+  <text class="d-text" x="675" y="92" text-anchor="middle">IAM role</text>
+  <text class="d-sub" x="675" y="114" text-anchor="middle">trust policy</text>
+
+  <rect class="d-box d-ok" x="360" y="180" width="190" height="64" rx="10"/>
+  <text class="d-text" x="455" y="208" text-anchor="middle">Lambda API</text>
+  <text class="d-sub" x="455" y="228" text-anchor="middle">update, publish, alias</text>
+
+  <!-- Job to STS and back -->
+  <line class="d-edge d-edge-accent" x1="240" y1="80" x2="360" y2="80" marker-end="url(#oidc-trust-arrow)"/>
+  <text class="d-sub" x="300" y="70" text-anchor="middle">JWT + role</text>
+  <circle class="d-num" cx="300" cy="96" r="10"/><text class="d-num-text" x="300" y="96">3</text>
+  <line class="d-edge d-dashed" x1="360" y1="116" x2="240" y2="116" marker-end="url(#oidc-trust-arrow)"/>
+  <text class="d-sub" x="300" y="134" text-anchor="middle">1-hour creds</text>
+
+  <line class="d-edge" x1="550" y1="100" x2="590" y2="100" marker-end="url(#oidc-trust-arrow)"/>
+
+  <!-- Job to Lambda -->
+  <path class="d-edge d-edge-ok" d="M225 140 V212 H360" marker-end="url(#oidc-trust-arrow)"/>
+  <text class="d-sub" x="300" y="202" text-anchor="middle">deploy</text>
+
+  <!-- Trust condition -->
+  <line class="d-edge d-dashed" x1="675" y1="140" x2="675" y2="280"/>
+  <rect class="d-box d-cyan" x="360" y="280" width="400" height="100" rx="10"/>
+  <text class="d-text" x="560" y="306" text-anchor="middle">Trust condition</text>
+  <text class="d-sub d-mono" x="560" y="330" text-anchor="middle">aud = sts.amazonaws.com</text>
+  <text class="d-sub d-mono" x="560" y="352" text-anchor="middle">sub = repo:my-org/my-repo:</text>
+  <text class="d-sub d-mono" x="560" y="370" text-anchor="middle">environment:production</text>
+</svg>
