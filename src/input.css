@@ -281,7 +281,20 @@
   /* ---- About ---- */
   .about__grid { display: grid; gap: 3.5rem; align-items: center; }
   @media (min-width: 1024px) { .about__grid { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: 6rem; } }
-  .reveal-words { font-weight: 500; font-size: clamp(1.6rem, 3.1vw, 2.9rem); line-height: 1.22; letter-spacing: -0.025em; }
+  .about__title { margin-top: 1rem; }
+  .about__lead { margin-top: 1.75rem; max-width: 40rem; font-size: clamp(1.1rem, 1.5vw, 1.3rem); line-height: 1.6; color: var(--muted); }
+  .about__lead strong { color: var(--text); font-weight: 600; }
+  .about__owns { margin-top: 2.25rem; display: grid; gap: 0.75rem; }
+  @media (min-width: 640px) { .about__owns { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .about__owns li {
+    display: flex; align-items: center; gap: 0.9rem; padding: 0.85rem 1rem; border: 1px solid var(--line); border-radius: 16px;
+    background: radial-gradient(120% 120% at 0% 0%, rgb(77 141 255 / 0.06), transparent 60%), var(--bg-2);
+    transition: border-color 0.3s, transform 0.4s var(--ease-out);
+  }
+  .about__owns li:hover { border-color: rgb(77 141 255 / 0.5); transform: translateY(-2px); }
+  .about__owns img { width: 2.5rem; height: 2.5rem; flex: none; border-radius: 11px; box-shadow: 0 8px 20px -8px rgb(0 0 0 / 0.7); }
+  .about__owns span { display: grid; gap: 0.1rem; font-size: 0.875rem; line-height: 1.35; color: var(--muted); }
+  .about__owns strong { font-size: 0.9875rem; font-weight: 650; color: var(--text); }
   .about__note { margin-top: 2rem; font-family: var(--font-mono); font-size: 0.875rem; color: var(--muted); }
   .portrait { position: relative; max-width: 26rem; justify-self: center; width: 100%; }
   .portrait__frame {
