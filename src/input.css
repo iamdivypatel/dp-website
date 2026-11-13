@@ -487,12 +487,7 @@
 
   /* ---- Footer ---- */
   .footer { position: relative; z-index: 1; background: var(--bg); padding-top: 4rem; overflow: clip; }
-  .manifest { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
-  @media (min-width: 900px) { .manifest { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-  .manifest div { padding: 1rem 1.25rem; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: 0 -1px -1px 0; }
-  .manifest dt { font-family: var(--font-mono); font-size: 0.75rem; color: var(--faint); }
-  .manifest dd { margin-top: 0.3rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9375rem; }
-  .footer__links { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 2rem; font-weight: 600; }
+  .footer__links { display: flex; flex-wrap: wrap; gap: 1.5rem; font-weight: 600; }
   .footer__links a { border-bottom: 1px solid var(--line-2); }
   .footer__links a:hover { border-color: var(--accent-2); color: var(--accent-2); }
   .footer__top { margin-left: auto; }

@@ -161,7 +161,7 @@ mm.add(
     }
 
     // Generic fade-up reveals.
-    const revealables = $$('.stats li, .role, .project, .pattern, .skill-card, .edu__item, .contact__list > div, .form, .manifest > div' + (desktop ? '' : ', .step'));
+    const revealables = $$('.stats li, .role, .project, .pattern, .skill-card, .edu__item, .contact__list > div, .form' + (desktop ? '' : ', .step'));
     if (motion && revealables.length) {
       gsap.set(revealables, { opacity: 0, y: 28 });
       ScrollTrigger.batch(revealables, {
