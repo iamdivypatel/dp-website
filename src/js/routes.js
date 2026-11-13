@@ -31,7 +31,7 @@ export const routes = [
     path: '/projects',
     id: 'projects',
     title: 'Projects – Divya Patel, Backend & Cloud Engineer',
-    description: 'Client projects Divya Patel built at Blisslers Technolabs: Golf Daddy, E4RTH, a New Tab ads extension, GREEN_EV and a real-time fuel monitoring system.',
+    description: 'Client projects Divya Patel built at Blisslers Technolabs: Golf Daddy, E4RTH, a New Tab ads extension, GREEN_EV and a real-time fuel monitoring system, plus freelance work on the TweeFeed Chrome extension.',
   },
   {
     path: '/industries',

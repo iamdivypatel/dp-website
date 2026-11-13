@@ -509,6 +509,7 @@
   .c-adtech  { --c: #a796ff; --c2: #4d8dff; }
   .c-ev      { --c: #cdf06a; --c2: #7ce7ff; }
   .c-fuel    { --c: #ffb457; --c2: #ff7a59; }
+  .c-brand   { --c: #5cc8ff; --c2: #ff8fd0; }
 
   /* A section title on the left, its lead paragraph on the right */
   .split-head { display: grid; gap: 1.5rem; }
@@ -711,6 +712,23 @@
   @keyframes v-bar { to { scale: 1 var(--to); } }
   .v-dash__legend { display: flex; flex-wrap: wrap; gap: 0.4em 1em; margin-top: 1.2cqw; font-family: var(--font-mono); font-size: clamp(0.55rem, 1.35cqw, 0.72rem); color: var(--muted); }
   .v-dash__legend span { display: inline-flex; align-items: center; gap: 0.4em; }
+
+  /* TweeFeed: a feed in the extension window, and the brand settings panel */
+  .v-feed { gap: 1.6cqw; }
+  .v-feed p { display: flex; align-items: center; gap: 1.6cqw; padding: 1.4cqw; border-radius: 1.3cqw; background: #fff; border: 1px solid #e3e0fb; }
+  .v-feed p > i { flex: none; width: 4.2cqw; height: 4.2cqw; border-radius: 50%; background: linear-gradient(135deg, var(--c), var(--c2)); }
+  .v-feed p > span { display: grid; gap: 1cqw; flex: 1; }
+  .v-feed b { display: block; height: 1.1cqw; border-radius: 1cqw; background: #dcd7f6; }
+  .v-feed b + b { width: 65%; background: #ebe8fb; }
+  .v-brand { top: 14%; bottom: auto; width: 28cqw; }
+  .v-brand__swatches { display: flex; gap: 1.2cqw; margin-top: 1.6cqw; }
+  .v-brand__swatches i { width: 4cqw; height: 4cqw; border-radius: 1cqw; background: var(--c); box-shadow: 0 0 0 1px rgb(255 255 255 / 0.15) inset; }
+  .v-brand__swatches i:nth-child(2) { background: var(--c2); }
+  .v-brand__swatches i:nth-child(3) { background: #ffd166; }
+  .v-brand__swatches i:nth-child(4) { background: #f5f4ff; outline: 2px solid var(--c); outline-offset: 2px; }
+  .v-brand__row { display: flex; align-items: center; justify-content: space-between; margin-top: 1.4cqw; font-family: var(--font-mono); font-size: clamp(0.55rem, 1.35cqw, 0.72rem); color: var(--muted); }
+  .v-brand__row b { position: relative; width: 4.6cqw; height: 2.4cqw; border-radius: 2cqw; background: color-mix(in srgb, var(--c) 70%, transparent); }
+  .v-brand__row b::after { content: ""; position: absolute; top: 0.3cqw; right: 0.3cqw; width: 1.8cqw; height: 1.8cqw; border-radius: 50%; background: #fff; }
   .v-dash__legend span::before { content: ""; width: 0.6em; height: 0.6em; border-radius: 50%; background: var(--c); }
   .v-dash__legend span:nth-child(2)::before { background: var(--c2); }
   .v-dash__legend span:nth-child(3)::before { background: #f6f7f9; }
@@ -804,12 +822,6 @@
   .project--link .project__go:focus-visible { outline: none; }
 
   /* The grid's last slot: an invitation, shaped like an illustration */
-  .project-cta {
-    position: relative; align-self: start; aspect-ratio: 16 / 11; display: grid; place-content: center; justify-items: center; gap: 1.25rem;
-    padding: 2rem; text-align: center; border-radius: clamp(20px, 2.4vw, 30px); border: 1px dashed var(--line-2);
-    background: radial-gradient(80% 80% at 50% 0%, rgb(77 141 255 / 0.12), transparent 70%);
-  }
-  .project-cta p { font-family: var(--font-serif); font-style: italic; font-size: clamp(1.6rem, 2.4vw, 2.2rem); line-height: 1.1; max-width: 14ch; }
 
   /* ---- Industries: the six industries and the problems they share ---- */
   .ind-index { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: clamp(2rem, 4vw, 3rem); }
