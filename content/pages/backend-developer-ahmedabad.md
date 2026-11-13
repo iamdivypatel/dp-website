@@ -35,7 +35,7 @@ At Blisslers Technolabs I built backends for client products in different indust
 
 - **Golf Daddy:** a golf training and gaming platform that connects players and coaches. Serverless microservices on AWS.
 - **E4RTH:** a platform that rewards environmental action with carbon certificates.
-- **AdUP:** a Chrome extension that replaces the New Tab page with content and ads, with an admin portal and live analytics.
+- **New Tab Ads Extension:** a Chrome extension that replaces the New Tab page with content and ads, with an admin portal and live analytics.
 - **GREEN_EV:** a CRM for the full life of electric vehicles, with five user roles.
 - **Petrol Pump:** live monitoring of fuel dispensers over MQTT, with dashboards, reports and billing.
 
